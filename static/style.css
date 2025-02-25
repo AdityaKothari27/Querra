@@ -1,0 +1,108 @@
+/* Custom styles for Deep Research */
+
+/* Main container padding */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    padding: 2rem 1rem;
+}
+
+/* Headers */
+h1 {
+    color: #1f1f1f;
+    font-size: 2.5rem !important;
+    margin-bottom: 2rem !important;
+}
+
+h2 {
+    color: #2c2c2c;
+    font-size: 1.8rem !important;
+}
+
+h3 {
+    color: #3c3c3c;
+    font-size: 1.4rem !important;
+}
+
+/* Search results styling */
+.stCheckbox {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.stCheckbox:hover {
+    background-color: #e9ecef;
+}
+
+/* Button styling */
+.stButton > button {
+    width: 100%;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    background-color: #0066cc;
+    color: white;
+}
+
+.stButton > button:hover {
+    background-color: #0052a3;
+}
+
+/* Text area styling */
+.stTextArea > div > div {
+    border-radius: 4px;
+}
+
+/* Report container */
+.element-container div[data-testid="stMarkdownContainer"] {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    margin-top: 1rem;
+}
+
+/* Export section */
+.exportSection {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Knowledge base entries */
+.stExpander {
+    margin-bottom: 0.5rem;
+}
+
+/* Loading spinner */
+.stSpinner {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+/* Alert messages */
+.stAlert {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+/* Download button */
+.stDownloadButton > button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.stDownloadButton > button:hover {
+    background-color: #218838;
+}

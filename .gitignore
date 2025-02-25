@@ -1,0 +1,7 @@
+.env
+__pycache__/
+exports/*
+!exports/.gitkeep
+knowledge_base.db
+ven/
+/node_modules
