@@ -35,30 +35,47 @@ export class GoogleSearch {
       throw new Error("Missing API key or Search Engine ID");
     }
 
-    const params = {
-      key: this.api_key,
-      cx: this.cx,
-      q: query,
-      num: Math.min(maxResults, 10),
-    };
-
-    const dateRestrict = this._get_date_restrict(timeFilter);
-    if (dateRestrict) {
-      Object.assign(params, { dateRestrict });
-    }
-
-    try {
-      const response = await axios.get<GoogleSearchResponse>(this.endpoint, { params });
-      const items = response.data.items || [];
+    // Google API only allows 10 results per request, so we need to make multiple requests
+    const allResults: SearchResult[] = [];
+    const requestsNeeded = Math.ceil(maxResults / 10);
+    
+    for (let i = 0; i < requestsNeeded; i++) {
+      const startIndex = i * 10 + 1; // Google uses 1-based indexing
       
-      return items.map((item) => ({
-        title: item.title || '',
-        url: item.link || '',
-        snippet: item.snippet || ''
-      }));
-    } catch (error) {
-      console.error('Error during search:', error);
-      return [];
+      const params = {
+        key: this.api_key,
+        cx: this.cx,
+        q: query,
+        num: 10, // Max allowed per request
+        start: startIndex,
+      };
+
+      const dateRestrict = this._get_date_restrict(timeFilter);
+      if (dateRestrict) {
+        Object.assign(params, { dateRestrict });
+      }
+
+      try {
+        const response = await axios.get<GoogleSearchResponse>(this.endpoint, { params });
+        const items = response.data.items || [];
+        
+        const results = items.map((item) => ({
+          title: item.title || '',
+          url: item.link || '',
+          snippet: item.snippet || ''
+        }));
+        
+        allResults.push(...results);
+        
+        // If we got fewer results than requested, there are no more results
+        if (items.length < 10) break;
+        
+      } catch (error) {
+        console.error('Error during search:', error);
+        break;
+      }
     }
+
+    return allResults.slice(0, maxResults);
   }
 } 
