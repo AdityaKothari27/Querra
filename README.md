@@ -171,9 +171,13 @@ The application allows users to:
 deep_research/
 
 ├── public/ # Static files
+
 ├── src/
+
 │ ├── components/ # React components
+
 │ │ ├── Layout.tsx # Main layout component
+
 │ │ ├── SearchSection.tsx # Search interface
 │ │ └── ReportSection.tsx # Report generation interface
 │ ├── lib/
