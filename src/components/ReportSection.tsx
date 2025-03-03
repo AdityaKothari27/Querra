@@ -57,37 +57,82 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
           doc.setFontSize(12);
           doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 40, { align: 'center' });
           
-          // Add content with proper formatting
-          doc.setFontSize(12);
+          // Add content with proper markdown formatting
           const pageWidth = doc.internal.pageSize.width;
           const margin = 20;
           const maxWidth = pageWidth - (margin * 2);
           
-          // Split content into paragraphs
-          const paragraphs = report.split('\n\n');
+          // Process markdown content for PDF
+          const pdfParagraphs = report.split('\n');
           let yPosition = 60;
           
-          paragraphs.forEach((paragraph) => {
+          pdfParagraphs.forEach((paragraph) => {
+            if (!paragraph.trim()) {
+              yPosition += 5;
+              return;
+            }
+            
             if (yPosition > 270) { // Check if near page bottom
               doc.addPage();
               yPosition = 20;
             }
             
-            const lines = doc.splitTextToSize(paragraph, maxWidth);
-            doc.text(lines, margin, yPosition);
-            yPosition += (lines.length * 7) + 5; // Add spacing between paragraphs
+            // Handle different markdown elements
+            if (paragraph.startsWith('# ')) {
+              doc.setFontSize(16);
+              doc.setFont("helvetica", "bold");
+              const text = paragraph.replace(/^# /, '');
+              const lines = doc.splitTextToSize(text, maxWidth);
+              doc.text(lines, margin, yPosition);
+              yPosition += (lines.length * 8) + 8;
+            } else if (paragraph.startsWith('## ')) {
+              doc.setFontSize(14);
+              doc.setFont("helvetica", "bold");
+              const text = paragraph.replace(/^## /, '');
+              const lines = doc.splitTextToSize(text, maxWidth);
+              doc.text(lines, margin, yPosition);
+              yPosition += (lines.length * 7) + 7;
+            } else if (paragraph.startsWith('### ')) {
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "bold");
+              const text = paragraph.replace(/^### /, '');
+              const lines = doc.splitTextToSize(text, maxWidth);
+              doc.text(lines, margin, yPosition);
+              yPosition += (lines.length * 6) + 6;
+            } else if (paragraph.startsWith('- ') || paragraph.startsWith('* ')) {
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "normal");
+              const text = paragraph.replace(/^[-*] /, '• ');
+              const lines = doc.splitTextToSize(text, maxWidth - 10);
+              doc.text(lines, margin + 5, yPosition);
+              yPosition += (lines.length * 6) + 4;
+            } else if (/^\d+\.\s/.test(paragraph)) {
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "normal");
+              const lines = doc.splitTextToSize(paragraph, maxWidth - 5);
+              doc.text(lines, margin, yPosition);
+              yPosition += (lines.length * 6) + 4;
+            } else {
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "normal");
+              const lines = doc.splitTextToSize(paragraph, maxWidth);
+              doc.text(lines, margin, yPosition);
+              yPosition += (lines.length * 6) + 4;
+            }
           });
           
           // Add sources on new page
           doc.addPage();
           doc.setFontSize(14);
+          doc.setFont("helvetica", "bold");
           doc.text('Sources:', margin, 20);
           
           let sourceY = 30;
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
           selectedSources.forEach((source, index) => {
             const sourceText = `${index + 1}. ${source}`;
             const sourceLines = doc.splitTextToSize(sourceText, maxWidth);
-            doc.setFontSize(10);
             doc.text(sourceLines, margin, sourceY);
             sourceY += (sourceLines.length * 5) + 5;
           });
