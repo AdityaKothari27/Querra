@@ -169,34 +169,29 @@ The application allows users to:
 ## Project Structure 
 
 deep_research/
-
-├── public/ # Static files
-
+├── public/                   # Static files
 ├── src/
-
-│ ├── components/ # React components
-
-│ │ ├── Layout.tsx # Main layout component
-
-│ │ ├── SearchSection.tsx # Search interface
-│ │ └── ReportSection.tsx # Report generation interface
-│ ├── lib/
-│ │ └── api.ts # API client functions
-│ ├── pages/
-│ │ ├── api/ # API routes
-│ │ │ ├── generate.ts # Report generation endpoint
-│ │ │ ├── search.ts # Search endpoint
-│ │ │ └── reports.ts # Knowledge base endpoint
-│ │ ├── index.tsx # Home page  
-│ │ └── knowledge-base.tsx # Knowledge base page
-│ ├── utils/
-│ │ ├── ai_processor.ts # AI integration
-│ │ ├── database.ts # Data storage
-│ │ ├── extractor.ts # Content extraction
-│ │ └── search.ts # Search functionality
-│ └── types.ts # TypeScript type definitions
-├── .env.local # Environment variables
-├── next.config.js # Next.js configuration
-├── package.json # Project dependencies
-├── tsconfig.json # TypeScript configuration
-└── README.md # Project documentation
+│   ├── components/           # React components
+│   │   ├── Layout.tsx        # Main layout component
+│   │   ├── SearchSection.tsx # Search interface
+│   │   └── ReportSection.tsx # Report generation interface
+│   ├── lib/
+│   │   └── api.ts            # API client functions
+│   ├── pages/
+│   │   ├── api/              # API routes
+│   │   │   ├── generate.ts   # Report generation endpoint
+│   │   │   ├── search.ts     # Search endpoint
+│   │   │   └── reports.ts    # Knowledge base endpoint
+│   │   ├── index.tsx         # Home page  
+│   │   └── knowledge-base.tsx # Knowledge base page
+│   ├── utils/
+│   │   ├── ai_processor.ts   # AI integration
+│   │   ├── database.ts       # Data storage
+│   │   ├── extractor.ts      # Content extraction
+│   │   └── search.ts         # Search functionality
+│   └── types.ts              # TypeScript type definitions
+├── .env.local                # Environment variables
+├── next.config.js            # Next.js configuration
+├── package.json              # Project dependencies
+├── tsconfig.json             # TypeScript configuration
+└── README.md                 # Project documentation
