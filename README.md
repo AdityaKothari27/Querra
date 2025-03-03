@@ -169,6 +169,7 @@ The application allows users to:
 ## Project Structure 
 
 deep_research/
+
 ├── public/ # Static files
 ├── src/
 │ ├── components/ # React components
