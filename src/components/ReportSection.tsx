@@ -11,7 +11,7 @@ interface ReportSectionProps {
 
 const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery }) => {
   const [promptTemplate, setPromptTemplate] = useState(
-    'Generate a comprehensive report based on the following sources. Include key findings, analysis, and recommendations.'
+    'Generate a detailed and comprehensive report with proper alignment and styling based on the following sources. Include key findings, analysis, and recommendations.'
   );
   const [report, setReport] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
