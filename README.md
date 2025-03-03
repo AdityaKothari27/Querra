@@ -167,7 +167,7 @@ The application allows users to:
 3. Copy your API key
 
 ## Project Structure 
-
+///
 deep_research/
 ├── public/                   # Static files
 ├── src/
@@ -195,3 +195,4 @@ deep_research/
 ├── package.json              # Project dependencies
 ├── tsconfig.json             # TypeScript configuration
 └── README.md                 # Project documentation
+///
