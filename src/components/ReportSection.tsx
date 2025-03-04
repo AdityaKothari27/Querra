@@ -137,7 +137,7 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
             sourceY += (sourceLines.length * 5) + 5;
           });
           
-          doc.save('research_report.pdf');
+          doc.save('Research_Report.pdf');
           break;
 
         case 'docx':
