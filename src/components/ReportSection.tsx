@@ -1,8 +1,11 @@
 import { FC, useState } from 'react';
 import { generateReport } from '../lib/api';
 import { jsPDF } from 'jspdf';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 interface ReportSectionProps {
   selectedSources: string[];
@@ -11,7 +14,7 @@ interface ReportSectionProps {
 
 const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery }) => {
   const [promptTemplate, setPromptTemplate] = useState(
-    'Generate a detailed and comprehensive report with proper alignment and styling based on the following sources. Include key findings, analysis, and recommendations.'
+    'Generate a comprehensive report based on the following sources. Format your response using Markdown with proper headings (##), bullet points, numbered lists, and emphasis where appropriate. Include key findings, analysis, and recommendations.'
   );
   const [report, setReport] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -57,87 +60,42 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
           doc.setFontSize(12);
           doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 40, { align: 'center' });
           
-          // Add content with proper markdown formatting
+          // Add content with proper formatting
+          doc.setFontSize(12);
           const pageWidth = doc.internal.pageSize.width;
           const margin = 20;
           const maxWidth = pageWidth - (margin * 2);
           
-          // Process markdown content for PDF
-          const pdfParagraphs = report.split('\n');
+          // Split content into paragraphs
+          const paragraphs = report.split('\n\n');
           let yPosition = 60;
           
-          pdfParagraphs.forEach((paragraph) => {
-            if (!paragraph.trim()) {
-              yPosition += 5;
-              return;
-            }
-            
+          paragraphs.forEach((paragraph) => {
             if (yPosition > 270) { // Check if near page bottom
               doc.addPage();
               yPosition = 20;
             }
             
-            // Handle different markdown elements
-            if (paragraph.startsWith('# ')) {
-              doc.setFontSize(16);
-              doc.setFont("helvetica", "bold");
-              const text = paragraph.replace(/^# /, '');
-              const lines = doc.splitTextToSize(text, maxWidth);
-              doc.text(lines, margin, yPosition);
-              yPosition += (lines.length * 8) + 8;
-            } else if (paragraph.startsWith('## ')) {
-              doc.setFontSize(14);
-              doc.setFont("helvetica", "bold");
-              const text = paragraph.replace(/^## /, '');
-              const lines = doc.splitTextToSize(text, maxWidth);
-              doc.text(lines, margin, yPosition);
-              yPosition += (lines.length * 7) + 7;
-            } else if (paragraph.startsWith('### ')) {
-              doc.setFontSize(12);
-              doc.setFont("helvetica", "bold");
-              const text = paragraph.replace(/^### /, '');
-              const lines = doc.splitTextToSize(text, maxWidth);
-              doc.text(lines, margin, yPosition);
-              yPosition += (lines.length * 6) + 6;
-            } else if (paragraph.startsWith('- ') || paragraph.startsWith('* ')) {
-              doc.setFontSize(12);
-              doc.setFont("helvetica", "normal");
-              const text = paragraph.replace(/^[-*] /, '• ');
-              const lines = doc.splitTextToSize(text, maxWidth - 10);
-              doc.text(lines, margin + 5, yPosition);
-              yPosition += (lines.length * 6) + 4;
-            } else if (/^\d+\.\s/.test(paragraph)) {
-              doc.setFontSize(12);
-              doc.setFont("helvetica", "normal");
-              const lines = doc.splitTextToSize(paragraph, maxWidth - 5);
-              doc.text(lines, margin, yPosition);
-              yPosition += (lines.length * 6) + 4;
-            } else {
-              doc.setFontSize(12);
-              doc.setFont("helvetica", "normal");
-              const lines = doc.splitTextToSize(paragraph, maxWidth);
-              doc.text(lines, margin, yPosition);
-              yPosition += (lines.length * 6) + 4;
-            }
+            const lines = doc.splitTextToSize(paragraph, maxWidth);
+            doc.text(lines, margin, yPosition);
+            yPosition += (lines.length * 7) + 5; // Add spacing between paragraphs
           });
           
           // Add sources on new page
           doc.addPage();
           doc.setFontSize(14);
-          doc.setFont("helvetica", "bold");
           doc.text('Sources:', margin, 20);
           
           let sourceY = 30;
-          doc.setFontSize(10);
-          doc.setFont("helvetica", "normal");
           selectedSources.forEach((source, index) => {
             const sourceText = `${index + 1}. ${source}`;
             const sourceLines = doc.splitTextToSize(sourceText, maxWidth);
+            doc.setFontSize(10);
             doc.text(sourceLines, margin, sourceY);
             sourceY += (sourceLines.length * 5) + 5;
           });
           
-          doc.save(`${searchQuery}_Report.pdf`);
+          doc.save('research_report.pdf');
           break;
 
         case 'docx':
@@ -230,18 +188,18 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">Report Generation</h2>
       
-      <div className="mb-6">
+      <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Custom Prompt Template
+          Prompt Template
         </label>
         <textarea
           value={promptTemplate}
           onChange={(e) => setPromptTemplate(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          rows={4}
+          rows={3}
         />
       </div>
-
+      
       <button
         onClick={handleGenerateReport}
         disabled={isGenerating || selectedSources.length === 0}
@@ -274,8 +232,24 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
             </div>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4 prose max-w-none">
-            {report}
+          <div className="bg-gray-50 rounded-lg p-6 prose prose-headings:font-bold prose-headings:text-gray-900 prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-700 prose-p:my-4 prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]} 
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-xl font-bold my-3" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-lg font-bold my-2" {...props} />,
+                p: ({node, ...props}) => <p className="my-2" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc pl-5 my-2" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-2" {...props} />,
+                li: ({node, ...props}) => <li className="ml-2 my-1" {...props} />,
+                strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                em: ({node, ...props}) => <em className="italic" {...props} />
+              }}
+            >
+              {report}
+            </ReactMarkdown>
           </div>
         </div>
       )}
