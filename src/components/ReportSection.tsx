@@ -96,7 +96,7 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
             sourceY += (sourceLines.length * 5) + 5;
           });
           
-          doc.save(`${searchQuery}_Report.pdf`);
+          doc.save('research_report.pdf');
           break;
 
         case 'docx':
@@ -157,7 +157,7 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
           
           // Generate and save DOCX
           const buffer = await Packer.toBlob(doc2);
-          saveAs(buffer, `${searchQuery}_Report.docx`);
+          saveAs(buffer, 'research_report.docx');
           break;
 
         case 'txt':
@@ -174,7 +174,7 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
           ].join('\n\n');
           
           const textBlob = new Blob([textContent], { type: 'text/plain' });
-          saveAs(textBlob, `${searchQuery}_Report.txt`);
+          saveAs(textBlob, 'research_report.txt');
           break;
       }
     } catch (error) {
@@ -186,20 +186,20 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
+    <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
         <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-indigo-400" />
         Report Generation
       </h2>
       
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Prompt Template
         </label>
         <textarea
           value={promptTemplate}
           onChange={(e) => setPromptTemplate(e.target.value)}
-          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-slate-400 transition-all duration-300"
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
           rows={3}
         />
       </div>
@@ -233,7 +233,7 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
               <select
                 value={exportFormat}
                 onChange={(e) => setExportFormat(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white text-sm"
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white text-sm"
               >
                 <option>PDF</option>
                 <option>DOCX</option>
@@ -254,7 +254,7 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
             </div>
           </div>
           
-          <div className="bg-gray-50 dark:bg-slate-700/30 border border-gray-200 dark:border-slate-600 rounded-lg p-6 prose dark:prose-invert max-w-none">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 prose dark:prose-invert max-w-none">
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]} 
               rehypePlugins={[rehypeRaw]}
@@ -262,9 +262,9 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
                 h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4 text-gray-900 dark:text-white" {...props} />,
                 h2: ({node, ...props}) => <h2 className="text-xl font-bold my-3 text-gray-900 dark:text-white" {...props} />,
                 h3: ({node, ...props}) => <h3 className="text-lg font-bold my-2 text-gray-900 dark:text-white" {...props} />,
-                p: ({node, ...props}) => <p className="my-2 text-gray-700 dark:text-slate-300" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-disc pl-5 my-2 text-gray-700 dark:text-slate-300" {...props} />,
-                ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-2 text-gray-700 dark:text-slate-300" {...props} />,
+                p: ({node, ...props}) => <p className="my-2 text-gray-700 dark:text-gray-300" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc pl-5 my-2 text-gray-700 dark:text-gray-300" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-2 text-gray-700 dark:text-gray-300" {...props} />,
                 li: ({node, ...props}) => <li className="ml-2 my-1" {...props} />,
                 strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-indigo-300" {...props} />,
                 em: ({node, ...props}) => <em className="italic text-gray-800 dark:text-purple-300" {...props} />,
