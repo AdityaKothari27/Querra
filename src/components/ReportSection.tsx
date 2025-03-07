@@ -207,12 +207,16 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
       <button
         onClick={handleGenerateReport}
         disabled={isGenerating || selectedSources.length === 0}
-        className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-600 dark:to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 dark:hover:from-indigo-500 dark:hover:to-purple-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-indigo-500/20 flex items-center justify-center"
+        className={`w-full py-3 relative overflow-hidden rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-indigo-500/20 flex items-center justify-center
+          ${isGenerating 
+            ? 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-600 dark:to-purple-600 text-white/80' 
+            : 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-600 dark:to-purple-600 text-white hover:from-blue-500 hover:to-purple-500 dark:hover:from-indigo-500 dark:hover:to-purple-500'
+          }`}
       >
         {isGenerating ? (
           <>
-            <div className="animate-spin h-5 w-5 border-t-2 border-white border-r-2 border-white rounded-full mr-2"></div>
-            Generating Report...
+            <div className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+            <span className="relative z-10">Generating Report...</span>
           </>
         ) : (
           <>
