@@ -1,31 +1,93 @@
-import { FC, ReactNode, useState } from 'react';
-import Sidebar from './Sidebar';
-import { MagnifyingGlassIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { FC, ReactNode, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { BeakerIcon, BookOpenIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-export const navigationItems = [
-  { name: 'Search & Generate', icon: MagnifyingGlassIcon, path: '/' },
-  { name: 'Knowledge Base', icon: BookOpenIcon, path: '/knowledge-base' }
-];
-
 const Layout: FC<LayoutProps> = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    // Check for saved theme preference or use system preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setDarkMode(savedTheme === 'dark');
+    } else {
+      setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Update document class when theme changes
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Save preference to localStorage
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+  };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        navigationItems={navigationItems}
-      />
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto px-6 py-8">
-          {children}
+    <div className="min-h-screen bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 text-gray-800 dark:text-white transition-colors duration-300">
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-white/70 dark:bg-slate-900/70 border-b border-gray-200 dark:border-slate-700 transition-colors duration-300">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center space-x-2 group">
+            <BeakerIcon className="h-8 w-8 text-blue-600 dark:text-indigo-400 group-hover:text-blue-500 dark:group-hover:text-indigo-300 transition-colors duration-300" />
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+              Deep Research
+            </span>
+          </Link>
+          <div className="flex items-center space-x-6">
+            <button 
+              onClick={toggleTheme}
+              className="p-2 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors duration-300"
+              aria-label="Toggle theme"
+            >
+              {darkMode ? (
+                <SunIcon className="h-5 w-5" />
+              ) : (
+                <MoonIcon className="h-5 w-5" />
+              )}
+            </button>
+            <nav>
+              <ul className="flex space-x-6">
+                <li>
+                  <Link 
+                    href="/" 
+                    className="text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center"
+                  >
+                    Research
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/knowledge-base" 
+                    className="text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center space-x-1"
+                  >
+                    <BookOpenIcon className="h-5 w-5" />
+                    <span>Knowledge Base</span>
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
+      </header>
+      <main className="container mx-auto px-4 py-8">
+        {children}
       </main>
+      <footer className="bg-gray-100 dark:bg-slate-900/70 border-t border-gray-200 dark:border-slate-700 py-6 transition-colors duration-300">
+        <div className="container mx-auto px-4 text-center text-gray-600 dark:text-slate-400">
+          <p>© {new Date().getFullYear()} Deep Research. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };
