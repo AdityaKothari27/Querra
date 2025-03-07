@@ -46,7 +46,7 @@ const SearchSection: FC<SearchSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
+    <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
         <MagnifyingGlassIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-indigo-400" />
         Research Topic
@@ -60,7 +60,7 @@ const SearchSection: FC<SearchSectionProps> = ({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Enter your research topic..."
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-slate-400 transition-all duration-300"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
             />
             {isLoading && (
               <div className="absolute right-3 top-3">
@@ -72,7 +72,7 @@ const SearchSection: FC<SearchSectionProps> = ({
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className="md:w-auto px-4 py-3 bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors flex items-center justify-center"
+            className="md:w-auto px-4 py-3 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
           >
             <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
             Filters
@@ -88,33 +88,35 @@ const SearchSection: FC<SearchSectionProps> = ({
         </div>
         
         {showFilters && (
-          <div className="mt-4 p-4 bg-gray-100 dark:bg-slate-700/30 rounded-lg border border-gray-200 dark:border-slate-600 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
+          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                Max Results
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Max Results: {maxResults}
               </label>
-              <select
-                value={maxResults}
-                onChange={(e) => setMaxResults(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
-              >
-                {[5, 10, 15, 20].map((num) => (
-                  <option key={num} value={num}>
-                    {num} results
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 dark:text-gray-400">1</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={maxResults}
+                  onChange={(e) => setMaxResults(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-300 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-indigo-500"
+                />
+                <span className="text-xs text-gray-600 dark:text-gray-400">20</span>
+              </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <ClockIcon className="h-4 w-4 inline mr-1" />
                 Time Filter
               </label>
               <select
                 value={timeFilter}
                 onChange={(e) => setTimeFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
+                className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
               >
                 {['Any', 'Past 24 hours', 'Past week', 'Past month', 'Past year'].map((filter) => (
                   <option key={filter} value={filter}>
@@ -137,9 +139,9 @@ const SearchSection: FC<SearchSectionProps> = ({
                 id="select-all"
                 checked={selectedResults.length === searchResults.length}
                 onChange={(e) => handleSelectAll(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-slate-700"
+                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-gray-700"
               />
-              <label htmlFor="select-all" className="ml-2 text-sm text-gray-700 dark:text-slate-300">
+              <label htmlFor="select-all" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                 Select All
               </label>
             </div>
@@ -149,18 +151,18 @@ const SearchSection: FC<SearchSectionProps> = ({
             {searchResults.map((result) => (
               <div 
                 key={result.url} 
-                className="bg-gray-50 dark:bg-slate-700/40 border border-gray-200 dark:border-slate-600 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-slate-700/60 transition-colors duration-300"
+                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors duration-300"
               >
                 <div className="flex items-start">
                   <input
                     type="checkbox"
                     checked={selectedResults.includes(result.url)}
                     onChange={(e) => handleResultSelect(result.url, e.target.checked)}
-                    className="h-4 w-4 mt-1 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-slate-700"
+                    className="h-4 w-4 mt-1 rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-gray-700"
                   />
                   <div className="ml-3 flex-1">
                     <h4 className="text-md font-medium text-gray-900 dark:text-white">{result.title}</h4>
-                    <p className="text-sm text-gray-700 dark:text-slate-300 mt-1">{result.snippet}</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{result.snippet}</p>
                     <a 
                       href={result.url} 
                       target="_blank" 
