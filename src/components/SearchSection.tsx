@@ -1,12 +1,13 @@
-import { FC, useState } from 'react';
-import { SearchResult, SearchConfig } from '../types';
-import { MagnifyingGlassIcon, ClockIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { FC, useState, useEffect } from 'react';
+import { SearchResult, SearchConfig, CategoryConfig } from '../types/index';
+import { MagnifyingGlassIcon, ClockIcon, AdjustmentsHorizontalIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 interface SearchSectionProps {
   onSearch: (query: string, config: SearchConfig) => Promise<void>;
   onSourceSelect: (sources: string[]) => void;
   searchResults: SearchResult[];
   isLoading: boolean;
+  categoryConfig: CategoryConfig;
 }
 
 const SearchSection: FC<SearchSectionProps> = ({
@@ -14,12 +15,19 @@ const SearchSection: FC<SearchSectionProps> = ({
   onSourceSelect,
   searchResults,
   isLoading,
+  categoryConfig,
 }) => {
   const [query, setQuery] = useState('');
   const [maxResults, setMaxResults] = useState(10);
   const [timeFilter, setTimeFilter] = useState('Any');
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [showTip, setShowTip] = useState(true);
+
+  // Reset selected results when category changes
+  useEffect(() => {
+    setSelectedResults([]);
+  }, [categoryConfig]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +57,25 @@ const SearchSection: FC<SearchSectionProps> = ({
     <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
         <MagnifyingGlassIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-indigo-400" />
-        Research Topic
+        {categoryConfig.name}
       </h2>
+      
+      {categoryConfig.searchInstructions && showTip && (
+        <div className={`mb-4 p-3 rounded-lg flex items-start border ${
+          `bg-${categoryConfig.color}-50 border-${categoryConfig.color}-200 text-${categoryConfig.color}-700 dark:bg-${categoryConfig.color}-900/20 dark:border-${categoryConfig.color}-800 dark:text-${categoryConfig.color}-300`
+        }`}>
+          <InformationCircleIcon className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm">{categoryConfig.searchInstructions}</p>
+          </div>
+          <button 
+            onClick={() => setShowTip(false)}
+            className="text-sm ml-2 opacity-70 hover:opacity-100"
+          >
+            ×
+          </button>
+        </div>
+      )}
       
       <form onSubmit={handleSearch} className="mb-6">
         <div className="flex flex-col md:flex-row gap-4">
@@ -59,7 +84,7 @@ const SearchSection: FC<SearchSectionProps> = ({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter your research topic..."
+              placeholder={`Enter your ${categoryConfig.name.toLowerCase()} topic...`}
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
             />
             {isLoading && (
@@ -80,31 +105,34 @@ const SearchSection: FC<SearchSectionProps> = ({
           
           <button
             type="submit"
-            disabled={isLoading || !query.trim()}
-            className="md:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-600 dark:to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 dark:hover:from-indigo-500 dark:hover:to-purple-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-indigo-500/20"
+            disabled={!query.trim() || isLoading}
+            className={`md:w-auto px-6 py-3 bg-${categoryConfig.color}-600 text-white rounded-lg hover:bg-${categoryConfig.color}-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
           >
-            {isLoading ? 'Searching...' : 'Search'}
+            <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
+            Search
           </button>
         </div>
         
         {showFilters && (
-          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 animate-fadeIn">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Max Results: {maxResults}
+                Max Results
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center space-x-2">
                 <span className="text-xs text-gray-600 dark:text-gray-400">1</span>
                 <input
                   type="range"
                   min="1"
                   max="20"
-                  step="1"
                   value={maxResults}
                   onChange={(e) => setMaxResults(Number(e.target.value))}
                   className="w-full h-2 bg-gray-300 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-indigo-500"
                 />
                 <span className="text-xs text-gray-600 dark:text-gray-400">20</span>
+              </div>
+              <div className="text-center text-sm text-gray-700 dark:text-gray-300 mt-1">
+                {maxResults} results
               </div>
             </div>
             

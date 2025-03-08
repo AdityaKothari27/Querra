@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { getReports, searchReports, deleteReport } from '../lib/api';
-import { Report } from '../types';
+import { Report } from '../types/index';
 
 const KnowledgeBasePage: FC = () => {
   const [reports, setReports] = useState<Report[]>([]);

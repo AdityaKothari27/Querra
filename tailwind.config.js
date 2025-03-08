@@ -13,12 +13,13 @@ module.exports = {
         },
       },
       animation: {
-        shimmer: 'shimmer 2s infinite linear',
+        'shimmer': 'shimmer 2.5s infinite',
+        'shimmer-fast': 'shimmer 1.5s infinite linear',
       },
       keyframes: {
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(200%)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
       typography: (theme) => ({
@@ -69,6 +70,9 @@ module.exports = {
           },
         },
       }),
+      backdropBlur: {
+        xs: '2px',
+      },
     },
   },
   plugins: [

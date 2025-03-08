@@ -8,6 +8,7 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     // Check for saved theme preference or use system preference
@@ -17,6 +18,14 @@ const Layout: FC<LayoutProps> = ({ children }) => {
     } else {
       setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
+
+    // Add scroll listener
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -36,7 +45,11 @@ const Layout: FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-white transition-colors duration-300">
-      <header className="sticky top-0 z-10 backdrop-blur-md bg-white/70 dark:bg-black/70 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+      <header className={`sticky top-0 z-10 transition-all duration-300 ${
+        scrolled 
+          ? 'backdrop-blur-xl bg-white/80 dark:bg-black/80 shadow-md' 
+          : 'backdrop-blur-md bg-white/60 dark:bg-black/60'
+      } border-b border-gray-200 dark:border-gray-800`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2 group">
             <BeakerIcon className="h-8 w-8 text-blue-600 dark:text-indigo-400 group-hover:text-blue-500 dark:group-hover:text-indigo-300 transition-colors duration-300" />
@@ -47,7 +60,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center space-x-6">
             <button 
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
+              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm"
               aria-label="Toggle theme"
             >
               {darkMode ? (
@@ -85,7 +98,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       </main>
       <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>© {new Date().getFullYear()} Deep Research. Made with Vibe Coding.</p>
+          <p>© {new Date().getFullYear()} Deep Research. All rights reserved.</p>
         </div>
       </footer>
     </div>

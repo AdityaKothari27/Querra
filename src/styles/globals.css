@@ -12,7 +12,11 @@
   }
   
   .animate-shimmer {
-    animation: shimmer 2s infinite linear;
+    animation: shimmer 2.5s infinite;
+  }
+  
+  .animate-shimmer-fast {
+    animation: shimmer 1.5s infinite linear;
   }
 }
 
@@ -41,7 +45,7 @@
     transform: translateX(-100%);
   }
   100% {
-    transform: translateX(200%);
+    transform: translateX(100%);
   }
 }
 
