@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { generateReport } from '../lib/api';
 import { jsPDF } from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
@@ -7,20 +7,29 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { DocumentTextIcon, ArrowDownTrayIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { CategoryConfig } from '../types/index';
 
 interface ReportSectionProps {
   selectedSources: string[];
   searchQuery: string;
+  categoryConfig: CategoryConfig;
 }
 
-const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery }) => {
-  const [promptTemplate, setPromptTemplate] = useState(
-    'Generate a comprehensive report based on the following sources. Format your response using Markdown with proper headings (##), bullet points, numbered lists, and emphasis where appropriate. Include key findings, analysis, and recommendations.'
-  );
+const ReportSection: FC<ReportSectionProps> = ({ 
+  selectedSources, 
+  searchQuery,
+  categoryConfig 
+}) => {
+  const [promptTemplate, setPromptTemplate] = useState('');
   const [report, setReport] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
+
+  // Update prompt template when category changes
+  useEffect(() => {
+    setPromptTemplate(categoryConfig.defaultPrompt || '');
+  }, [categoryConfig]);
 
   const handleGenerateReport = async () => {
     if (selectedSources.length === 0) {
@@ -185,43 +194,41 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
     }
   };
 
+  const getButtonColorClass = () => {
+    return `bg-${categoryConfig.color}-600 hover:bg-${categoryConfig.color}-500`;
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-        <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-indigo-400" />
-        Report Generation
-      </h2>
+    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300">
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Generate Report</h2>
       
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="prompt-template" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Prompt Template
         </label>
         <textarea
+          id="prompt-template"
           value={promptTemplate}
           onChange={(e) => setPromptTemplate(e.target.value)}
-          className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
-          rows={3}
+          className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
+          rows={4}
         />
       </div>
       
       <button
         onClick={handleGenerateReport}
         disabled={isGenerating || selectedSources.length === 0}
-        className={`w-full py-3 relative overflow-hidden rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-indigo-500/20 flex items-center justify-center
-          ${isGenerating 
-            ? 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-600 dark:to-purple-600 text-white/80' 
-            : 'bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-600 dark:to-purple-600 text-white hover:from-blue-500 hover:to-purple-500 dark:hover:from-indigo-500 dark:hover:to-purple-500'
-          }`}
+        className={`w-full py-3 relative overflow-hidden rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center ${getButtonColorClass()}`}
       >
         {isGenerating ? (
-          <>
-            <div className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-            <span className="relative z-10">Generating Report...</span>
-          </>
+          <div className="relative overflow-hidden">
+            <span className="text-white font-medium">Generating Report...</span>
+            <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
+          </div>
         ) : (
           <>
-            <SparklesIcon className="h-5 w-5 mr-2" />
-            Generate Report
+            <SparklesIcon className="h-5 w-5 mr-2 text-white" />
+            <span className="text-white">Generate Report</span>
           </>
         )}
       </button>
@@ -229,15 +236,12 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
       {report && (
         <div className="mt-8 animate-fadeIn">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium text-gray-800 dark:text-white flex items-center">
-              <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-indigo-400" />
-              Generated Report
-            </h3>
+            <h3 className="text-lg font-medium text-gray-800">Generated Report</h3>
             <div className="flex gap-2">
               <select
                 value={exportFormat}
                 onChange={(e) => setExportFormat(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white text-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg"
               >
                 <option>PDF</option>
                 <option>DOCX</option>
@@ -246,13 +250,8 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
               <button
                 onClick={handleExport}
                 disabled={isExporting}
-                className="px-4 py-2 bg-blue-600 dark:bg-indigo-600 text-white rounded-lg hover:bg-blue-500 dark:hover:bg-indigo-500 transition-colors disabled:opacity-50 flex items-center"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {isExporting ? (
-                  <div className="animate-spin h-4 w-4 border-t-2 border-white border-r-2 border-white rounded-full mr-2"></div>
-                ) : (
-                  <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
-                )}
                 {isExporting ? 'Exporting...' : 'Export'}
               </button>
             </div>
@@ -262,18 +261,6 @@ const ReportSection: FC<ReportSectionProps> = ({ selectedSources, searchQuery })
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]} 
               rehypePlugins={[rehypeRaw]}
-              components={{
-                h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-4 text-gray-900 dark:text-white" {...props} />,
-                h2: ({node, ...props}) => <h2 className="text-xl font-bold my-3 text-gray-900 dark:text-white" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-lg font-bold my-2 text-gray-900 dark:text-white" {...props} />,
-                p: ({node, ...props}) => <p className="my-2 text-gray-700 dark:text-gray-300" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-disc pl-5 my-2 text-gray-700 dark:text-gray-300" {...props} />,
-                ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-2 text-gray-700 dark:text-gray-300" {...props} />,
-                li: ({node, ...props}) => <li className="ml-2 my-1" {...props} />,
-                strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-indigo-300" {...props} />,
-                em: ({node, ...props}) => <em className="italic text-gray-800 dark:text-purple-300" {...props} />,
-                a: ({node, ...props}) => <a className="text-blue-600 dark:text-indigo-400 hover:text-blue-500 dark:hover:text-indigo-300 transition-colors" {...props} />
-              }}
             >
               {report}
             </ReactMarkdown>
