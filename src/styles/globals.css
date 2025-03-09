@@ -71,4 +71,52 @@
 /* Gradient text */
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400;
+}
+
+/* Add these custom CSS variables to your globals.css file */
+:root {
+  --color-primary: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-secondary: #8b5cf6;
+  --color-secondary-dark: #7c3aed;
+}
+
+.dark {
+  --color-primary: #6366f1;
+  --color-primary-dark: #818cf8;
+  --color-secondary: #a78bfa;
+  --color-secondary-dark: #c4b5fd;
+  
+  /* Update dark mode colors */
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  --tw-border-opacity: 1;
+  
+  /* Improved dark background */
+  --color-bg-primary: #111827;
+  --color-bg-secondary: #1f2937;
+  --color-bg-tertiary: #374151;
+  
+  /* Improved dark text */
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #e5e7eb;
+  --color-text-tertiary: #d1d5db;
+}
+
+/* Apply these variables to tailwind classes */
+.dark .bg-gray-900 {
+  background-color: var(--color-bg-primary);
+}
+
+.dark .bg-gray-800 {
+  background-color: var(--color-bg-secondary);
+}
+
+.dark .bg-gray-700 {
+  background-color: var(--color-bg-tertiary);
+}
+
+/* Add a subtle gradient to dark mode backgrounds */
+.dark body {
+  background: linear-gradient(to bottom right, #111827, #1e293b);
 } 

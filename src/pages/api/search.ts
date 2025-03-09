@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleSearch } from '../../utils/search';
 
-const searchEngine = new GoogleSearch();
+const searchClient = new GoogleSearch();
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,11 +12,22 @@ export default async function handler(
   }
 
   try {
-    const { query, maxResults, timeFilter } = req.body;
-    const results = await searchEngine.search(query, maxResults, timeFilter);
+    const { query, maxResults, timeFilter, category } = req.body;
+    
+    // Use the category to potentially modify the search query
+    let enhancedQuery = query;
+    if (category && category !== 'general') {
+      enhancedQuery = `${query} ${category}`;
+    }
+    
+    const results = await searchClient.search(enhancedQuery, maxResults, timeFilter);
+    
     res.status(200).json(results);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Search error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ 
+      message: error.message || 'Internal server error',
+      results: [] 
+    });
   }
 } 
