@@ -257,13 +257,8 @@ const ReportSection: FC<ReportSectionProps> = ({
             </div>
           </div>
           
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 prose dark:prose-invert max-w-none">
-            <ReactMarkdown 
-              remarkPlugins={[remarkGfm]} 
-              rehypePlugins={[rehypeRaw]}
-            >
-              {report}
-            </ReactMarkdown>
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none">
+            <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>
       )}

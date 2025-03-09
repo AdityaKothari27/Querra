@@ -23,7 +23,7 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-markdown": "^10.0.1",
+    "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1"
   },

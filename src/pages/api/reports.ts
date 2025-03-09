@@ -8,9 +8,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === 'GET') {
-    const reports = await db.get_reports();
-    return res.status(200).json(reports);
+    try {
+      const reports = await db.get_reports();
+      res.status(200).json(reports);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to get reports' });
+    }
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
-
-  return res.status(405).json({ message: 'Method not allowed' });
 } 
