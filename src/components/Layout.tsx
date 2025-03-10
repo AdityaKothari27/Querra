@@ -54,7 +54,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <Link href="/" className="flex items-center space-x-2 group">
             <BeakerIcon className="h-8 w-8 text-blue-600 dark:text-indigo-400 group-hover:text-blue-500 dark:group-hover:text-indigo-300 transition-colors duration-300" />
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              Deep Research
+              Deep Search
             </span>
           </Link>
           <div className="flex items-center space-x-6">
@@ -98,7 +98,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       </main>
       <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>© {new Date().getFullYear()} Deep Research. Made with Vibe coding.</p>
+          <p>© {new Date().getFullYear()} Deep Search. Made with Vibe coding.</p>
         </div>
       </footer>
     </div>

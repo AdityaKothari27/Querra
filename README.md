@@ -1,8 +1,8 @@
-# Deep Research
+# Deep Search
 
 A powerful AI-powered research assistant that helps you gather information, analyze sources, and generate comprehensive reports on any topic.
 
-![Deep Research](https://via.placeholder.com/800x400?text=Deep+Research)
+![Deep Search](https://via.placeholder.com/800x400?text=Deep+Research)
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ A powerful AI-powered research assistant that helps you gather information, anal
 
 ## Overview
 
-Deep Research is a web application that streamlines the research process by automating source discovery, content extraction, and report generation. It leverages AI to analyze multiple sources and synthesize information into well-structured reports.
+Deep Search is a web application that streamlines the research process by automating source discovery, content extraction, and report generation. It leverages AI to analyze multiple sources and synthesize information into well-structured reports.
 
 The application allows users to:
 - Search for relevant sources on any topic
