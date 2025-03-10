@@ -95,7 +95,7 @@
   /* Improved dark background */
   --color-bg-primary: #111827;
   --color-bg-secondary: #65a2f7;
-  --color-bg-tertiary: #fbfbfc;
+  --color-bg-tertiary: #3b3b3b;
   --color-bg-quarternary: #e8e9eb;
   
   /* Improved dark text */
@@ -120,4 +120,26 @@
 /* Add a subtle gradient to dark mode backgrounds */
 .dark body {
   background: linear-gradient(to bottom right, #111827, #1e293b);
+}
+
+/* Add this at the very end of the file */
+.dark .report-container {
+  background-color: #1d1b1b !important;
+}
+
+/* Add this after your .report-container rule at the end of the file */
+.dark .report-container h1,
+.dark .report-container h2,
+.dark .report-container h3,
+.dark .report-container h4,
+.dark .report-container h5,
+.dark .report-container h6,
+.dark .report-container strong {
+  color: white !important;
+}
+
+/* For bullet points and list items */
+.dark .report-container ul li::marker,
+.dark .report-container ol li::marker {
+  color: white !important;
 } 
