@@ -105,7 +105,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             sourceY += (sourceLines.length * 5) + 5;
           });
           
-          doc.save('research_report.pdf');
+          doc.save(`${searchQuery}_report.pdf`);
           break;
 
         case 'docx':
@@ -166,7 +166,7 @@ const ReportSection: FC<ReportSectionProps> = ({
           
           // Generate and save DOCX
           const buffer = await Packer.toBlob(doc2);
-          saveAs(buffer, 'research_report.docx');
+          saveAs(buffer, `${searchQuery}_report.docx`);
           break;
 
         case 'txt':
@@ -183,7 +183,7 @@ const ReportSection: FC<ReportSectionProps> = ({
           ].join('\n\n');
           
           const textBlob = new Blob([textContent], { type: 'text/plain' });
-          saveAs(textBlob, 'research_report.txt');
+          saveAs(textBlob, `${searchQuery}_report.txt`);
           break;
       }
     } catch (error) {
