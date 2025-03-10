@@ -223,7 +223,7 @@ const ReportSection: FC<ReportSectionProps> = ({
         {isGenerating ? (
           <div className="relative overflow-hidden">
             <span className="text-white font-medium">Generating Report...</span>
-            <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
+            <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-slow"></div>
           </div>
         ) : (
           <>
@@ -236,12 +236,12 @@ const ReportSection: FC<ReportSectionProps> = ({
       {report && (
         <div className="mt-8 animate-fadeIn">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium text-gray-800">Generated Report</h3>
+            <h3 className="text-lg font-medium text-white-800">Generated Report</h3>
             <div className="flex gap-2">
               <select
                 value={exportFormat}
                 onChange={(e) => setExportFormat(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-800"
               >
                 <option>PDF</option>
                 <option>DOCX</option>
@@ -257,7 +257,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             </div>
           </div>
           
-          <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none">
+          <div className="mt-6 bg-white dark:bg-black rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark-text-white">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>

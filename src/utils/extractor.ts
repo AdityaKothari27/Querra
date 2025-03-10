@@ -94,9 +94,9 @@ export class ContentExtractor {
       return `This is financial data from Yahoo Finance about a stock or financial instrument. The URL is ${url}. The page likely contains stock price information, financial metrics, company overview, and market data.`;
     }
     
-    if (url.includes('investor.apple.com')) {
-      return `This is investor relations information from Apple Inc. The URL is ${url}. The page likely contains financial reports, earnings information, investor presentations, and company announcements.`;
-    }
+    // if (url.includes('investor.apple.com')) {
+    //   return `This is investor relations information from Apple Inc. The URL is ${url}. The page likely contains financial reports, earnings information, investor presentations, and company announcements.`;
+    // }
     
     // Generic fallback for other sites
     return this.generatePlaceholderContent(url);

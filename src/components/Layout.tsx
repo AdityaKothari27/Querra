@@ -47,8 +47,8 @@ const Layout: FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-white transition-colors duration-300">
       <header className={`sticky top-0 z-10 transition-all duration-300 ${
         scrolled 
-          ? 'backdrop-blur-xl bg-white/80 dark:bg-black/80 shadow-md' 
-          : 'backdrop-blur-md bg-white/60 dark:bg-black/60'
+          ? 'backdrop-blur-xl bg-white dark:bg-black shadow-md' 
+          : 'backdrop-blur-md bg-white dark:bg-black'
       } border-b border-gray-200 dark:border-gray-800`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2 group">
