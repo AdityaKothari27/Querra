@@ -257,7 +257,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             </div>
           </div>
           
-          <div className="mt-6 bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark:text-white">
+          <div className="mt-6 bg-white report-container rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark:text-white" >
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>
