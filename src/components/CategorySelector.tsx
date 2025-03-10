@@ -51,7 +51,7 @@ const CategorySelector: FC<CategorySelectorProps> = ({
   return (
     <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-        Select Research Category
+        Select Search Category
       </h2>
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">

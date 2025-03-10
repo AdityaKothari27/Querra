@@ -61,7 +61,7 @@ const ReportSection: FC<ReportSectionProps> = ({
           
           // Add title
           doc.setFontSize(18);
-          doc.text(`Research Report`, 105, 20, { align: 'center' });
+          doc.text(`Search Report`, 105, 20, { align: 'center' });
           
           doc.setFontSize(14);
           doc.text(`Topic: ${searchQuery}`, 105, 30, { align: 'center' });
@@ -116,7 +116,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               children: [
                 // Title
                 new Paragraph({
-                  text: "Research Report",
+                  text: "Search Report",
                   heading: "Heading1",
                   spacing: { after: 200 }
                 }),
@@ -172,7 +172,7 @@ const ReportSection: FC<ReportSectionProps> = ({
         case 'txt':
           // Format text file
           const textContent = [
-            'Research Report',
+            'Search Report',
             `Topic: ${searchQuery}`,
             `Generated: ${new Date().toLocaleDateString()}`,
             '',
