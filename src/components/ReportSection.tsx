@@ -199,7 +199,7 @@ const ReportSection: FC<ReportSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300">
+    <div className="bg-white dark:bg-black rounded-xl shadow-xl border border-gray-200 dark:border-white p-6 transition-all duration-300">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Generate Report</h2>
       
       <div className="mb-4">
@@ -210,7 +210,7 @@ const ReportSection: FC<ReportSectionProps> = ({
           id="prompt-template"
           value={promptTemplate}
           onChange={(e) => setPromptTemplate(e.target.value)}
-          className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
+          className="w-full px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
           rows={4}
         />
       </div>
@@ -223,7 +223,7 @@ const ReportSection: FC<ReportSectionProps> = ({
         {isGenerating ? (
           <div className="relative overflow-hidden">
             <span className="text-white font-medium">Generating Report...</span>
-            <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-slow"></div>
+            <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
           </div>
         ) : (
           <>
@@ -257,7 +257,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             </div>
           </div>
           
-          <div className="mt-6 bg-white dark:bg-black rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark-text-white">
+          <div className="mt-6 bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark:text-white">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>
