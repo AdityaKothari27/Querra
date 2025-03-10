@@ -12,7 +12,7 @@ class GeminiProcessor:
         combined_content = "\n\n".join([f"Source {i+1}:\n{content}" for i, content in enumerate(contents)])
         
         prompt = f"""
-Research Topic: {query}
+Search Topic: {query}
 
 {prompt_template}
 

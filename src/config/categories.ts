@@ -3,7 +3,7 @@ import { CategoryConfig } from '../types/index';
 export const categories: CategoryConfig[] = [
   {
     id: 'general',
-    name: 'General Research',
+    name: 'General Search',
     description: 'Broad research across multiple sources',
     icon: 'GlobeAltIcon',
     defaultPrompt: 'Generate a comprehensive report based on the following sources. Format your response using Markdown with proper headings (##), bullet points, numbered lists, and emphasis where appropriate. Include key findings, analysis, and recommendations.',
@@ -12,7 +12,7 @@ export const categories: CategoryConfig[] = [
   },
   {
     id: 'academic',
-    name: 'Academic Research',
+    name: 'Academic Search',
     description: 'Scholarly articles, journals, and research papers',
     icon: 'AcademicCapIcon',
     defaultPrompt: 'Generate an academic research summary based on these scholarly sources. Format your response using Markdown with proper headings (##), citations, and academic terminology. Include methodology analysis, key findings, theoretical implications, and suggestions for future research. Maintain a formal academic tone throughout.',
@@ -48,7 +48,7 @@ export const categories: CategoryConfig[] = [
   },
   {
     id: 'legal',
-    name: 'Legal Research',
+    name: 'Legal Search',
     description: 'Laws, regulations, case studies, and legal analysis',
     icon: 'ScaleIcon',
     defaultPrompt: 'Generate a legal research brief based on these sources. Format your response using Markdown with proper headings (##). Include relevant laws/regulations, case precedents, legal interpretations, and potential implications. Organize information by jurisdiction where applicable. Add a disclaimer that this does not constitute legal advice and should not replace consultation with a legal professional.',

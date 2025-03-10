@@ -76,7 +76,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                     href="/" 
                     className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center"
                   >
-                    Research
+                    Search
                   </Link>
                 </li>
                 <li>

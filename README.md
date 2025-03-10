@@ -1,6 +1,6 @@
 # Deep Search
 
-A powerful AI-powered research assistant that helps you gather information, analyze sources, and generate comprehensive reports on any topic.
+A powerful AI-powered search assistant that helps you gather information, analyze sources, and generate comprehensive reports on any topic.
 
 ![Deep Search](https://via.placeholder.com/800x400?text=Deep+Research)
 
@@ -116,7 +116,7 @@ The application allows users to:
 
 ### Searching for Sources
 
-1. Enter your research topic in the search bar
+1. Enter your Search topic in the search bar
 2. Adjust search parameters if needed:
    - Max Results: Control the number of search results (5-20)
    - Time Filter: Filter results by recency

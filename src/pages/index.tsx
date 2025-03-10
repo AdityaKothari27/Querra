@@ -50,7 +50,7 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Deep Search - AI-Powered Research Assistant</title>
+        <title>Deep Search - AI-Powered Search Assistant</title>
         <meta name="description" content="Conduct deep research with AI assistance" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

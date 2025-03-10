@@ -68,7 +68,7 @@ export class GeminiProcessor {
       .join("\n\n");
     
     return `
-Research Topic: ${query}
+Search Topic: ${query}
 
 Instructions: ${promptTemplate}
 
