@@ -54,7 +54,7 @@ const SearchSection: FC<SearchSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
+    <div className="bg-white dark:bg-black backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-white p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
         <MagnifyingGlassIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-indigo-400" />
         {categoryConfig.name}
@@ -85,7 +85,7 @@ const SearchSection: FC<SearchSectionProps> = ({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={`Enter your ${categoryConfig.name.toLowerCase()} topic...`}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
             />
             {isLoading && (
               <div className="absolute right-3 top-3">
@@ -97,7 +97,7 @@ const SearchSection: FC<SearchSectionProps> = ({
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className="md:w-auto px-4 py-3 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+            className="md:w-auto px-4 py-3 bg-gray-200 dark:bg-gray-900 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors flex items-center justify-center"
           >
             <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
             Filters
@@ -114,7 +114,7 @@ const SearchSection: FC<SearchSectionProps> = ({
         </div>
         
         {showFilters && (
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 animate-fadeIn">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 animate-fadeIn">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Max Results
@@ -144,7 +144,7 @@ const SearchSection: FC<SearchSectionProps> = ({
               <select
                 value={timeFilter}
                 onChange={(e) => setTimeFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
+                className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
               >
                 {['Any', 'Past 24 hours', 'Past week', 'Past month', 'Past year'].map((filter) => (
                   <option key={filter} value={filter}>
@@ -167,7 +167,7 @@ const SearchSection: FC<SearchSectionProps> = ({
                 id="select-all"
                 checked={selectedResults.length === searchResults.length}
                 onChange={(e) => handleSelectAll(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-gray-700"
+                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-gray-900"
               />
               <label htmlFor="select-all" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                 Select All
@@ -179,7 +179,7 @@ const SearchSection: FC<SearchSectionProps> = ({
             {searchResults.map((result) => (
               <div 
                 key={result.url} 
-                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors duration-300"
+                className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors duration-300"
               >
                 <div className="flex items-start">
                   <input
