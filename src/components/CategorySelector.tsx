@@ -30,12 +30,12 @@ const CategorySelector: FC<CategorySelectorProps> = ({
 
   // Map of color classes
   const colorMap: Record<string, string> = {
-    blue: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
-    purple: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
-    green: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
-    indigo: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800',
-    red: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
-    stone: 'bg-gray-200 text-gray-700 border-gray-300 dark:bg-gray-200 dark:text-gray-700 dark:border-gray-300 hover:bg-gray-300 dark:hover:bg-gray-300',
+    blue: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-800 dark:border-blue-800 hover:bg-blue-300 dark:hover:bg-blue-300',
+    purple: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-800 dark:border-purple-800 hover:bg-purple-300 dark:hover:bg-purple-300',
+    green: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-800 dark:border-green-800 hover:bg-green-300 dark:hover:bg-green-300',
+    indigo: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-800 dark:border-indigo-800 hover:bg-indigo-300 dark:hover:bg-indigo-300',
+    red: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-800 dark:border-red-800 hover:bg-red-300 dark:hover:bg-red-300',
+    gray: 'bg-gray-200 text-gray-800 border-gray-300 dark:bg-gray-200 dark:text-gray-800 dark:border-gray-300 hover:bg-gray-300 dark:hover:bg-gray-300',
   };
 
   // Map of selected color classes
@@ -45,7 +45,7 @@ const CategorySelector: FC<CategorySelectorProps> = ({
     green: 'bg-green-600 text-white border-green-700 dark:bg-green-700 dark:border-green-600',
     indigo: 'bg-indigo-600 text-white border-indigo-700 dark:bg-indigo-700 dark:border-indigo-600',
     red: 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-600',
-    stone: 'bg-gray-500 text-white border-gray-500 dark:bg-gray-500 dark:border-gray-500 dark:text-white',
+    gray: 'bg-gray-500 text-white border-gray-500 dark:bg-gray-500 dark:border-gray-500 dark:text-white',
   };
 
   return (
