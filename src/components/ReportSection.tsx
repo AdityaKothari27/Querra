@@ -199,7 +199,7 @@ const ReportSection: FC<ReportSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-black rounded-xl shadow-xl border border-gray-200 dark:border-white p-6 transition-all duration-300">
+    <div className="bg-white dark:bg-black rounded-xl shadow-xl border border-gray-800 dark:border-white p-6 transition-all duration-300">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Generate Report</h2>
       
       <div className="mb-4">
@@ -241,7 +241,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               <select
                 value={exportFormat}
                 onChange={(e) => setExportFormat(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-800"
+                className="px-4 py-2 border border-gray-800 rounded-lg text-gray-800"
               >
                 <option>PDF</option>
                 <option>DOCX</option>
@@ -257,7 +257,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             </div>
           </div>
           
-          <div className="mt-6 bg-white report-container rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark:text-white" >
+          <div className="mt-6 bg-white report-container rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none dark:text-white border border-gray-700 dark:border-white" >
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>
