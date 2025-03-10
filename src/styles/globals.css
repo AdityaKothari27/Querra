@@ -94,8 +94,9 @@
   
   /* Improved dark background */
   --color-bg-primary: #111827;
-  --color-bg-secondary: #1f2937;
-  --color-bg-tertiary: #374151;
+  --color-bg-secondary: #65a2f7;
+  --color-bg-tertiary: #fbfbfc;
+  --color-bg-quarternary: #e8e9eb;
   
   /* Improved dark text */
   --color-text-primary: #f9fafb;
@@ -105,7 +106,7 @@
 
 /* Apply these variables to tailwind classes */
 .dark .bg-gray-900 {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-quarternary);
 }
 
 .dark .bg-gray-800 {
