@@ -53,7 +53,7 @@ export const categories: CategoryConfig[] = [
     icon: 'ScaleIcon',
     defaultPrompt: 'Generate a legal research brief based on these sources. Format your response using Markdown with proper headings (##). Include relevant laws/regulations, case precedents, legal interpretations, and potential implications. Organize information by jurisdiction where applicable. Add a disclaimer that this does not constitute legal advice and should not replace consultation with a legal professional.',
     searchInstructions: 'Search legal documents and case law.',
-    color: 'amber',
+    color: 'stone',
   },
 ];
 

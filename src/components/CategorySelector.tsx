@@ -35,7 +35,7 @@ const CategorySelector: FC<CategorySelectorProps> = ({
     green: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
     indigo: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800',
     red: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
-    amber: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
+    stone: 'bg-gray-200 text-gray-700 border-gray-300 dark:bg-gray-200 dark:text-gray-700 dark:border-gray-300 hover:bg-gray-300 dark:hover:bg-gray-300',
   };
 
   // Map of selected color classes
@@ -45,7 +45,7 @@ const CategorySelector: FC<CategorySelectorProps> = ({
     green: 'bg-green-600 text-white border-green-700 dark:bg-green-700 dark:border-green-600',
     indigo: 'bg-indigo-600 text-white border-indigo-700 dark:bg-indigo-700 dark:border-indigo-600',
     red: 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-600',
-    amber: 'bg-amber-600 text-white border-amber-700 dark:bg-amber-700 dark:border-amber-600',
+    stone: 'bg-gray-500 text-white border-gray-500 dark:bg-gray-500 dark:border-gray-500 dark:text-white',
   };
 
   return (
@@ -62,7 +62,7 @@ const CategorySelector: FC<CategorySelectorProps> = ({
             className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-300 hover:shadow-md ${
               selectedCategory === category.id
                 ? selectedColorMap[category.color]
-                : `${colorMap[category.color]} hover:bg-opacity-80`
+                : `${colorMap[category.color]}`
             }`}
           >
             <div className="mb-2">
