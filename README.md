@@ -13,6 +13,7 @@ A powerful AI-powered search assistant that helps you gather information, analyz
 - [Usage](#usage)
 - [API Configuration](#api-configuration)
 - [Project Structure](#project-structure)
+- [Recent Updates](#recent-updates)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -21,6 +22,7 @@ A powerful AI-powered search assistant that helps you gather information, analyz
 Deep Search is a web application that streamlines the research process by automating source discovery, content extraction, and report generation. It leverages AI to analyze multiple sources and synthesize information into well-structured reports.
 
 The application allows users to:
+- Select from multiple research categories (General, Academic, Financial, Technology, Health, Legal)
 - Search for relevant sources on any topic
 - Select which sources to include in their research
 - Generate comprehensive reports based on selected sources
@@ -28,6 +30,11 @@ The application allows users to:
 - Save reports to a knowledge base for future reference
 
 ## Features
+
+### 🎨 Category-Based Search
+- Choose from specialized research categories
+- Each category has tailored search instructions and report templates
+- Custom styling for each research domain
 
 ### 🔍 Intelligent Search
 - Customizable search parameters (max results, time filters)
@@ -50,6 +57,11 @@ The application allows users to:
 - Browse and search through past reports
 - Organize research by topic
 
+### 🌓 Dark Mode Support
+- Full dark mode support throughout the application
+- Custom-styled report display for better readability in dark mode
+- Consistent styling across all components
+
 ## Tech Stack
 
 ### Frontend
@@ -61,6 +73,7 @@ The application allows users to:
 - **jsPDF**: PDF generation
 - **docx**: DOCX file generation
 - **File-Saver**: Client-side file saving
+- **Heroicons**: SVG icon library
 
 ### Backend (API Routes)
 - **Next.js API Routes**: Serverless functions
@@ -114,9 +127,19 @@ The application allows users to:
 
 ## Usage
 
+### Selecting a Research Category
+
+1. Choose a research category that matches your needs:
+   - General Research: For broad topics across multiple domains
+   - Academic Research: For scholarly and academic topics
+   - Financial Analysis: For market data and financial information
+   - Technology Review: For product reviews and technical documentation
+   - Health & Medical: For medical research and health information
+   - Legal Research: For laws, regulations, and legal analysis
+
 ### Searching for Sources
 
-1. Enter your Search topic in the search bar
+1. Enter your search topic in the search bar
 2. Adjust search parameters if needed:
    - Max Results: Control the number of search results (5-20)
    - Time Filter: Filter results by recency
@@ -173,8 +196,11 @@ deep_research/
 ├── src/
 │   ├── components/           # React components
 │   │   ├── Layout.tsx        # Main layout component
+│   │   ├── CategorySelector.tsx # Research category selection
 │   │   ├── SearchSection.tsx # Search interface
 │   │   └── ReportSection.tsx # Report generation interface
+│   ├── config/
+│   │   └── categories.ts # Research category configurations
 │   ├── lib/
 │   │   └── api.ts            # API client functions
 │   ├── pages/
@@ -184,6 +210,8 @@ deep_research/
 │   │   │   └── reports.ts    # Knowledge base endpoint
 │   │   ├── index.tsx         # Home page  
 │   │   └── knowledge-base.tsx # Knowledge base page
+│   ├── styles/
+│   │   └── globals.css # Global styles and dark mode
 │   ├── utils/
 │   │   ├── ai_processor.ts   # AI integration
 │   │   ├── database.ts       # Data storage
@@ -196,3 +224,20 @@ deep_research/
 ├── tsconfig.json             # TypeScript configuration
 └── README.md                 # Project documentation
 ```
+
+## Recent Updates
+
+- Added dark mode support throughout the application
+- Customized report background to dark grey (#3b3b3b) in dark mode
+- Improved heading and list marker visibility in dark mode
+- Added specialized research categories with custom styling
+- Enhanced Legal Research category with custom styling
+- Improved responsive design for mobile and tablet devices
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
