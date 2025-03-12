@@ -102,7 +102,7 @@ The application allows users to:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/AdityaKothari27/deep_research.git
+   git clone https://github.com/AdityaKothari27/deep_search.git
    cd deep_research
    ```
 
