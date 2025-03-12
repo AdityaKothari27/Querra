@@ -170,7 +170,7 @@ const SearchSection: FC<SearchSectionProps> = ({
                 className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-indigo-600 focus:ring-blue-500 dark:focus:ring-indigo-500 bg-white dark:bg-gray-900"
               />
               <label htmlFor="select-all" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                Select All
+                Select All "(Do no select too many sources rn coz gemini takes longer than netlify funtion timeout. ps: will add groq support soon)"
               </label>
             </div>
           </div>
