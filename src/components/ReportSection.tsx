@@ -71,7 +71,7 @@ const ReportSection: FC<ReportSectionProps> = ({
       
       if (exportFormat === 'PDF') {
         const doc = new jsPDF();
-        doc.text(report, 10, 10);
+        doc.text(report,10,10);
         doc.save(`${filename}.pdf`);
       } else if (exportFormat === 'DOCX') {
         // Convert markdown to docx
@@ -118,6 +118,11 @@ const ReportSection: FC<ReportSectionProps> = ({
           rows={4}
           placeholder={getDefaultPrompt()}
         />
+        {!promptTemplate && (
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Default: {getDefaultPrompt()}
+          </p>
+        )}
       </div>
       
       <div className="mb-4">
