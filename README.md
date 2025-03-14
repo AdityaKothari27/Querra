@@ -27,7 +27,7 @@ The application allows users to:
 - Select which sources to include in their research
 - Generate comprehensive reports based on selected sources
 - Export reports in various formats (PDF, DOCX, TXT)
-- Save reports to a knowledge base for future reference
+- Use own documents for search.
 
 ## Features
 
