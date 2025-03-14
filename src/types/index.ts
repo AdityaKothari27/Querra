@@ -6,10 +6,10 @@ export interface SearchResult {
 
 export interface Report {
   id: number;
-  title: string;
   query: string;
   content: string;
-  date: string;
+  sources: string[];
+  created_at: string;
 }
 
 export interface SearchConfig {
@@ -26,4 +26,11 @@ export interface CategoryConfig {
   defaultPrompt?: string;
   searchInstructions?: string;
   color: string;
+}
+
+export interface Document {
+  id: number;
+  name: string;
+  path: string;
+  created_at: string;
 } 

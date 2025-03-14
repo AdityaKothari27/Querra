@@ -1,9 +1,14 @@
 import axios from 'axios';
-import { SearchResult, Report, SearchConfig } from '../types/index';
+import { SearchResult, Report, Document, SearchConfig } from '../types/index';
 
 const api = axios.create({
   baseURL: '/api'
 });
+
+// Mock data for development
+const mockSearchResults: Record<string, SearchResult[]> = {
+  // Keep your existing mock data
+};
 
 export const searchWeb = async (
   query: string,
@@ -34,12 +39,13 @@ export const searchTopics = async (
 export const generateReport = async (
   query: string,
   sources: string[],
+  documentIds: number[],
   promptTemplate: string
 ) => {
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, sources, promptTemplate }),
+    body: JSON.stringify({ query, sources, documentIds, promptTemplate }),
   });
 
   if (!response.ok) {
@@ -54,6 +60,11 @@ export const getReports = async (): Promise<Report[]> => {
   return response.data;
 };
 
+export const getDocuments = async (): Promise<Document[]> => {
+  const response = await api.get('/documents');
+  return response.data;
+};
+
 export const searchReports = async (query: string): Promise<Report[]> => {
   const response = await api.get('/reports/search', { params: { query } });
   return response.data;
@@ -61,4 +72,8 @@ export const searchReports = async (query: string): Promise<Report[]> => {
 
 export const deleteReport = async (id: number): Promise<void> => {
   await api.delete(`/reports/${id}`);
+};
+
+export const deleteDocument = async (id: number): Promise<void> => {
+  await api.delete(`/documents/${id}`);
 }; 

@@ -14,6 +14,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('general');
+  const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([]);
   
   const handleSearch = async (query: string, config: SearchConfig) => {
     setIsLoading(true);
@@ -34,8 +35,9 @@ export default function Home() {
     }
   };
 
-  const handleSourceSelect = (sources: string[]) => {
+  const handleSourceSelect = (sources: string[], documentIds: number[]) => {
     setSelectedSources(sources);
+    setSelectedDocumentIds(documentIds);
   };
 
   const handleCategorySelect = (categoryId: string) => {
@@ -50,32 +52,32 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Deep Search - AI-Powered Search Assistant</title>
-        <meta name="description" content="Conduct deep research with AI assistance" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Deep Research - AI-Powered Research Assistant</title>
+        <meta name="description" content="AI-powered research assistant for comprehensive reports" />
       </Head>
 
       <div className="space-y-8">
+        <h1 className="text-3xl font-bold">Research Assistant</h1>
+        
         <CategorySelector 
-          selectedCategory={selectedCategory} 
-          onCategorySelect={handleCategorySelect} 
+          selectedCategory={selectedCategory}
+          onCategorySelect={handleCategorySelect}
         />
         
         <SearchSection 
-          onSearch={handleSearch} 
+          onSearch={handleSearch}
           onSourceSelect={handleSourceSelect}
-          searchResults={searchResults}
           isLoading={isLoading}
+          searchResults={searchResults}
           categoryConfig={categoryConfig}
         />
         
-        {selectedSources.length > 0 && (
-          <ReportSection 
-            selectedSources={selectedSources} 
-            searchQuery={searchQuery}
-            categoryConfig={categoryConfig}
-          />
-        )}
+        <ReportSection 
+          searchQuery={searchQuery}
+          selectedSources={selectedSources}
+          selectedDocumentIds={selectedDocumentIds}
+          categoryConfig={categoryConfig}
+        />
       </div>
     </Layout>
   );

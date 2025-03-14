@@ -16,18 +16,33 @@ export default async function handler(
   }
 
   try {
-    const { query, sources, promptTemplate } = req.body;
+    const { query, sources, documentIds, promptTemplate } = req.body;
     
-    // Extract content from sources
-    const contents = await Promise.all(
+    // Extract content from web sources
+    const webContents = await Promise.all(
       sources.map((url: string) => extractor.extract(url))
     );
+    
+    // Get content from documents
+    const documentContents = await Promise.all(
+      (documentIds || []).map(async (id: number) => {
+        const content = await db.get_document_content(id);
+        return content;
+      })
+    );
+    
+    // Combine all contents
+    const allContents = [...webContents, ...documentContents];
 
     // Generate report
-    const report = await ai_processor.generate_report(query, contents, promptTemplate);
+    const report = await ai_processor.generate_report(query, allContents, promptTemplate);
     
-    // Save to database
-    await db.save_report(query, report, sources);
+    // Save to database (include both web sources and document IDs)
+    const allSources = [
+      ...sources,
+      ...(documentIds || []).map((id: number) => `document:${id}`)
+    ];
+    await db.save_report(query, report, allSources);
 
     res.status(200).json({ report });
   } catch (error: any) {
