@@ -3,8 +3,6 @@ import { generateReport } from '../lib/api';
 import { SparklesIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
-import jsPDF from 'jspdf';
-import { Packer } from 'docx';
 
 interface ReportSectionProps {
   searchQuery: string;
@@ -70,26 +68,27 @@ const ReportSection: FC<ReportSectionProps> = ({
       const filename = `${searchQuery.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report`;
       
       if (exportFormat === 'PDF') {
-        const doc = new jsPDF();
-        doc.text(report,10,10);
-        doc.save(`${filename}.pdf`);
+        // const doc = new Document();
+        // doc.html(report);
+        // const blob = await doc.save();
+        // saveAs(blob, `${filename}.pdf`);
       } else if (exportFormat === 'DOCX') {
         // Convert markdown to docx
-        const docx = await import('docx');
-        const doc = new docx.Document({
-          sections: [{
-            properties: {},
-            children: [
-              new docx.Paragraph({
-                text: report,
-                style: 'Normal',
-              }),
-            ],
-          }],
-        });
+        // const docx = await import('docx');
+        // const doc = new docx.Document({
+        //   sections: [{
+        //     properties: {},
+        //     children: [
+        //       new docx.Paragraph({
+        //         text: report,
+        //         style: 'Normal',
+        //       }),
+        //     ],
+        //   }],
+        // });
         
-        const blob = await Packer.toBlob(doc);
-        saveAs(blob, `${filename}.docx`);
+        // const blob = await Packer.toBlob(doc);
+        // saveAs(blob, `${filename}.docx`);
       } else if (exportFormat === 'TXT') {
         const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, `${filename}.txt`);
@@ -118,11 +117,6 @@ const ReportSection: FC<ReportSectionProps> = ({
           rows={4}
           placeholder={getDefaultPrompt()}
         />
-        {!promptTemplate && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Default: {getDefaultPrompt()}
-          </p>
-        )}
       </div>
       
       <div className="mb-4">
