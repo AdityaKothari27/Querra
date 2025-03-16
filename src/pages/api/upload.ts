@@ -1,9 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
-import fs from 'fs';
-import path from 'path';
-import { Database } from '../../utils/database';
 import { PdfExtractor } from '../../utils/pdf_extractor';
+import { Database } from '../../utils/database';
 
 export const config = {
   api: {
@@ -23,18 +21,14 @@ export default async function handler(
   }
 
   try {
-    const uploadDir = path.join(process.cwd(), 'uploads');
-    
-    // Create uploads directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
+    // Use in-memory processing instead of file system
     const form = formidable({
-      uploadDir,
-      keepExtensions: true,
       maxFileSize: 10 * 1024 * 1024, // 10MB
       filter: (part) => part.mimetype?.includes('pdf') || false,
+      // Don't write to disk
+      fileWriteStreamHandler: () => {
+        throw new Error('File writing not supported in serverless environment');
+      },
     });
 
     const [fields, files] = await new Promise<[formidable.Fields, formidable.Files]>((resolve, reject) => {
@@ -46,18 +40,17 @@ export default async function handler(
 
     const uploadedFiles = Array.isArray(files.files) ? files.files : [files.files];
     
-    // Process each uploaded file
+    // Process each uploaded file in memory
     for (const file of uploadedFiles) {
       if (!file) continue;
       
-      const filePath = file.filepath;
-      const fileName = file.originalFilename || path.basename(filePath);
+      const fileName = file.originalFilename || 'unnamed.pdf';
       
-      // Extract text from PDF
-      const content = await pdfExtractor.extract(filePath);
+      // Extract text directly from the file buffer
+      const content = await pdfExtractor.extractFromBuffer(file.filepath);
       
-      // Save to database
-      await db.save_document(fileName, filePath, content);
+      // Store only the content and filename, not the path
+      await db.save_document(fileName, fileName, content);
     }
 
     res.status(200).json({ message: 'Files uploaded successfully' });

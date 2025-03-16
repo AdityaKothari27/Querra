@@ -3,6 +3,14 @@ import { open, Database as SQLiteDatabase } from 'sqlite';
 import path from 'path';
 import { Report } from '../types';
 
+// In-memory storage for serverless environments
+const inMemoryDB = {
+  reports: [] as any[],
+  documents: [] as any[],
+  reportCounter: 0,
+  documentCounter: 0
+};
+
 export class Database {
   private db: SQLiteDatabase | null = null;
   private dbPath: string;
@@ -42,54 +50,63 @@ export class Database {
   }
 
   async save_report(query: string, content: string, sources: string[]) {
-    const db = await this.getConnection();
-    await db.run(
-      'INSERT INTO reports (query, content, sources) VALUES (?, ?, ?)',
+    const id = ++inMemoryDB.reportCounter;
+    inMemoryDB.reports.push({
+      id,
       query,
       content,
-      JSON.stringify(sources)
-    );
+      sources: JSON.stringify(sources),
+      created_at: new Date().toISOString()
+    });
+    return id;
   }
 
   async get_reports() {
-    const db = await this.getConnection();
-    return db.all('SELECT * FROM reports ORDER BY created_at DESC');
-  }
-
-  async save_document(name: string, path: string, content: string) {
-    const db = await this.getConnection();
-    await db.run(
-      'INSERT INTO documents (name, path, content) VALUES (?, ?, ?)',
-      name,
-      path,
-      content
+    return inMemoryDB.reports.sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }
 
+  async save_document(name: string, path: string, content: string) {
+    const id = ++inMemoryDB.documentCounter;
+    inMemoryDB.documents.push({
+      id,
+      name,
+      path,
+      content,
+      created_at: new Date().toISOString()
+    });
+    return id;
+  }
+
   async get_documents() {
-    const db = await this.getConnection();
-    return db.all('SELECT id, name, path, created_at FROM documents ORDER BY created_at DESC');
+    return inMemoryDB.documents.map(doc => ({
+      id: doc.id,
+      name: doc.name,
+      path: doc.path,
+      created_at: doc.created_at
+    }));
+  }
+
+  async get_document_by_id(id: number) {
+    return inMemoryDB.documents.find(doc => doc.id === id);
   }
 
   async get_document_content(id: number) {
-    const db = await this.getConnection();
-    const document = await db.get('SELECT content FROM documents WHERE id = ?', id);
-    return document?.content || '';
+    const doc = await this.get_document_by_id(id);
+    return doc?.content || '';
+  }
+
+  async delete_document(id: number) {
+    const index = inMemoryDB.documents.findIndex(doc => doc.id === id);
+    if (index !== -1) {
+      inMemoryDB.documents.splice(index, 1);
+    }
   }
 
   async search_reports(query: string): Promise<Report[]> {
     return this.reports.filter(report => 
       report.query.toLowerCase().includes(query.toLowerCase())
     );
-  }
-
-  async get_document_by_id(id: number) {
-    const db = await this.getConnection();
-    return db.get('SELECT * FROM documents WHERE id = ?', id);
-  }
-
-  async delete_document(id: number) {
-    const db = await this.getConnection();
-    await db.run('DELETE FROM documents WHERE id = ?', id);
   }
 } 
