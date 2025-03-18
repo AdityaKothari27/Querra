@@ -32,8 +32,15 @@ const KnowledgeBasePage: FC = () => {
 
   const handleDeleteDocument = async (id: number) => {
     if (confirm('Are you sure you want to delete this document?')) {
-      await deleteDocument(id);
-      loadData();
+      try {
+        await fetch(`/api/documents?id=${id}`, {
+          method: 'DELETE'
+        });
+        loadData();
+      } catch (error) {
+        console.error('Error deleting document:', error);
+        alert('Failed to delete document. Please try again.');
+      }
     }
   };
 

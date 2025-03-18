@@ -75,5 +75,5 @@ export const deleteReport = async (id: number): Promise<void> => {
 };
 
 export const deleteDocument = async (id: number): Promise<void> => {
-  await api.delete(`/documents/${id}`);
+  await api.delete(`/documents?id=${id}`);
 }; 

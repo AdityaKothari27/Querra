@@ -50,21 +50,18 @@ export class Database {
   }
 
   async save_report(query: string, content: string, sources: string[]) {
-    const id = ++inMemoryDB.reportCounter;
-    inMemoryDB.reports.push({
-      id,
+    const db = await this.getConnection();
+    await db.run(
+      'INSERT INTO reports (query, content, sources) VALUES (?, ?, ?)',
       query,
       content,
-      sources: JSON.stringify(sources),
-      created_at: new Date().toISOString()
-    });
-    return id;
+      JSON.stringify(sources)
+    );
   }
 
   async get_reports() {
-    return inMemoryDB.reports.sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    const db = await this.getConnection();
+    return db.all('SELECT * FROM reports ORDER BY created_at DESC');
   }
 
   async save_document(name: string, path: string, content: string) {
@@ -72,7 +69,7 @@ export class Database {
     inMemoryDB.documents.push({
       id,
       name,
-      path,
+      path, // This is now just the filename, not an actual path
       content,
       created_at: new Date().toISOString()
     });
@@ -80,28 +77,14 @@ export class Database {
   }
 
   async get_documents() {
-    return inMemoryDB.documents.map(doc => ({
-      id: doc.id,
-      name: doc.name,
-      path: doc.path,
-      created_at: doc.created_at
-    }));
-  }
-
-  async get_document_by_id(id: number) {
-    return inMemoryDB.documents.find(doc => doc.id === id);
+    const db = await this.getConnection();
+    return db.all('SELECT id, name, path, created_at FROM documents ORDER BY created_at DESC');
   }
 
   async get_document_content(id: number) {
-    const doc = await this.get_document_by_id(id);
-    return doc?.content || '';
-  }
-
-  async delete_document(id: number) {
-    const index = inMemoryDB.documents.findIndex(doc => doc.id === id);
-    if (index !== -1) {
-      inMemoryDB.documents.splice(index, 1);
-    }
+    const db = await this.getConnection();
+    const document = await db.get('SELECT content FROM documents WHERE id = ?', id);
+    return document?.content || '';
   }
 
   async search_reports(query: string): Promise<Report[]> {

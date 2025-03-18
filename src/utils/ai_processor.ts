@@ -77,4 +77,45 @@ ${combined_content}
 
 Please generate a comprehensive report based on the above sources. Include relevant details, comparisons, and insights from all provided sources.`;
   }
+
+  async extractTextFromPdf(base64Content: string): Promise<string> {
+    try {
+      // Create a prompt for Gemini to extract text from the PDF
+      const prompt = `
+This is a base64-encoded PDF document. Please extract all the text content from this document.
+Return ONLY the extracted text, formatted in a clean, readable way.
+Do not include any explanations, introductions, or analysis.
+`;
+
+      // Use Gemini's multimodal capabilities to process the PDF
+      const result = await this.model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              { 
+                inline_data: {
+                  mime_type: "application/pdf",
+                  data: base64Content
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 8192,
+        },
+      });
+
+      const response = await result.response;
+      return response.text();
+    } catch (error: any) {
+      console.error('Error extracting text from PDF with Gemini:', error);
+      throw new Error(`Failed to extract text from PDF: ${error.message}`);
+    }
+  }
 } 
