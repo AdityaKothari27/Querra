@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Database } from '../../utils/database';
+import { Database } from '../../../utils/database';
 
 const db = new Database();
 
@@ -7,7 +7,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // GET - fetch all documents
   if (req.method === 'GET') {
     try {
       const documents = await db.get_documents();
@@ -15,9 +14,7 @@ export default async function handler(
     } catch (error: any) {
       res.status(500).json({ message: error.message || 'Failed to get documents' });
     }
-  } 
-  // POST - create new document
-  else if (req.method === 'POST') {
+  } else if (req.method === 'POST') {
     try {
       const { name, content } = req.body;
       
@@ -36,24 +33,7 @@ export default async function handler(
     } catch (error: any) {
       res.status(500).json({ message: error.message || 'Failed to save document' });
     }
-  } 
-  // DELETE - delete a document
-  else if (req.method === 'DELETE') {
-    try {
-      const id = Number(req.query.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: 'Invalid document ID' });
-      }
-      
-      // Delete from database (no need to delete from filesystem in serverless)
-      await db.delete_document(id);
-      res.status(200).json({ message: 'Document deleted successfully' });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message || 'Failed to delete document' });
-    }
-  } 
-  // Other methods not allowed
-  else {
+  } else {
     res.status(405).json({ message: 'Method not allowed' });
   }
 } 
