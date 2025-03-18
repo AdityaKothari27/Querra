@@ -87,6 +87,11 @@ export class Database {
     return document?.content || '';
   }
 
+  async delete_document(id: number) {
+    const db = await this.getConnection();
+    await db.run('DELETE FROM documents WHERE id = ?', id);
+  }
+
   async search_reports(query: string): Promise<Report[]> {
     return this.reports.filter(report => 
       report.query.toLowerCase().includes(query.toLowerCase())
