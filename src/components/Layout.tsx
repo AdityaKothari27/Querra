@@ -96,9 +96,9 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       <main className="container mx-auto px-4 py-8">
         {children}
       </main>
-      <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
+      <footer className="bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>{new Date().getFullYear()} Deep Search. Vibe coded by <a href = "https://github.com/AdityaKothari27">Aditya Kothari</a>.</p>
+          <p>{new Date().getFullYear()} Deep Search. Vibe coded by <a href = "https://x.com/aditya_kothari1?s=21">Aditya Kothari</a>.<a href = "https://github.com/AdityaKothari27/Deep_Search">Source Code</a></p>
         </div>
       </footer>
     </div>

@@ -154,7 +154,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               id="exportFormat"
               value={exportFormat}
               onChange={(e) => setExportFormat(e.target.value)}
-              className="rounded-md border border-gray-300 dark:border-gray-600 py-1 px-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+              className="rounded-md border border-gray-300 dark:border-gray-600 py-1 px-3 bg-white dark:bg-black text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
             >
               <option value="PDF">PDF</option>
               <option value="DOCX">DOCX</option>
@@ -163,13 +163,13 @@ const ReportSection: FC<ReportSectionProps> = ({
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 disabled:opacity-50"
+              className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-blue-800 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 disabled:opacity-50"
             >
               {isExporting ? 'Exporting...' : 'Export'}
             </button>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none">
+          <div className="bg-white dark:bg-black  border border-gray-200 dark:border-gray-300 text-gray-900 dark:text-gray-100 rounded-lg shadow-md p-6 prose !prose-invert max-w-none">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>

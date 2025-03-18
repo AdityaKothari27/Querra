@@ -36,13 +36,13 @@ module.exports = {
               color: theme('colors.gray.900'),
             },
             h2: {
-              color: theme('colors.gray.900'),
+              color: theme('colors.indigo.600'),
             },
             h3: {
               color: theme('colors.gray.900'),
             },
             strong: {
-              color: theme('colors.gray.900'),
+              color: theme('colors.indigo.500'),
             },
           },
         },
@@ -65,7 +65,7 @@ module.exports = {
               color: theme('colors.white'),
             },
             strong: {
-              color: theme('colors.indigo.300'),
+              color: theme('colors.indigo.500'),
             },
           },
         },
