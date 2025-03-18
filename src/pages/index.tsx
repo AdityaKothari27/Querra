@@ -52,7 +52,7 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Deep Research - AI-Powered Research Assistant</title>
+        <title>Deep Search - AI-Powered Research Assistant</title>
         <meta name="description" content="AI-powered research assistant for comprehensive reports" />
       </Head>
 
