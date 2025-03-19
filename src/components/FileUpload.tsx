@@ -17,9 +17,7 @@ const FileUpload: FC<FileUploadProps> = ({ onUploadComplete }) => {
     setUploadProgress(0);
 
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
-    }
+    formData.append('file', files[0]);
 
     try {
       const response = await fetch('/api/upload', {
@@ -28,7 +26,8 @@ const FileUpload: FC<FileUploadProps> = ({ onUploadComplete }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Upload failed');
       }
 
       onUploadComplete();

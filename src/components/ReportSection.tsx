@@ -82,45 +82,156 @@ const ReportSection: FC<ReportSectionProps> = ({
     try {
       switch (exportFormat.toLowerCase()) {
         case 'pdf':
-          const jsPDFModule = await import('jspdf');
-          const jsPDF = jsPDFModule.default;
-          const doc = new jsPDF();
-          
-          doc.setFont("helvetica");
-          doc.setFontSize(18);
-          doc.text(`Research Report`, 105, 20, { align: 'center' });
-          
+          try {
+            // Dynamic import jsPDF
+            const { default: JsPDF } = await import('jspdf');
+            const doc = new JsPDF();
+            
+            // Set font
+            doc.setFont("helvetica");
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text(`Research Report`, 105, 20, { align: 'center' });
+            
+            doc.setFontSize(14);
+            doc.text(`Topic: ${searchQuery}`, 105, 30, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(12);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 40, { align: 'center' });
+            
+            // Add content with proper formatting
+            doc.setFontSize(12);
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 20;
+            const maxWidth = pageWidth - (margin * 2);
+            
+            // Split content into paragraphs
+            const paragraphs = report ? report.split('\n\n') : [];
+            let yPosition = 60;
+            
+            paragraphs.forEach((paragraph) => {
+              if (yPosition > 270) { // Check if near page bottom
+                doc.addPage();
+                yPosition = 20;
+              }
+              
+              const lines = doc.splitTextToSize(paragraph, maxWidth);
+              doc.text(lines, margin, yPosition);
+              yPosition += (lines.length * 7) + 5; // Add spacing between paragraphs
+            });
+            
+            // Add sources on new page
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.text('Sources:', margin, 20);
+            
+            let sourceY = 30;
+            selectedSources.forEach((source, index) => {
+              const sourceText = `${index + 1}. ${source}`;
+              const sourceLines = doc.splitTextToSize(sourceText, maxWidth);
+              doc.setFontSize(10);
+              doc.text(sourceLines, margin, sourceY);
+              sourceY += (sourceLines.length * 5) + 5;
+            });
+            
+            doc.save(`${searchQuery}_report.pdf`);
+          } catch (err) {
+            console.error("PDF error:", err);
+            alert("Error creating PDF. Try another format.");
+          }
           break;
 
         case 'docx':
-          const docxModule = await import('docx');
-          const { Document, Packer, Paragraph, TextRun } = docxModule;
-          const saveAsModule = await import('file-saver');
-          const { saveAs } = saveAsModule;
-          
-          const doc2 = new Document({
-            sections: [{
-              properties: {},
-              children: [
-                // ... your existing DOCX code ...
-              ]
-            }]
-          });
-          
-          const buffer = await Packer.toBlob(doc2);
-          saveAs(buffer, `${searchQuery}_report.docx`);
+          try {
+            // Dynamic import
+            const docx = await import('docx');
+            
+            // Create document
+            const doc = new docx.Document({
+              sections: [{
+                properties: {},
+                children: [
+                  // Title
+                  new docx.Paragraph({
+                    text: "Research Report",
+                    heading: docx.HeadingLevel.HEADING_1,
+                    spacing: { after: 200 }
+                  }),
+                  
+                  // Topic
+                  new docx.Paragraph({
+                    children: [
+                      new docx.TextRun({
+                        text: `Topic: ${searchQuery}`,
+                        bold: true,
+                        size: 28
+                      })
+                    ],
+                    spacing: { after: 200 }
+                  }),
+                  
+                  // Date
+                  new docx.Paragraph({
+                    text: `Generated: ${new Date().toLocaleDateString()}`,
+                    spacing: { after: 400 }
+                  }),
+                  
+                  // Content - simple implementation
+                  ...(report ? report.split('\n\n').map(para => 
+                    new docx.Paragraph({
+                      text: para,
+                      spacing: { after: 200 }
+                    })
+                  ) : []),
+                  
+                  // Sources
+                  new docx.Paragraph({
+                    text: "Sources:",
+                    heading: docx.HeadingLevel.HEADING_2,
+                    spacing: { before: 400, after: 200 }
+                  }),
+                  
+                  ...selectedSources.map((source, index) => 
+                    new docx.Paragraph({
+                      text: `${index + 1}. ${source}`,
+                      spacing: { after: 100 }
+                    })
+                  )
+                ]
+              }]
+            });
+            
+            // Generate and save DOCX
+            const buffer = await docx.Packer.toBlob(doc);
+            saveAs(buffer, `${searchQuery}_report.docx`);
+          } catch (err) {
+            console.error("DOCX error:", err);
+            alert("Error creating DOCX. Try another format.");
+          }
           break;
 
         case 'txt':
-          const saveAsModuleTxt = await import('file-saver');
-          const { saveAs: saveAsTxt } = saveAsModuleTxt;
-          
-          const textContent = [
-            // ... your existing text export code ...
-          ].join('\n\n');
-          
-          const textBlob = new Blob([textContent], { type: 'text/plain' });
-          saveAsTxt(textBlob, `${searchQuery}_report.txt`);
+          try {
+            // Format text file
+            const textContent = [
+              'Research Report',
+              `Topic: ${searchQuery}`,
+              `Generated: ${new Date().toLocaleDateString()}`,
+              '',
+              report || '',
+              '',
+              'Sources:',
+              ...selectedSources.map((source, index) => `${index + 1}. ${source}`)
+            ].join('\n\n');
+            
+            const textBlob = new Blob([textContent], { type: 'text/plain' });
+            saveAs(textBlob, `${searchQuery}_report.txt`);
+          } catch (err) {
+            console.error("Text export error:", err);
+            alert("Error creating text file.");
+          }
           break;
       }
     } catch (error) {
