@@ -24,10 +24,12 @@ Deep Search is a web application that streamlines the research process by automa
 The application allows users to:
 - Select from multiple research categories (General, Academic, Financial, Technology, Health, Legal)
 - Search for relevant sources on any topic
+- Exclude specific domains from search results
 - Select which sources to include in their research
 - Generate comprehensive reports based on selected sources
 - Export reports in various formats (PDF, DOCX, TXT)
-- Use own documents for search.
+- Use own documents for search
+- Navigate through search results with pagination
 
 ## Features
 
@@ -37,30 +39,42 @@ The application allows users to:
 - Custom styling for each research domain
 
 ### 🔍 Intelligent Search
-- Customizable search parameters (max results, time filters)
+- Customizable search parameters (max results, time filters, domain exclusion)
 - Preview of search results with titles, snippets, and URLs
 - "Select All" functionality for quick source selection
+- Domain exclusion to filter out unwanted sources
+- Pagination for navigating large search result sets
 
 ### 📝 AI-Powered Report Generation
 - Extracts content from selected web sources
 - Uses Google's Gemini AI to analyze and synthesize information
 - Generates well-structured reports with proper formatting
 - Customizable prompt templates for different report styles
+- Interactive loading animation with progress indication
+- Toast notifications for operation status feedback
 
 ### 📊 Export Options
 - PDF export with proper formatting and styling
 - DOCX export with preserved structure
 - Plain text export
+- Clickable citation links in the web view
 
 ### 📚 Knowledge Base
 - Save generated reports for future reference
 - Browse and search through past reports
 - Organize research by topic
+- Use documents from knowledge base in new reports
 
 ### 🌓 Dark Mode Support
 - Full dark mode support throughout the application
 - Custom-styled report display for better readability in dark mode
 - Consistent styling across all components
+
+### 🔔 User Experience Enhancements
+- Toast notifications for user feedback
+- Loading animations during report generation and search
+- Improved mobile responsiveness
+- Enhanced error handling and informative messages
 
 ## Tech Stack
 
@@ -143,7 +157,9 @@ The application allows users to:
 2. Adjust search parameters if needed:
    - Max Results: Control the number of search results (5-20)
    - Time Filter: Filter results by recency
+   - Domain Exclusion: Add domains you want to exclude from results
 3. Click "Search" to find relevant sources
+4. Navigate through results using pagination controls
 
 ### Generating Reports
 
@@ -152,7 +168,8 @@ The application allows users to:
    - Use "Select All" to include all sources
 2. Customize the prompt template if desired
 3. Click "Generate Report" to create your research report
-4. Wait for the AI to analyze sources and generate the report
+4. Monitor progress through the animated loading indicator
+5. Review toast notifications for success or error messages
 
 ### Exporting Reports
 
@@ -198,7 +215,8 @@ deep_research/
 │   │   ├── Layout.tsx        # Main layout component
 │   │   ├── CategorySelector.tsx # Research category selection
 │   │   ├── SearchSection.tsx # Search interface
-│   │   └── ReportSection.tsx # Report generation interface
+│   │   ├── ReportSection.tsx # Report generation interface
+│   │   └── Toast.tsx         # Toast notification component
 │   ├── config/
 │   │   └── categories.ts # Research category configurations
 │   ├── lib/
@@ -227,12 +245,16 @@ deep_research/
 
 ## Recent Updates
 
-- Added dark mode support throughout the application
-- Customized report background to dark grey (#3b3b3b) in dark mode
-- Improved heading and list marker visibility in dark mode
-- Added specialized research categories with custom styling
-- Enhanced Legal Research category with custom styling
-- Improved responsive design for mobile and tablet devices
+- Added domain exclusion feature to filter out specific websites from search results
+- Implemented pagination controls for easier navigation through search results
+- Added loading animations for report generation with progress indication
+- Added toast notifications for better user feedback during operations
+- Improved report formatting with better section heading styles
+- Enhanced dark mode styling for reports with better text contrast
+- Added clickable citation links in report web view
+- Optimized PDF and DOCX export functionality
+- Improved error handling throughout the application
+- Enhanced mobile responsiveness for better experience on smaller screens
 
 ## Contributing
 
