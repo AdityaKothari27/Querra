@@ -19,7 +19,9 @@ export const searchWeb = async (
       query,
       maxResults: config.maxResults,
       timeFilter: config.timeFilter,
-      category: config.category
+      excludedDomains: config.excludedDomains,
+      category: config.category,
+      page: config.page
     });
     return response.data;
   } catch (error) {

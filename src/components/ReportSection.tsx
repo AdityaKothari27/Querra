@@ -3,6 +3,7 @@ import { generateReport } from '../lib/api';
 import { SparklesIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
+import { useToast } from './Toast';
 
 interface ReportSectionProps {
   searchQuery: string;
@@ -18,10 +19,37 @@ const ReportSection: FC<ReportSectionProps> = ({
   categoryConfig
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
   const [report, setReport] = useState<string | null>(null);
   const [promptTemplate, setPromptTemplate] = useState('');
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
+  const { showToast } = useToast();
+
+  // Simulate progress during report generation
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isGenerating) {
+      setGenerationProgress(0);
+      interval = setInterval(() => {
+        setGenerationProgress(prev => {
+          // Slow down progress as it gets closer to 90%
+          const increment = prev < 30 ? 5 : prev < 60 ? 3 : prev < 80 ? 1 : 0.5;
+          const newProgress = Math.min(prev + increment, 90);
+          return newProgress;
+        });
+      }, 300);
+    } else if (generationProgress > 0) {
+      // Complete the progress bar when generation is done
+      setGenerationProgress(100);
+      interval = setTimeout(() => {
+        setGenerationProgress(0);
+      }, 1000) as unknown as NodeJS.Timeout;
+    }
+    
+    return () => clearInterval(interval);
+  }, [isGenerating]);
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -49,7 +77,10 @@ const ReportSection: FC<ReportSectionProps> = ({
 
   const handleGenerateReport = async () => {
     if (selectedSources.length === 0 && selectedDocumentIds.length === 0) {
-      alert('Please select at least one source or document');
+      showToast({
+        type: 'warning',
+        message: 'Please select at least one source or document',
+      });
       return;
     }
 
@@ -62,9 +93,16 @@ const ReportSection: FC<ReportSectionProps> = ({
         promptTemplate || getDefaultPrompt()
       );
       setReport(response.report);
+      showToast({
+        type: 'success',
+        message: 'Report generated successfully!',
+      });
     } catch (error) {
       console.error('Error generating report:', error);
-      alert('Failed to generate report. Please try again.');
+      showToast({
+        type: 'error',
+        message: 'Failed to generate report. Please try again.',
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -137,9 +175,16 @@ const ReportSection: FC<ReportSectionProps> = ({
             });
             
             doc.save(`${searchQuery}_report.pdf`);
+            showToast({
+              type: 'success',
+              message: 'PDF exported successfully',
+            });
           } catch (err) {
             console.error("PDF error:", err);
-            alert("Error creating PDF. Try another format.");
+            showToast({
+              type: 'error',
+              message: 'Error creating PDF. Try another format.',
+            });
           }
           break;
 
@@ -206,9 +251,16 @@ const ReportSection: FC<ReportSectionProps> = ({
             // Generate and save DOCX
             const buffer = await docx.Packer.toBlob(doc);
             saveAs(buffer, `${searchQuery}_report.docx`);
+            showToast({
+              type: 'success',
+              message: 'DOCX exported successfully',
+            });
           } catch (err) {
             console.error("DOCX error:", err);
-            alert("Error creating DOCX. Try another format.");
+            showToast({
+              type: 'error',
+              message: 'Error creating DOCX. Try another format.',
+            });
           }
           break;
 
@@ -228,15 +280,25 @@ const ReportSection: FC<ReportSectionProps> = ({
             
             const textBlob = new Blob([textContent], { type: 'text/plain' });
             saveAs(textBlob, `${searchQuery}_report.txt`);
+            showToast({
+              type: 'success',
+              message: 'Text file exported successfully',
+            });
           } catch (err) {
             console.error("Text export error:", err);
-            alert("Error creating text file.");
+            showToast({
+              type: 'error',
+              message: 'Error creating text file.',
+            });
           }
           break;
       }
     } catch (error) {
       console.error('Export error:', error);
-      alert('Failed to export report: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      showToast({
+        type: 'error',
+        message: 'Failed to export report',
+      });
     } finally {
       setIsExporting(false);
     }
@@ -273,9 +335,15 @@ const ReportSection: FC<ReportSectionProps> = ({
         className={`w-full py-3 relative overflow-hidden rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center ${getButtonColorClass()}`}
       >
         {isGenerating ? (
-          <div className="relative overflow-hidden">
+          <div className="w-full relative overflow-hidden">
             <span className="text-white font-medium">Generating Report...</span>
             <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
+            <div className="absolute bottom-0 left-0 h-1 bg-white/30 rounded-full w-full mt-2">
+              <div 
+                className="h-full bg-white rounded-full transition-all duration-300"
+                style={{ width: `${generationProgress}%` }}
+              ></div>
+            </div>
           </div>
         ) : (
           <>
@@ -306,11 +374,19 @@ const ReportSection: FC<ReportSectionProps> = ({
               disabled={isExporting}
               className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-blue-800 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 disabled:opacity-50"
             >
-              {isExporting ? 'Exporting...' : 'Export'}
+              {isExporting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Exporting...
+                </>
+              ) : 'Export'}
             </button>
           </div>
           
-          <div className="bg-white dark:bg-black  border border-gray-200 dark:border-gray-300 text-gray-900 dark:text-gray-100 rounded-lg shadow-md p-6 prose !prose-invert max-w-none">
+          <div className="bg-white dark:bg-[#3b3b3b] border border-gray-200 dark:border-gray-300 text-gray-900 dark:text-gray-100 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none report-container">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
         </div>

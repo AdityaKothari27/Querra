@@ -16,6 +16,8 @@ export interface SearchConfig {
   maxResults: number;
   timeFilter: string;
   category?: string;
+  excludedDomains?: string[];
+  page?: number;
 }
 
 export interface CategoryConfig {

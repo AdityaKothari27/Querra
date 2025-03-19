@@ -12,7 +12,7 @@ export default async function handler(
   }
 
   try {
-    const { query, maxResults, timeFilter, category } = req.body;
+    const { query, maxResults, timeFilter, category, excludedDomains } = req.body;
     
     // Use the category to potentially modify the search query
     let enhancedQuery = query;
@@ -20,7 +20,12 @@ export default async function handler(
       enhancedQuery = `${query} ${category}`;
     }
     
-    const results = await searchClient.search(enhancedQuery, maxResults, timeFilter);
+    const results = await searchClient.search(
+      enhancedQuery, 
+      maxResults, 
+      timeFilter, 
+      excludedDomains || []
+    );
     
     res.status(200).json(results);
   } catch (error: any) {
