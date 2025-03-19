@@ -19,37 +19,11 @@ const ReportSection: FC<ReportSectionProps> = ({
   categoryConfig
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState(0);
   const [report, setReport] = useState<string | null>(null);
   const [promptTemplate, setPromptTemplate] = useState('');
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
-
-  // Simulate progress during report generation
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isGenerating) {
-      setGenerationProgress(0);
-      interval = setInterval(() => {
-        setGenerationProgress(prev => {
-          // Slow down progress as it gets closer to 90%
-          const increment = prev < 30 ? 5 : prev < 60 ? 3 : prev < 80 ? 1 : 0.5;
-          const newProgress = Math.min(prev + increment, 90);
-          return newProgress;
-        });
-      }, 300);
-    } else if (generationProgress > 0) {
-      // Complete the progress bar when generation is done
-      setGenerationProgress(100);
-      interval = setTimeout(() => {
-        setGenerationProgress(0);
-      }, 1000) as unknown as NodeJS.Timeout;
-    }
-    
-    return () => clearInterval(interval);
-  }, [isGenerating]);
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -112,10 +86,15 @@ const ReportSection: FC<ReportSectionProps> = ({
     if (categoryConfig && categoryConfig.promptTemplate) {
       return categoryConfig.promptTemplate;
     }
-    return 'Generate a comprehensive report based on the provided sources.';
+    return 'Generate a comprehensive report based on the provided sources. Include an introduction, key findings, analysis, and conclusion. Use citation notation like [1], [2], etc. when referencing specific sources.';
   };
 
   const handleExport = async () => {
+    if (!report) {
+      showToast({ type: 'error', message: 'No report available to export.' });
+      return;
+    }
+
     setIsExporting(true);
     try {
       switch (exportFormat.toLowerCase()) {
@@ -187,7 +166,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             });
           }
           break;
-
+          
         case 'docx':
           try {
             // Dynamic import
@@ -263,7 +242,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             });
           }
           break;
-
+          
         case 'txt':
           try {
             // Format text file
@@ -292,6 +271,12 @@ const ReportSection: FC<ReportSectionProps> = ({
             });
           }
           break;
+          
+        default:
+          showToast({
+            type: 'error',
+            message: 'Unsupported export format',
+          });
       }
     } catch (error) {
       console.error('Export error:', error);
@@ -335,15 +320,9 @@ const ReportSection: FC<ReportSectionProps> = ({
         className={`w-full py-3 relative overflow-hidden rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center ${getButtonColorClass()}`}
       >
         {isGenerating ? (
-          <div className="w-full relative overflow-hidden">
+          <div className="relative overflow-hidden">
             <span className="text-white font-medium">Generating Report...</span>
             <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
-            <div className="absolute bottom-0 left-0 h-1 bg-white/30 rounded-full w-full mt-2">
-              <div 
-                className="h-full bg-white rounded-full transition-all duration-300"
-                style={{ width: `${generationProgress}%` }}
-              ></div>
-            </div>
           </div>
         ) : (
           <>
@@ -386,8 +365,26 @@ const ReportSection: FC<ReportSectionProps> = ({
             </button>
           </div>
           
-          <div className="bg-white dark:bg-[#3b3b3b] border border-gray-200 dark:border-gray-300 text-gray-900 dark:text-gray-100 rounded-lg shadow-md p-6 prose dark:prose-invert max-w-none report-container">
+          <div className="prose dark:prose-invert max-w-none mt-6">
             <ReactMarkdown>{report}</ReactMarkdown>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Sources</h3>
+            <ol className="list-decimal list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-1">
+              {selectedSources.map((source, index) => (
+                <li key={index}>
+                  <a 
+                    href={source} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:underline text-blue-600 dark:text-blue-400"
+                  >
+                    {source}
+                  </a>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       )}
