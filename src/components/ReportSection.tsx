@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { generateReport } from '../lib/api';
 import { SparklesIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
@@ -22,6 +22,23 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [promptTemplate, setPromptTemplate] = useState('');
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
+
+  useEffect(() => {
+    const loadExportLibraries = async () => {
+      try {
+        if (typeof window !== 'undefined') {
+          const jsPDF = (await import('jspdf')).default;
+          const { Packer } = await import('docx');
+          
+          console.log('Export libraries loaded successfully');
+        }
+      } catch (error) {
+        console.error('Failed to load export libraries:', error);
+      }
+    };
+    
+    loadExportLibraries();
+  }, []);
 
   const getButtonColorClass = () => {
     if (categoryConfig && categoryConfig.color) {
@@ -61,41 +78,54 @@ const ReportSection: FC<ReportSectionProps> = ({
   };
 
   const handleExport = async () => {
-    if (!report) return;
-    
     setIsExporting(true);
     try {
-      const filename = `${searchQuery.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report`;
-      
-      if (exportFormat === 'PDF') {
-        // const doc = new Document();
-        // doc.html(report);
-        // const blob = await doc.save();
-        // saveAs(blob, `${filename}.pdf`);
-      } else if (exportFormat === 'DOCX') {
-        // Convert markdown to docx
-        // const docx = await import('docx');
-        // const doc = new docx.Document({
-        //   sections: [{
-        //     properties: {},
-        //     children: [
-        //       new docx.Paragraph({
-        //         text: report,
-        //         style: 'Normal',
-        //       }),
-        //     ],
-        //   }],
-        // });
-        
-        // const blob = await Packer.toBlob(doc);
-        // saveAs(blob, `${filename}.docx`);
-      } else if (exportFormat === 'TXT') {
-        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-        saveAs(blob, `${filename}.txt`);
+      switch (exportFormat.toLowerCase()) {
+        case 'pdf':
+          const jsPDFModule = await import('jspdf');
+          const jsPDF = jsPDFModule.default;
+          const doc = new jsPDF();
+          
+          doc.setFont("helvetica");
+          doc.setFontSize(18);
+          doc.text(`Research Report`, 105, 20, { align: 'center' });
+          
+          break;
+
+        case 'docx':
+          const docxModule = await import('docx');
+          const { Document, Packer, Paragraph, TextRun } = docxModule;
+          const saveAsModule = await import('file-saver');
+          const { saveAs } = saveAsModule;
+          
+          const doc2 = new Document({
+            sections: [{
+              properties: {},
+              children: [
+                // ... your existing DOCX code ...
+              ]
+            }]
+          });
+          
+          const buffer = await Packer.toBlob(doc2);
+          saveAs(buffer, `${searchQuery}_report.docx`);
+          break;
+
+        case 'txt':
+          const saveAsModuleTxt = await import('file-saver');
+          const { saveAs: saveAsTxt } = saveAsModuleTxt;
+          
+          const textContent = [
+            // ... your existing text export code ...
+          ].join('\n\n');
+          
+          const textBlob = new Blob([textContent], { type: 'text/plain' });
+          saveAsTxt(textBlob, `${searchQuery}_report.txt`);
+          break;
       }
     } catch (error) {
-      console.error('Error exporting report:', error);
-      alert('Failed to export report. Please try again.');
+      console.error('Export error:', error);
+      alert('Failed to export report: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsExporting(false);
     }
