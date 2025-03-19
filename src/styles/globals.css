@@ -142,4 +142,120 @@
 .dark .report-container ul li::marker,
 .dark .report-container ol li::marker {
   color: white !important;
+}
+
+/* Mobile Responsiveness Styles */
+@media (max-width: 768px) {
+  .prose {
+    font-size: 0.9rem;
+  }
+  
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .report-container {
+    padding: 1rem !important;
+  }
+  
+  /* Improve tap targets on mobile */
+  button, a, select, input[type="checkbox"] {
+    min-height: 36px;
+  }
+  
+  /* Fix for citation links on mobile */
+  .citation-link {
+    padding: 2px 4px;
+    margin: 0 1px;
+  }
+  
+  /* Source verification modal on mobile */
+  .fixed.inset-0 > div {
+    width: 95% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Convert flex rows to columns on mobile */
+  .md\:flex-row {
+    flex-direction: column !important;
+  }
+
+  /* Adjust grid columns for mobile */
+  .md\:grid-cols-2, 
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Adjust spacing on mobile */
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  /* Stack filters on mobile */
+  .flex.items-center.space-x-2 {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+/* Tablet Adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Adjust grid layouts for tablets */
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  /* Source verification card adjustments */
+  .fixed.inset-0 .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Fix source verification modal on mobile */
+@media (max-width: 640px) {
+  .fixed.inset-0 .p-6 {
+    padding: 0.75rem !important;
+  }
+  
+  .fixed.inset-0 .grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Improve readability of small text on mobile */
+  .text-xs {
+    font-size: 0.75rem !important;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  /* Make form inputs mobile friendly to prevent zoom */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Ensure buttons are properly spaced in flex containers */
+  .flex.gap-4 {
+    gap: 0.5rem !important;
+  }
 } 

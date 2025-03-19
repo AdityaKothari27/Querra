@@ -287,15 +287,17 @@ const SearchSection: FC<SearchSectionProps> = ({
                   onChange={() => handleSourceSelect(result.url)}
                   className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor={`source-${result.url}`} className="ml-3 cursor-pointer">
-                  <h3 className="text-lg font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                    <a href={result.url} target="_blank" rel="noopener noreferrer">
-                      {result.title}
-                    </a>
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">{result.snippet}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{result.url}</p>
-                </label>
+                <div className="ml-3 flex-1">
+                  <label htmlFor={`source-${result.url}`} className="cursor-pointer">
+                    <h3 className="text-lg font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                      <a href={result.url} target="_blank" rel="noopener noreferrer">
+                        {result.title}
+                      </a>
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{result.snippet}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{result.url}</p>
+                  </label>
+                </div>
               </div>
             ))}
           </div>
