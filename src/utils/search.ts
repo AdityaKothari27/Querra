@@ -30,9 +30,26 @@ export class GoogleSearch {
     return filters[timeFilter] || null;
   }
 
-  async search(query: string, maxResults: number = 10, timeFilter: string = "Any"): Promise<SearchResult[]> {
+  // Helper function to format excluded domains for Google Search API
+  private _format_excluded_domains(domains: string[]): string {
+    // Google search syntax: -site:example.com -site:another-example.com
+    return domains.map(domain => `-site:${domain}`).join(' ');
+  }
+
+  async search(
+    query: string, 
+    maxResults: number = 10, 
+    timeFilter: string = "Any",
+    excludedDomains: string[] = []
+  ): Promise<SearchResult[]> {
     if (!this.api_key || !this.cx) {
       throw new Error("Missing API key or Search Engine ID");
+    }
+
+    // Modify query to exclude domains if specified
+    let enhancedQuery = query;
+    if (excludedDomains && excludedDomains.length > 0) {
+      enhancedQuery = `${query} ${this._format_excluded_domains(excludedDomains)}`;
     }
 
     // Google API only allows 10 results per request, so we need to make multiple requests
@@ -45,7 +62,7 @@ export class GoogleSearch {
       const params = {
         key: this.api_key,
         cx: this.cx,
-        q: query,
+        q: enhancedQuery,
         num: 10, // Max allowed per request
         start: startIndex,
       };
