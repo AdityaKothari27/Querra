@@ -30,14 +30,14 @@ export const Toast: FC<ToastProps> = ({
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return <CheckCircleIcon className="h-5 w-5 text-green-400" />;
+        return <CheckCircleIcon className="h-5 w-5 text-green-800" />;
       case 'error':
-        return <XCircleIcon className="h-5 w-5 text-red-400" />;
+        return <XCircleIcon className="h-5 w-5 text-red-800" />;
       case 'warning':
-        return <ExclamationCircleIcon className="h-5 w-5 text-yellow-400" />;
+        return <ExclamationCircleIcon className="h-5 w-5 text-yellow-800" />;
       case 'info':
       default:
-        return <InformationCircleIcon className="h-5 w-5 text-blue-400" />;
+        return <InformationCircleIcon className="h-5 w-5 text-blue-800" />;
     }
   };
 
