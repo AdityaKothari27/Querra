@@ -365,13 +365,13 @@ const ReportSection: FC<ReportSectionProps> = ({
             </button>
           </div>
           
-          <div className="prose dark:prose-invert max-w-none mt-6">
+          <div className=" border border-gray-700 dark:border-gray-300 text-gray-900 dark:text-gray-100 rounded-lg shadow-md p-6 prose !prose-invert max-w-none ">
             <ReactMarkdown>{report}</ReactMarkdown>
           </div>
           
           <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700">
             <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Sources</h3>
-            <ol className="list-decimal list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-1">
+            <ol className="list-decimal list-inside text-sm text-gray-600 dark:text-white space-y-1 ml-1">
               {selectedSources.map((source, index) => (
                 <li key={index}>
                   <a 
