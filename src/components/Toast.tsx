@@ -72,14 +72,14 @@ export const Toast: FC<ToastProps> = ({
   const getTextColor = () => {
     switch (type) {
       case 'success':
-        return 'text-green-800 dark:text-green-200';
+        return 'text-green-800 dark:text-green-500';
       case 'error':
-        return 'text-red-800 dark:text-red-200';
+        return 'text-red-800 dark:text-red-500';
       case 'warning':
-        return 'text-yellow-800 dark:text-yellow-200';
+        return 'text-yellow-800 dark:text-yellow-500';
       case 'info':
       default:
-        return 'text-blue-800 dark:text-blue-200';
+        return 'text-blue-800 dark:text-blue-500';
     }
   };
 
