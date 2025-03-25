@@ -129,7 +129,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             let yPosition = 60;
             
             paragraphs.forEach((paragraph) => {
-              if (yPosition > 270) { // Check if near page bottom
+              if (yPosition > 250) { // Check if near page bottom
                 doc.addPage();
                 yPosition = 20;
               }
