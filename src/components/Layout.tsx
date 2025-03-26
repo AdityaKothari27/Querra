@@ -2,6 +2,7 @@ import { FC, ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from '../contexts/SessionContext';
 import { BeakerIcon, BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { Analytics } from "@vercel/analytics/react"
 
 interface LayoutProps {
   children: ReactNode;
@@ -118,6 +119,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <p>{new Date().getFullYear()} Deep Search. Vibe coded by <a href="https://x.com/aditya_kothari1?s=21">Aditya Kothari</a>. <a href="https://github.com/AdityaKothari27/Deep_Search">Source Code</a></p>
         </div>
       </footer>
+      <Analytics />
     </div>
   );
 };
