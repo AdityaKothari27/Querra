@@ -3,6 +3,7 @@ import { SearchResult, SearchConfig, CategoryConfig } from '../types/index';
 import { MagnifyingGlassIcon, ClockIcon, AdjustmentsHorizontalIcon, InformationCircleIcon, MinusCircleIcon, PlusCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import DocumentSelector from './DocumentSelector';
 import { useToast } from './Toast';
+import { useSession } from '../contexts/SessionContext';
 
 interface SearchSectionProps {
   onSearch: (query: string, config: SearchConfig) => Promise<void>;
@@ -20,12 +21,12 @@ const SearchSection: FC<SearchSectionProps> = ({
   searchResults,
   isLoading,
   categoryConfig,
+  selectedSources,
+  selectedDocumentIds
 }) => {
   const [query, setQuery] = useState('');
   const [maxResults, setMaxResults] = useState(10);
   const [timeFilter, setTimeFilter] = useState('Any');
-  const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showTip, setShowTip] = useState(true);
   const [excludedDomains, setExcludedDomains] = useState<string[]>([]);
@@ -33,12 +34,14 @@ const SearchSection: FC<SearchSectionProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const { showToast } = useToast();
+  const { searchQuery } = useSession();
 
-  // Reset selected results when category changes
+  // Use searchQuery from session when available
   useEffect(() => {
-    setSelectedSources([]);
-    setSelectedDocumentIds([]);
-  }, [categoryConfig]);
+    if (searchQuery) {
+      setQuery(searchQuery);
+    }
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,39 +52,27 @@ const SearchSection: FC<SearchSectionProps> = ({
         timeFilter, 
         excludedDomains: excludedDomains.length > 0 ? excludedDomains : undefined 
       });
-      setSelectedSources([]);
-      setSelectedDocumentIds([]);
     }
   };
 
   const handleSourceSelect = (url: string) => {
-    setSelectedSources(prev => 
-      prev.includes(url) 
-        ? prev.filter(source => source !== url)
-        : [...prev, url]
-    );
+    const newSelectedSources = selectedSources.includes(url) 
+      ? selectedSources.filter(source => source !== url)
+      : [...selectedSources, url];
     
-    onSourceSelect(
-      selectedSources.includes(url) 
-        ? selectedSources.filter(source => source !== url)
-        : [...selectedSources, url],
-      selectedDocumentIds
-    );
+    onSourceSelect(newSelectedSources, selectedDocumentIds);
   };
 
   const handleSelectAll = () => {
     const allUrls = currentPageResults.map(result => result.url);
-    if (selectedSources.length === currentPageResults.length) {
-      setSelectedSources([]);
-      onSourceSelect([], selectedDocumentIds);
-    } else {
-      setSelectedSources(allUrls);
-      onSourceSelect(allUrls, selectedDocumentIds);
-    }
+    const newSelectedSources = selectedSources.length === currentPageResults.length 
+      ? [] 
+      : allUrls;
+      
+    onSourceSelect(newSelectedSources, selectedDocumentIds);
   };
 
   const handleDocumentSelect = (documentIds: number[]) => {
-    setSelectedDocumentIds(documentIds);
     onSourceSelect(selectedSources, documentIds);
   };
 

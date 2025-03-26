@@ -58,24 +58,50 @@ export const generateReport = async (
 };
 
 export const getReports = async (): Promise<Report[]> => {
-  const response = await api.get('/reports');
-  return response.data;
+  try {
+    const response = await api.get('/reports');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching reports:', error);
+    return [];
+  }
 };
 
 export const getDocuments = async (): Promise<Document[]> => {
-  const response = await api.get('/documents');
-  return response.data;
+  try {
+    const response = await api.get('/documents');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+    return [];
+  }
 };
 
 export const searchReports = async (query: string): Promise<Report[]> => {
-  const response = await api.get('/reports/search', { params: { query } });
-  return response.data;
+  try {
+    const response = await api.get('/reports/search', { params: { query } });
+    return response.data;
+  } catch (error) {
+    console.error('Error searching reports:', error);
+    return [];
+  }
 };
 
-export const deleteReport = async (id: number): Promise<void> => {
-  await api.delete(`/reports/${id}`);
+export const deleteReport = async (reportId: number) => {
+  try {
+    const response = await api.delete(`/reports/${reportId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting report:', error);
+    throw error;
+  }
 };
 
 export const deleteDocument = async (id: number): Promise<void> => {
-  await api.delete(`/documents?id=${id}`);
+  try {
+    await api.delete(`/documents`, { params: { id } });
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    throw error;
+  }
 }; 

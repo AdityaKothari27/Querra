@@ -1,84 +1,42 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { SearchResult, SearchConfig } from '../types';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 interface SessionContextType {
-  // Search state
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  searchResults: SearchResult[];
-  setSearchResults: (results: SearchResult[]) => void;
+  searchResults: any[];
+  setSearchResults: (results: any[]) => void;
   selectedSources: string[];
   setSelectedSources: (sources: string[]) => void;
   selectedDocumentIds: number[];
   setSelectedDocumentIds: (ids: number[]) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  searchConfig: SearchConfig | null;
-  setSearchConfig: (config: SearchConfig | null) => void;
-  
-  // Report state
-  generatedReport: string | null;
-  setGeneratedReport: (report: string | null) => void;
+  searchConfig: any;
+  setSearchConfig: (config: any) => void;
+  generatedReport: any;
+  setGeneratedReport: (report: any) => void;
   clearSession: () => void;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-interface SessionProviderProps {
-  children: ReactNode;
-}
+export const useSession = () => {
+  const context = useContext(SessionContext);
+  if (!context) {
+    throw new Error('useSession must be used within a SessionProvider');
+  }
+  return context;
+};
 
-export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
-  // Search state
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<number[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('general');
-  const [searchConfig, setSearchConfig] = useState<SearchConfig | null>(null);
-  
-  // Report state
-  const [generatedReport, setGeneratedReport] = useState<string | null>(null);
-  
-  // Load session from localStorage on mount
-  useEffect(() => {
-    try {
-      const savedSession = localStorage.getItem('researchSession');
-      if (savedSession) {
-        const parsedSession = JSON.parse(savedSession);
-        setSearchQuery(parsedSession.searchQuery || '');
-        setSearchResults(parsedSession.searchResults || []);
-        setSelectedSources(parsedSession.selectedSources || []);
-        setSelectedDocumentIds(parsedSession.selectedDocumentIds || []);
-        setSelectedCategory(parsedSession.selectedCategory || 'general');
-        setSearchConfig(parsedSession.searchConfig || null);
-        setGeneratedReport(parsedSession.generatedReport || null);
-      }
-    } catch (error) {
-      console.error('Error loading session:', error);
-      // If loading fails, clear localStorage to prevent future errors
-      localStorage.removeItem('researchSession');
-    }
-  }, []);
-  
-  // Save session to localStorage whenever state changes
-  useEffect(() => {
-    try {
-      const sessionData = {
-        searchQuery,
-        searchResults,
-        selectedSources,
-        selectedDocumentIds,
-        selectedCategory,
-        searchConfig,
-        generatedReport
-      };
-      localStorage.setItem('researchSession', JSON.stringify(sessionData));
-    } catch (error) {
-      console.error('Error saving session:', error);
-    }
-  }, [searchQuery, searchResults, selectedSources, selectedDocumentIds, selectedCategory, searchConfig, generatedReport]);
-  
+  const [selectedCategory, setSelectedCategory] = useState('general');
+  const [searchConfig, setSearchConfig] = useState<any>(null);
+  const [generatedReport, setGeneratedReport] = useState<any>(null);
+
   const clearSession = () => {
     setSearchQuery('');
     setSearchResults([]);
@@ -89,7 +47,50 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     setGeneratedReport(null);
     localStorage.removeItem('researchSession');
   };
-  
+
+  useEffect(() => {
+    const sessionData = localStorage.getItem('researchSession');
+    if (sessionData) {
+      const {
+        searchQuery,
+        searchResults,
+        selectedSources,
+        selectedDocumentIds,
+        selectedCategory,
+        searchConfig,
+        generatedReport,
+      } = JSON.parse(sessionData);
+      setSearchQuery(searchQuery);
+      setSearchResults(searchResults);
+      setSelectedSources(selectedSources);
+      setSelectedDocumentIds(selectedDocumentIds);
+      setSelectedCategory(selectedCategory);
+      setSearchConfig(searchConfig);
+      setGeneratedReport(generatedReport);
+    }
+  }, []);
+
+  useEffect(() => {
+    const sessionData = {
+      searchQuery,
+      searchResults,
+      selectedSources,
+      selectedDocumentIds,
+      selectedCategory,
+      searchConfig,
+      generatedReport,
+    };
+    localStorage.setItem('researchSession', JSON.stringify(sessionData));
+  }, [
+    searchQuery,
+    searchResults,
+    selectedSources,
+    selectedDocumentIds,
+    selectedCategory,
+    searchConfig,
+    generatedReport,
+  ]);
+
   return (
     <SessionContext.Provider
       value={{
@@ -107,18 +108,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
         setSearchConfig,
         generatedReport,
         setGeneratedReport,
-        clearSession
+        clearSession,
       }}
     >
       {children}
     </SessionContext.Provider>
   );
 };
-
-export const useSession = (): SessionContextType => {
-  const context = useContext(SessionContext);
-  if (context === undefined) {
-    throw new Error('useSession must be used within a SessionProvider');
-  }
-  return context;
-}; 

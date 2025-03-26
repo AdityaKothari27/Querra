@@ -199,25 +199,21 @@ export class Database {
     }
   }
 
-  async delete_report(id: number) {
+  async delete_report(id: number): Promise<void> {
     const db = await this.getConnection();
     if (db) {
       try {
+        // Delete the report from SQLite
         await db.run('DELETE FROM reports WHERE id = ?', id);
       } catch (error) {
-        console.error('Error deleting report from SQLite:', error);
-        // Also update in-memory storage
-        const index = inMemoryDB.reports.findIndex(r => r.id === id);
-        if (index !== -1) {
-          inMemoryDB.reports.splice(index, 1);
-        }
+        console.error(`Error deleting report ${id} from SQLite:`, error);
       }
-    } else {
-      // Use in-memory storage
-      const index = inMemoryDB.reports.findIndex(r => r.id === id);
-      if (index !== -1) {
-        inMemoryDB.reports.splice(index, 1);
-      }
+    }
+    
+    // Also update in-memory storage if needed
+    const index = inMemoryDB.reports.findIndex(r => r.id === id);
+    if (index !== -1) {
+      inMemoryDB.reports.splice(index, 1);
     }
   }
 
