@@ -4,26 +4,30 @@ import { SparklesIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
 import { useToast } from './Toast';
+import { useSession } from '../contexts/SessionContext';
 
 interface ReportSectionProps {
   searchQuery: string;
   selectedSources: string[];
   selectedDocumentIds: number[];
   categoryConfig: any;
+  initialReport?: string | null;
 }
 
 const ReportSection: FC<ReportSectionProps> = ({ 
   searchQuery, 
   selectedSources,
   selectedDocumentIds,
-  categoryConfig
+  categoryConfig,
+  initialReport = null
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [report, setReport] = useState<string | null>(null);
+  const [report, setReport] = useState<string | null>(initialReport);
   const [promptTemplate, setPromptTemplate] = useState('');
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
+  const { setGeneratedReport } = useSession();
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -41,6 +45,12 @@ const ReportSection: FC<ReportSectionProps> = ({
     
     loadExportLibraries();
   }, []);
+
+  useEffect(() => {
+    if (report) {
+      setGeneratedReport(report);
+    }
+  }, [report, setGeneratedReport]);
 
   const getButtonColorClass = () => {
     if (categoryConfig && categoryConfig.color) {

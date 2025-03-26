@@ -82,6 +82,13 @@ The application allows users to:
 - TXT (plain text)
 - MD (Markdown format for easy version control and further editing)
 
+### 🔄 Session Management
+- Persistent state across page navigation
+- All search results, selected sources, and generated reports are preserved
+- Resume your research exactly where you left off
+- Easily clear session data when starting new research
+- Session data is securely stored in the browser's local storage
+
 ## Tech Stack
 
 ### Frontend

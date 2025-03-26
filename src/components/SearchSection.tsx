@@ -10,6 +10,8 @@ interface SearchSectionProps {
   searchResults: SearchResult[];
   isLoading: boolean;
   categoryConfig: CategoryConfig;
+  selectedSources: string[];
+  selectedDocumentIds: number[];
 }
 
 const SearchSection: FC<SearchSectionProps> = ({
