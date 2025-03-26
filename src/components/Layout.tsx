@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BeakerIcon, BookOpenIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
+import { useSession } from '../contexts/SessionContext';
+import { BeakerIcon, BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,6 +10,8 @@ interface LayoutProps {
 const Layout: FC<LayoutProps> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [scrolled, setScrolled] = useState(false);
+
+  const { clearSession } = useSession();
 
   useEffect(() => {
     // Check for saved theme preference or use system preference
@@ -69,6 +72,20 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                 <MoonIcon className="h-5 w-5" />
               )}
             </button>
+            
+            <button 
+              onClick={() => {
+                clearSession();
+                // Show toast
+                window.alert('Session cleared successfully!');
+              }}
+              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm"
+              aria-label="Clear session"
+              title="Clear session"
+            >
+              <TrashIcon className="h-5 w-5" />
+            </button>
+            
             <nav>
               <ul className="flex space-x-6">
                 <li>
@@ -98,7 +115,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       </main>
       <footer className="bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>{new Date().getFullYear()} Deep Search. Vibe coded by <a href = "https://x.com/aditya_kothari1?s=21">Aditya Kothari</a>. <a href = "https://github.com/AdityaKothari27/Deep_Search">Source Code</a></p>
+          <p>{new Date().getFullYear()} Deep Search. Vibe coded by <a href="https://x.com/aditya_kothari1?s=21">Aditya Kothari</a>. <a href="https://github.com/AdityaKothari27/Deep_Search">Source Code</a></p>
         </div>
       </footer>
     </div>
