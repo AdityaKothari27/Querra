@@ -4,12 +4,14 @@ import FileUpload from '../components/FileUpload';
 import { getReports, getDocuments, deleteReport, deleteDocument } from '../lib/api';
 import { Report, Document } from '../types/index';
 import { TrashIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { useToast } from '../components/Toast';
 
 const KnowledgeBasePage: FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [activeTab, setActiveTab] = useState<'reports' | 'documents'>('reports');
   const [isVercelEnvironment, setIsVercelEnvironment] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     // Check if running on Vercel
@@ -56,21 +58,38 @@ const KnowledgeBasePage: FC = () => {
 
   const handleDeleteReport = async (id: number) => {
     if (confirm('Are you sure you want to delete this report?')) {
-      await deleteReport(id);
-      loadData();
+      try {
+        await deleteReport(id);
+        await loadData(); // Reload data after successful deletion
+        showToast({
+          type: 'success',
+          message: 'Report deleted successfully',
+        });
+      } catch (error) {
+        console.error('Error deleting report:', error);
+        showToast({
+          type: 'error',
+          message: 'Failed to delete report',
+        });
+      }
     }
   };
 
   const handleDeleteDocument = async (id: number) => {
     if (confirm('Are you sure you want to delete this document?')) {
       try {
-        await fetch(`/api/documents?id=${id}`, {
-          method: 'DELETE'
+        await deleteDocument(id);
+        await loadData(); // Reload data after successful deletion
+        showToast({
+          type: 'success',
+          message: 'Document deleted successfully',
         });
-        loadData();
       } catch (error) {
         console.error('Error deleting document:', error);
-        alert('Failed to delete document. Please try again.');
+        showToast({
+          type: 'error',
+          message: 'Failed to delete document',
+        });
       }
     }
   };
