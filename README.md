@@ -76,6 +76,12 @@ The application allows users to:
 - Improved mobile responsiveness
 - Enhanced error handling and informative messages
 
+### **Multiple Export Formats**: Export your research reports in various formats:
+- PDF (formatted document with sections and styling)
+- DOCX (Microsoft Word compatible)
+- TXT (plain text)
+- MD (Markdown format for easy version control and further editing)
+
 ## Tech Stack
 
 ### Frontend

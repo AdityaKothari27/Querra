@@ -272,6 +272,35 @@ const ReportSection: FC<ReportSectionProps> = ({
           }
           break;
           
+        case 'markdown':
+        case 'md':
+          try {
+            // Format markdown content
+            const markdownContent = [
+              '# Research Report\n',
+              `## Topic: ${searchQuery}\n`,
+              `Generated: ${new Date().toLocaleDateString()}\n`,
+              '\n---\n',
+              report,
+              '\n## Sources\n',
+              selectedSources.map((source, index) => `${index + 1}. ${source}`).join('\n')
+            ].join('\n');
+            
+            const markdownBlob = new Blob([markdownContent], { type: 'text/markdown' });
+            saveAs(markdownBlob, `${searchQuery}_report.md`);
+            showToast({
+              type: 'success',
+              message: 'Markdown file exported successfully',
+            });
+          } catch (err) {
+            console.error("Markdown export error:", err);
+            showToast({
+              type: 'error',
+              message: 'Error creating Markdown file.',
+            });
+          }
+          break;
+          
         default:
           showToast({
             type: 'error',
@@ -347,6 +376,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               <option value="PDF">PDF</option>
               <option value="DOCX">DOCX</option>
               <option value="TXT">TXT</option>
+              <option value="MD">Markdown</option>
             </select>
             <button
               onClick={handleExport}
