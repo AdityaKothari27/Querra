@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useSession } from '../contexts/SessionContext';
 import { BeakerIcon, BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 interface LayoutProps {
   children: ReactNode;
@@ -120,6 +121,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
         </div>
       </footer>
       <Analytics />
+      <SpeedInsights />
     </div>
   );
 };
