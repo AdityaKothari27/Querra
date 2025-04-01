@@ -72,6 +72,25 @@ const SearchSection: FC<SearchSectionProps> = ({
     onSourceSelect(newSelectedSources, selectedDocumentIds);
   };
 
+  const handleSelectAllResults = () => {
+    // If all search results are already selected, deselect all
+    const allResultUrls = searchResults.map(result => result.url);
+    const allSelected = allResultUrls.every(url => selectedSources.includes(url));
+    
+    if (allSelected) {
+      // Deselect all search results (but keep document selections)
+      const newSelectedSources = selectedSources.filter(
+        url => !allResultUrls.includes(url)
+      );
+      onSourceSelect(newSelectedSources, selectedDocumentIds);
+    } else {
+      // Select all search results
+      // Create a Set and convert it back to an array to remove duplicates
+      const uniqueSources = Array.from(new Set([...selectedSources, ...allResultUrls]));
+      onSourceSelect(uniqueSources, selectedDocumentIds);
+    }
+  };
+
   const handleDocumentSelect = (documentIds: number[]) => {
     onSourceSelect(selectedSources, documentIds);
   };
@@ -262,12 +281,20 @@ const SearchSection: FC<SearchSectionProps> = ({
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
               Search Results {searchResults.length > 0 && <span className="text-sm font-normal text-gray-500 dark:text-gray-400">({startIndex + 1}-{endIndex} of {searchResults.length})</span>}
             </h2>
-            <button
-              onClick={handleSelectAll}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              {selectedSources.length === currentPageResults.length ? 'Deselect All' : 'Select All'}
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleSelectAll}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {selectedSources.length === currentPageResults.length ? 'Deselect Page' : 'Select Page'}
+              </button>
+              <button
+                onClick={handleSelectAllResults}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {searchResults.every(result => selectedSources.includes(result.url)) ? 'Deselect All Results' : 'Select All Results'}
+              </button>
+            </div>
           </div>
           
           <div className="space-y-4">
