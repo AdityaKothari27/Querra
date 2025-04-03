@@ -9,8 +9,8 @@ export class GeminiProcessor {
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY || '';
     this.genAI = new GoogleGenerativeAI(apiKey);
-    // this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro-exp-03-25" });
+    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro-exp-03-25" });
   }
 
   private async delay(ms: number) {
