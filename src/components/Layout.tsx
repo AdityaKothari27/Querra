@@ -58,11 +58,11 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       } border-b border-gray-200 dark:border-gray-800`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center group">
-            <div className="relative h-10 w-10">
+            <div className="relative h-10 w-13">
               <Image 
-                src="/images/Querralogo.png" 
+                src="/images/querrawobg.png" 
                 alt="Querra Logo" 
-                width={40} 
+                width={100} 
                 height={40} 
                 className="transition-transform group-hover:scale-105" 
                 priority
