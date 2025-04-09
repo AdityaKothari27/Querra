@@ -57,20 +57,17 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           : 'backdrop-blur-md bg-white dark:bg-black'
       } border-b border-gray-200 dark:border-gray-800`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="relative h-8 w-8">
+          <Link href="/" className="flex items-center group">
+            <div className="relative h-10 w-10">
               <Image 
                 src="/images/Querralogo.png" 
                 alt="Querra Logo" 
-                width={32} 
-                height={32} 
+                width={40} 
+                height={40} 
                 className="transition-transform group-hover:scale-105" 
                 priority
               />
             </div>
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              Querra
-            </span>
           </Link>
           <div className="flex items-center space-x-6">
             <button 
