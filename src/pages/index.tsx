@@ -64,8 +64,8 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Deep Search - AI-Powered Research Assistant</title>
-        <meta name="description" content="AI-powered research assistant for comprehensive reports" />
+        <title>Querra - AI-Powered Research Assistant</title>
+        <meta name="description" content="Querra - AI-powered research assistant for comprehensive reports" />
       </Head>
 
       <div className="space-y-8">

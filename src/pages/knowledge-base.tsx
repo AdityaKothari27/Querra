@@ -5,6 +5,7 @@ import { getReports, getDocuments, deleteReport, deleteDocument } from '../lib/a
 import { Report, Document } from '../types/index';
 import { TrashIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { useToast } from '../components/Toast';
+import Head from 'next/head';
 
 const KnowledgeBasePage: FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
@@ -96,6 +97,10 @@ const KnowledgeBasePage: FC = () => {
 
   return (
     <Layout>
+      <Head>
+        <title>Knowledge Base | Querra</title>
+        <meta name="description" content="Manage your document collection and stored reports" />
+      </Head>
       <div className="space-y-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Knowledge Base</h1>
         

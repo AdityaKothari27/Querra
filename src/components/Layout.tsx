@@ -1,7 +1,8 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession } from '../contexts/SessionContext';
-import { BeakerIcon, BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -57,9 +58,18 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       } border-b border-gray-200 dark:border-gray-800`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2 group">
-            <BeakerIcon className="h-8 w-8 text-blue-600 dark:text-indigo-400 group-hover:text-blue-500 dark:group-hover:text-indigo-300 transition-colors duration-300" />
+            <div className="relative h-8 w-8">
+              <Image 
+                src="/images/Querralogo.png" 
+                alt="Querra Logo" 
+                width={32} 
+                height={32} 
+                className="transition-transform group-hover:scale-105" 
+                priority
+              />
+            </div>
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              Deep Search
+              Querra
             </span>
           </Link>
           <div className="flex items-center space-x-6">
@@ -118,7 +128,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       <footer className="bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 grid grid-cols-3 text-gray-600 dark:text-gray-400">
           <div className="text-left">
-            Deep Search 2025
+            Querra 2025
           </div>
           <div className="text-center">
             Vibe coded by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a> · <a href="https://github.com/AdityaKothari27/Deep_Search" className="hover:text-blue-500 dark:hover:text-blue-400">Source Code</a>
