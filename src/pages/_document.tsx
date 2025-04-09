@@ -7,6 +7,9 @@ export default function Document() {
         <link rel="icon" href="/images/Querralogo.png" />
         <meta name="application-name" content="Querra" />
         <meta name="apple-mobile-web-app-title" content="Querra" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
       </Head>
       <body>
         {/* Script to prevent dark mode flash */}
