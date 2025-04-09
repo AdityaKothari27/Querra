@@ -1,8 +1,45 @@
-# Deep Search
+# Querra: AI-Powered Research Assistant
 
-A powerful AI-powered search assistant that helps you gather information, analyze sources, and generate comprehensive reports on any topic.
+Querra is an advanced research assistant that helps you gather, analyze, and synthesize information from the web. Powered by Google's Gemini AI, it provides comprehensive research reports based on web sources and your personal document collection.
 
-![Deep Search](https://via.placeholder.com/800x400?text=Deep+Research)
+## Features
+
+- **Web Search Integration**: Search the web and select relevant sources for your research
+- **Document Management**: Upload and manage your own documents
+- **Knowledge Base**: Save and organize research reports
+- **Multiple Export Formats**: Export your research reports in various formats:
+  - PDF (formatted document with sections and styling)
+  - DOCX (Microsoft Word compatible)
+  - TXT (plain text)
+  - MD (Markdown format for easy version control and further editing)
+- **Session Management**: Preserve your research progress across navigation
+
+## Quick Start
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables (see below)
+4. Run the development server: `npm run dev`
+5. Navigate to `http://localhost:3000`
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```
+GEMINI_API_KEY=your_gemini_api_key
+GOOGLE_API_KEY=your_google_api_key
+GOOGLE_CX=your_google_custom_search_id
+```
+
+## Technologies
+
+- Next.js
+- TypeScript
+- TailwindCSS
+- Google Gemini API
+- Google Custom Search API
+- SQLite (for document storage)
 
 ## Table of Contents
 

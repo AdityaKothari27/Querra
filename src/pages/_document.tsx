@@ -2,8 +2,12 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html>
-      <Head />
+    <Html lang="en">
+      <Head>
+        <link rel="icon" href="/images/Querralogo.png" />
+        <meta name="application-name" content="Querra" />
+        <meta name="apple-mobile-web-app-title" content="Querra" />
+      </Head>
       <body>
         {/* Script to prevent dark mode flash */}
         <script dangerouslySetInnerHTML={{
