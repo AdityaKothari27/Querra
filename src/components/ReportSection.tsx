@@ -27,7 +27,7 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
-  const { setGeneratedReport } = useSession();
+  const { setGeneratedReport, generatedReport } = useSession();
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -51,6 +51,14 @@ const ReportSection: FC<ReportSectionProps> = ({
       setGeneratedReport(report);
     }
   }, [report, setGeneratedReport]);
+
+  useEffect(() => {
+    if (generatedReport === null && report !== null) {
+      setReport(null);
+    } else if (generatedReport !== null && initialReport === null) {
+      setReport(generatedReport);
+    }
+  }, [generatedReport, report, initialReport]);
 
   const getButtonColorClass = () => {
     if (categoryConfig && categoryConfig.color) {

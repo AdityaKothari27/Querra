@@ -5,6 +5,7 @@ import { useSession } from '../contexts/SessionContext';
 import { BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { useToast } from './Toast';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
   const [scrolled, setScrolled] = useState(false);
 
   const { clearSession } = useSession();
+  const { showToast } = useToast();
 
   useEffect(() => {
     // Check for saved theme preference or use system preference
@@ -85,8 +87,10 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             <button 
               onClick={() => {
                 clearSession();
-                // Show toast
-                window.alert('Session cleared successfully!');
+                showToast({
+                  type: 'success',
+                  message: 'Session cleared successfully!'
+                });
               }}
               className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm"
               aria-label="Clear session"

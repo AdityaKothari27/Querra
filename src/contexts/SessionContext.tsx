@@ -38,6 +38,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [generatedReport, setGeneratedReport] = useState<any>(null);
 
   const clearSession = () => {
+    // Set all state to initial values
     setSearchQuery('');
     setSearchResults([]);
     setSelectedSources([]);
@@ -45,7 +46,20 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setSelectedCategory('general');
     setSearchConfig(null);
     setGeneratedReport(null);
+    
+    // Remove from localStorage
     localStorage.removeItem('researchSession');
+    
+    // Log for verification
+    console.log('Session cleared - state reset to:', {
+      searchQuery: '',
+      searchResults: [],
+      selectedSources: [],
+      selectedDocumentIds: [],
+      selectedCategory: 'general',
+      searchConfig: null,
+      generatedReport: null
+    });
   };
 
   useEffect(() => {
