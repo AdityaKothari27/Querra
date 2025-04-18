@@ -26,6 +26,18 @@ export default function Home() {
     generatedReport
   } = useSession();
   
+  // Log session data on mount for debugging
+  useEffect(() => {
+    console.log('Session data on mount:', {
+      searchQuery,
+      searchResultsCount: searchResults.length,
+      selectedSourcesCount: selectedSources.length,
+      selectedDocumentIdsCount: selectedDocumentIds.length,
+      selectedCategory,
+      generatedReport: generatedReport ? 'Present' : 'None'
+    });
+  }, [searchQuery, searchResults, selectedSources, selectedDocumentIds, selectedCategory, generatedReport]);
+
   const handleSearch = async (query: string, config: SearchConfig) => {
     setIsLoading(true);
     setSearchQuery(query);

@@ -40,6 +40,9 @@ const SearchSection: FC<SearchSectionProps> = ({
   useEffect(() => {
     if (searchQuery) {
       setQuery(searchQuery);
+    } else if (searchQuery === '' && query !== '') {
+      // Reset the query when session is cleared
+      setQuery('');
     }
   }, [searchQuery]);
 
