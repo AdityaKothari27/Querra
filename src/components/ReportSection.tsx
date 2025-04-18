@@ -49,16 +49,24 @@ const ReportSection: FC<ReportSectionProps> = ({
   useEffect(() => {
     if (report) {
       setGeneratedReport(report);
+      console.log('Report updated, syncing to session:', report.substring(0, 50) + '...');
     }
   }, [report, setGeneratedReport]);
 
+  // Initialize from session if available
   useEffect(() => {
-    if (generatedReport === null && report !== null) {
-      setReport(null);
-    } else if (generatedReport !== null && initialReport === null) {
+    if (generatedReport && (!report || initialReport === null)) {
+      console.log('Initializing from session:', generatedReport.substring(0, 50) + '...');
       setReport(generatedReport);
     }
   }, [generatedReport, report, initialReport]);
+
+  // Reset when session is cleared
+  useEffect(() => {
+    if (generatedReport === null && report !== null) {
+      setReport(null);
+    }
+  }, [generatedReport, report]);
 
   const getButtonColorClass = () => {
     if (categoryConfig && categoryConfig.color) {
@@ -84,7 +92,13 @@ const ReportSection: FC<ReportSectionProps> = ({
         selectedDocumentIds,
         promptTemplate || getDefaultPrompt()
       );
+      
+      // Update local state first
       setReport(response.report);
+      
+      // Then update session state
+      setGeneratedReport(response.report);
+      
       showToast({
         type: 'success',
         message: 'Report generated successfully!',
