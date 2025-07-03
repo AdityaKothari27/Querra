@@ -1,94 +1,277 @@
 # Querra: AI-Powered Research Assistant
 
-Querra is an advanced research assistant that helps you gather, analyze, and synthesize information from the web. Powered by Google's Gemini AI, it provides comprehensive research reports based on web sources and your personal document collection.
+Querra is an advanced, intelligent research assistant that revolutionizes how you gather, analyze, and synthesize information from the web and your personal documents. Powered by Google's Gemini AI and equipped with sophisticated search capabilities, Querra provides comprehensive research reports tailored to specific domains and use cases.
 
-## Features
+## 🚀 Key Features
 
-- **Web Search Integration**: Search the web and select relevant sources for your research
-- **Document Management**: Upload and manage your own documents
-- **Knowledge Base**: Save and organize research reports
-- **Multiple Export Formats**: Export your research reports in various formats:
-  - PDF (formatted document with sections and styling)
-  - DOCX (Microsoft Word compatible)
-  - TXT (plain text)
-  - MD (Markdown format for easy version control and further editing)
-- **Session Management**: Preserve your research progress across navigation
+### 🔍 **Advanced Web Search with Category Intelligence**
+- **Smart Categorical Search**: 6 specialized search categories (General, Academic, Financial, Technology, Health & Medical, Legal)
+- **Google Custom Search Integration**: Leverages Google's powerful search API with custom filtering
+- **Time-based Filtering**: Search within specific timeframes (Past 24 hours, week, month, year)
+- **Domain Exclusion**: Filter out unwanted domains for refined results
+- **Pagination Support**: Handle large result sets efficiently
 
-## Quick Start
+### 📚 **Document Management System**
+- **Multi-format Document Upload**: Support for PDF, DOCX, TXT, and MD files
+- **Document Integration**: Seamlessly combine web sources with personal documents
+- **Knowledge Base Storage**: Persistent storage of uploaded documents and generated reports
+- **Content Extraction**: Advanced PDF and document text extraction capabilities
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up environment variables (see below)
-4. Run the development server: `npm run dev`
-5. Navigate to `http://localhost:3000`
+### 🤖 **AI-Powered Report Generation**
+- **Context-Aware AI**: Utilizes Google Gemini 2.0 Flash for intelligent content synthesis
+- **Category-Specific Prompts**: Tailored AI prompts for each research category
+- **Source Attribution**: Clear tracking and citation of all sources used
+- **Markdown Formatting**: Rich, structured output with proper formatting
 
-## Environment Variables
+### 📄 **Multiple Export Formats**
+- **PDF Export**: Professional formatted documents with proper styling
+- **DOCX Export**: Microsoft Word compatible files
+- **TXT Export**: Plain text for universal compatibility
+- **MD Export**: Markdown format for version control and further editing
 
-Create a `.env.local` file in the root directory with the following variables:
+### 💾 **Session & Knowledge Management**
+- **Session Persistence**: Maintain research state across page navigation
+- **Report History**: Access and manage previously generated reports
+- **Document Library**: Organized storage and retrieval of uploaded documents
+- **Cross-Platform Compatibility**: Works in both serverless and traditional environments
+
+## 🛠 Technology Stack
+
+- **Frontend**: Next.js 15.2.4, React 18, TypeScript 5.7.3
+- **Styling**: Tailwind CSS 4.0.6, Heroicons
+- **AI Integration**: Google Generative AI (@google/generative-ai)
+- **Search API**: Google Custom Search API
+- **Database**: SQLite3 with in-memory fallback for serverless
+- **Document Processing**: PDF-parse, PDF-lib, DOCX
+- **Content Extraction**: Cheerio, Axios
+- **Export Libraries**: jsPDF, file-saver
+
+## 🏗 Architecture Overview
+
+Querra follows a modern Next.js architecture with API routes handling backend operations:
+
+- **Frontend**: React components with TypeScript
+- **API Layer**: Next.js API routes for search, generation, and data management
+- **AI Processing**: Google Gemini integration for content synthesis
+- **Data Layer**: SQLite database with serverless compatibility
+- **Search Engine**: Google Custom Search API integration
+
+## 📋 Prerequisites
+
+Before installing Querra, ensure you have:
+
+1. **Node.js** (version 18 or higher)
+2. **npm** or **yarn** package manager
+3. **Google API Key** with Custom Search API enabled
+4. **Google Custom Search Engine ID**
+5. **Google Gemini API Key**
+
+## 🚀 Installation & Setup
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/querra.git
+cd querra
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Environment Configuration
+Create a `.env.local` file in the root directory:
+
+```bash
+# Required API Keys
+GEMINI_API_KEY=your_gemini_api_key_here
+GOOGLE_API_KEY=your_google_api_key_here
+GOOGLE_CX=your_google_custom_search_engine_id
+
+# Optional Configuration
+NEXT_PUBLIC_VERCEL_ENV=development
+```
+
+### 4. API Key Setup Guide
+
+#### Google Gemini API Key:
+1. Visit [Google AI Studio](https://aistudio.google.com/)
+2. Create a new project or select existing one
+3. Generate an API key for Gemini
+4. Copy the API key to your `.env.local` file
+
+#### Google Custom Search Setup:
+1. Visit [Google Custom Search](https://cse.google.com/)
+2. Create a new search engine
+3. Get your Search Engine ID (CX)
+4. Enable Custom Search API in [Google Cloud Console](https://console.cloud.google.com/)
+5. Create an API key with Custom Search API access
+
+### 5. Run the Application
+```bash
+# Development mode
+npm run dev
+
+# Production build
+npm run build
+npm start
+
+# Linting
+npm run lint
+```
+
+### 6. Access the Application
+Open your browser and navigate to:
+```
+http://localhost:3000
+```
+
+## 📖 How to Use Querra
+
+### 1. **Select Research Category**
+Choose from 6 specialized categories based on your research needs:
+- **General Search**: Broad research across multiple domains
+- **Academic Search**: Scholarly articles and research papers
+- **Financial Analysis**: Market data and investment insights
+- **Technology Review**: Product specs and technical documentation
+- **Health & Medical**: Medical research and health guidelines
+- **Legal Search**: Laws, regulations, and legal analysis
+
+### 2. **Configure Search Parameters**
+- Set maximum number of results (1-100)
+- Apply time filters (Any, Past 24 hours, Past week, Past month, Past year)
+- Exclude specific domains to refine results
+- Add your own documents to the research scope
+
+### 3. **Conduct Research**
+- Enter your research query
+- Review and select relevant sources from search results
+- Choose additional documents from your knowledge base
+- Generate AI-powered research reports
+
+### 4. **Export and Save**
+- Export reports in PDF, DOCX, TXT, or MD format
+- Save reports to your knowledge base for future reference
+- Organize and manage your research library
+
+## 🔧 Category-Specific Search Features
+
+### Academic Search
+- Focuses on scholarly sources and peer-reviewed content
+- Enhanced prompts for academic writing style
+- Emphasis on methodology and citations
+
+### Financial Analysis
+- Targets financial news and market data sources
+- Specialized prompts for market trends and risk assessment
+- Structured analysis format for investment insights
+
+### Technology Review
+- Optimized for tech specifications and product reviews
+- Comparative analysis capabilities
+- Focus on technical documentation and user feedback
+
+### Health & Medical
+- Medical journal and health guideline focused
+- Clinical study emphasis with safety disclaimers
+- Evidence-based research prioritization
+
+### Legal Search
+- Legal document and case law targeting
+- Jurisdiction-aware search enhancement
+- Professional disclaimers included
+
+## 🚀 Deployment
+
+### Vercel Deployment (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Add environment variables in Vercel dashboard
+3. Deploy automatically with each push
+
+### Traditional Hosting
+1. Build the application: `npm run build`
+2. Set up Node.js server environment
+3. Configure environment variables
+4. Start the application: `npm start`
+
+## 📁 Project Structure
 
 ```
-GEMINI_API_KEY=your_gemini_api_key
-GOOGLE_API_KEY=your_google_api_key
-GOOGLE_CX=your_google_custom_search_id
+Querra/
+├── src/
+│   ├── components/          # React components
+│   │   ├── CategorySelector.tsx
+│   │   ├── SearchSection.tsx
+│   │   ├── ReportSection.tsx
+│   │   └── ...
+│   ├── pages/              # Next.js pages and API routes
+│   │   ├── api/            # Backend API endpoints
+│   │   ├── index.tsx       # Main research interface
+│   │   └── knowledge-base.tsx
+│   ├── utils/              # Utility classes and functions
+│   │   ├── ai_processor.ts # Gemini AI integration
+│   │   ├── search.ts       # Google Search API client
+│   │   ├── database.ts     # SQLite database manager
+│   │   └── extractor.ts    # Content extraction engine
+│   ├── config/             # Configuration files
+│   │   └── categories.ts   # Search category definitions
+│   └── types/              # TypeScript type definitions
+├── public/                 # Static assets
+├── uploads/               # Document upload directory
+└── knowledge_base.db      # SQLite database (auto-generated)
 ```
 
-## Technologies
+## 🔒 Environment & Security
 
-- Next.js
-- TypeScript
-- TailwindCSS
-- Google Gemini API
-- Google Custom Search API
-- SQLite (for document storage)
+### Production Considerations
+- Ensure API keys are properly secured
+- Implement rate limiting for API endpoints
+- Configure proper CORS settings
+- Use HTTPS in production
 
-## Table of Contents
+### Serverless Compatibility
+- Automatic fallback to in-memory storage on Vercel
+- Stateless operation for scalability
+- Environment detection for optimal performance
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Configuration](#api-configuration)
-- [Project Structure](#project-structure)
-- [Recent Updates](#recent-updates)
-- [Contributing](#contributing)
-- [License](#license)
+## 🐛 Troubleshooting
 
-## Overview
+### Common Issues
+1. **API Key Errors**: Verify all environment variables are set correctly
+2. **Search Not Working**: Check Google Custom Search API quotas
+3. **PDF Upload Issues**: Ensure file size is under 10MB
+4. **Generation Timeout**: Try reducing the number of sources
 
-Deep Search is a web application that streamlines the research process by automating source discovery, content extraction, and report generation. It leverages AI to analyze multiple sources and synthesize information into well-structured reports.
+### Performance Optimization
+- Limit concurrent requests to APIs
+- Implement caching for frequently accessed content
+- Use pagination for large result sets
 
-The application allows users to:
-- Select from multiple research categories (General, Academic, Financial, Technology, Health, Legal)
-- Search for relevant sources on any topic
-- Exclude specific domains from search results
-- Select which sources to include in their research
-- Generate comprehensive reports based on selected sources
-- Export reports in various formats (PDF, DOCX, TXT)
-- Use own documents for search
-- Navigate through search results with pagination
+## 🤝 Contributing
 
-## Features
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-### 🎨 Category-Based Search
-- Choose from specialized research categories
-- Each category has tailored search instructions and report templates
-- Custom styling for each research domain
+## 📄 License
 
-### 🔍 Intelligent Search
-- Customizable search parameters (max results, time filters, domain exclusion)
-- Preview of search results with titles, snippets, and URLs
-- "Select All" functionality for quick source selection
-- Domain exclusion to filter out unwanted sources
-- Pagination for navigating large search result sets
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### 📝 AI-Powered Report Generation
-- Extracts content from selected web sources
-- Uses Google's Gemini AI to analyze and synthesize information
-- Generates well-structured reports with proper formatting
-- Customizable prompt templates for different report styles
-- Interactive loading animation with progress indication
-- Toast notifications for operation status feedback
+## 🆘 Support
+
+For support, please:
+1. Check the troubleshooting section
+2. Review the technical documentation (TECHNICAL.md)
+3. Open an issue on GitHub
+4. Contact the development team
+
+---
+
+**Querra** - Revolutionizing research with AI-powered intelligence.
 
 ### 📊 Export Options
 - PDF export with proper formatting and styling
