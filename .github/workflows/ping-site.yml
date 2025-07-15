@@ -1,0 +1,25 @@
+name: Keep Site Warm
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Ping website
+      run: |
+        echo "Pinging website..."
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://querra.vercel.app)
+        echo "Response code: $response"
+        
+        if [ $response -eq 200 ]; then
+          echo "✅ Site is up and responding"
+        else
+          echo "❌ Site returned code: $response"
+          exit 1
+        fi
+    
