@@ -132,7 +132,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             Querra 2025
           </div>
           <div className="text-center">
-            Vibe coded by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a> · <a href="https://github.com/AdityaKothari27/Deep_Search" className="hover:text-blue-500 dark:hover:text-blue-400">Source Code</a>
+            Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a> · <a href="https://github.com/AdityaKothari27/Deep_Search" className="hover:text-blue-500 dark:hover:text-blue-400">Source Code</a>
           </div>
           <div className="text-right">
             Powered by Gemini
