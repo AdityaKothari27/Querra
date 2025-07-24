@@ -129,10 +129,29 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       <footer className="bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 grid grid-cols-3 text-gray-600 dark:text-gray-400">
           <div className="text-left">
-            Querra 2025
+            <a href="https://github.com/AdityaKothari27/Deep_Search" className="hover:text-blue-500 dark:hover:text-blue-400">Source Code</a>
           </div>
-          <div className="text-center">
-            Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a> · <a href="https://github.com/AdityaKothari27/Deep_Search" className="hover:text-blue-500 dark:hover:text-blue-400">Source Code</a>
+          <div className="text-center flex items-center justify-center space-x-2">
+            <span>Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a></span>
+            <div className="flex items-center space-x-2 ml-2">
+              <a href="#" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X">
+                <Image 
+                  src="/images/x-logo-white.png" 
+                  alt="X (Twitter)" 
+                  width={16} 
+                  height={16} 
+                  className="filter invert dark:invert-0" 
+                />
+              </a>
+              <a href="#" className="hover:opacity-80 transition-opacity duration-300" title="Connect on LinkedIn">
+                <Image 
+                  src="/images/LinkedIn_icon.png" 
+                  alt="LinkedIn" 
+                  width={16} 
+                  height={16} 
+                />
+              </a>
+            </div>
           </div>
           <div className="text-right">
             Powered by Gemini
