@@ -134,7 +134,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <div className="text-center flex items-center justify-center space-x-2">
             <span>Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a></span>
             <div className="flex items-center space-x-2 ml-2">
-              <a href="#" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X">
+              <a href="https://x.com/Aditya_Kothari1" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X">
                 <Image 
                   src="/images/x-logo-white.png" 
                   alt="X (Twitter)" 
@@ -143,12 +143,12 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                   className="filter invert dark:invert-0" 
                 />
               </a>
-              <a href="#" className="hover:opacity-80 transition-opacity duration-300" title="Connect on LinkedIn">
+              <a href="https://www.linkedin.com/in/adityakothari27" className="hover:opacity-80 transition-opacity duration-300" title="Connect on LinkedIn">
                 <Image 
                   src="/images/LinkedIn_icon.png" 
                   alt="LinkedIn" 
-                  width={16} 
-                  height={16} 
+                  width={19} 
+                  height={19} 
                 />
               </a>
             </div>
