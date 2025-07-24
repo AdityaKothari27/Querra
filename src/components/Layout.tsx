@@ -129,12 +129,12 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       <footer className="bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-gray-800 py-6 transition-colors duration-300">
         <div className="container mx-auto px-4 grid grid-cols-3 text-gray-600 dark:text-gray-400">
           <div className="text-left">
-            <a href="https://github.com/AdityaKothari27/Deep_Search" className="hover:text-blue-500 dark:hover:text-blue-400">Source Code</a>
+            <a href="https://github.com/AdityaKothari27/Querra" className="hover:text-blue-500 dark:hover:text-blue-400" target='_blank'>Source Code</a>
           </div>
           <div className="text-center flex items-center justify-center space-x-2">
-            <span>Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400">Aditya Kothari</a></span>
+            <span>Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400" target='_blank'>Aditya Kothari</a></span>
             <div className="flex items-center space-x-2 ml-2">
-              <a href="https://x.com/Aditya_Kothari1" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X">
+              <a href="https://x.com/Aditya_Kothari1" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X" target='_blank'>
                 <Image 
                   src="/images/x-logo-white.png" 
                   alt="X (Twitter)" 
@@ -143,7 +143,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                   className="filter invert dark:invert-0" 
                 />
               </a>
-              <a href="https://www.linkedin.com/in/adityakothari27" className="hover:opacity-80 transition-opacity duration-300" title="Connect on LinkedIn">
+              <a href="https://www.linkedin.com/in/adityakothari27" className="hover:opacity-80 transition-opacity duration-300" title="Connect on LinkedIn" target='_blank'>
                 <Image 
                   src="/images/LinkedIn_icon.png" 
                   alt="LinkedIn" 
