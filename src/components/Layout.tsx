@@ -134,7 +134,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <div className="text-center flex items-center justify-center space-x-2">
             <span>Made by <a href="https://x.com/aditya_kothari1?s=21" className="hover:text-blue-500 dark:hover:text-blue-400" target='_blank'>Aditya Kothari</a></span>
             <div className="flex items-center space-x-2 ml-2">
-              <a href="https://x.com/Aditya_Kothari1" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X" target='_blank'>
+              <a href="https://github.com/AdityaKothari27" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X" target='_blank'>
                 <Image 
                   src="/images/x-logo-white.png" 
                   alt="X (Twitter)" 
