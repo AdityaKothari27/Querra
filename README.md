@@ -349,8 +349,8 @@ For support, please:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/AdityaKothari27/deep_search.git
-   cd deep_research
+   git clone https://github.com/AdityaKothari27/querra.git
+   cd querra
    ```
 
 2. Install dependencies:
@@ -441,7 +441,7 @@ For support, please:
 
 ## Project Structure 
 ```
-deep_research/
+Querra/
 ├── public/                   # Static files
 ├── src/
 │   ├── components/           # React components
