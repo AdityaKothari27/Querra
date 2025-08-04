@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { generateReport } from '../lib/api';
 import { SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
 import { useToast } from './Toast';
@@ -423,7 +424,12 @@ const ReportSection: FC<ReportSectionProps> = ({
                   </svg>
                   Exporting...
                 </>
-              ) : 'Export'}
+              ) : (
+                   <>
+                  <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
+                  Export
+                  </>
+                    )}
             </button>
           </div>
           
