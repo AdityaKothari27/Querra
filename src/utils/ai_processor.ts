@@ -120,9 +120,6 @@ Please generate a comprehensive research report based on the above sources. Stru
 
 # Research Report: ${query}
 
-**Generated:** ${currentDate}  
-**Mode:** Fast Analysis (URL Context)  
-**Sources:** ${urls.length} web sources
 
 ## Executive Summary
 [Provide a comprehensive 2-3 paragraph overview of key findings and implications]
