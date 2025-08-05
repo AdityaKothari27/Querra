@@ -116,7 +116,7 @@ ${promptTemplate}
 Source Materials:
 ${urlsWithNumbers}
 
-Please generate a comprehensive research report based on the above sources. Structure your response with proper Markdown formatting exactly as shown below:
+Generate a comprehensive research report based on the above sources. Structure your response with proper Markdown formatting exactly as shown below:
 
 # Research Report: ${query}
 

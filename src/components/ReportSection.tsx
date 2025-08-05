@@ -395,7 +395,7 @@ const ReportSection: FC<ReportSectionProps> = ({
                 <span className="font-medium text-gray-900 dark:text-white">Thorough Analysis</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Extracts and analyzes full content from sources (~30-60s)
+                Extracts and analyzes full content from sources
               </p>
             </div>
           </label>
@@ -419,7 +419,7 @@ const ReportSection: FC<ReportSectionProps> = ({
                 <span className="font-medium text-gray-900 dark:text-white">Quick Insights</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Uses URL context for faster processing (~10-20s)
+                Uses URL context for faster processing
                 {selectedDocumentIds.length > 0 && (
                   <span className="block text-yellow-600 dark:text-yellow-400">
                     ⚠️ Documents will use traditional mode
