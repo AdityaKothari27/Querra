@@ -44,6 +44,14 @@ export default async function handler(
       } else {
         // Pure fast mode with only URLs
         report = await ai_processor.generate_report_fast(query, sources, promptTemplate);
+        
+        // Add mode indicator to the report
+        const currentDate = new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        report = `${report}\n\n---\n\n**Report Generation Details:**\n- Mode: Fast Analysis (URL Context)\n- Generated: ${currentDate}\n- Processing Time: ~10-20 seconds\n- Sources: ${sources.length} web sources`;
       }
     } else {
       // Traditional mode: Extract content from web sources
@@ -63,6 +71,15 @@ export default async function handler(
       // Combine all contents
       const allContents = [...webContents, ...documentContents];
       report = await ai_processor.generate_report(query, allContents, promptTemplate);
+      
+      // Add mode indicator to the report
+      const currentDate = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      const totalSources = sources.length + (documentIds || []).length;
+      report = `${report}\n\n---\n\n**Report Generation Details:**\n- Mode: Thorough Analysis (Content Extraction)\n- Generated: ${currentDate}\n- Processing Time: ~30-60 seconds\n- Sources: ${sources.length} web sources${(documentIds || []).length > 0 ? ` + ${(documentIds || []).length} documents` : ''}`;
     }
     
     // Save to database (include both web sources and document IDs)

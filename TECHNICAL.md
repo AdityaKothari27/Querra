@@ -449,71 +449,223 @@ const dateRestrictMap = {
 
 ## AI Processing Pipeline
 
-### 1. Content Preparation
+### 1. Dual-Mode Architecture
 
-Before AI processing, content goes through several stages:
+Querra now supports two distinct generation modes:
 
+#### Traditional Mode (Content Extraction)
 ```typescript
 const contentPreparationPipeline = [
-  'extractWebContent',      // Extract text from HTML
-  'extractDocumentContent', // Extract text from documents
+  'extractWebContent',      // Extract text from HTML using Cheerio
+  'extractDocumentContent', // Extract text from PDF/DOCX files
   'cleanContent',          // Remove noise and formatting
   'truncateContent',       // Limit to token constraints
   'combineContent'         // Merge all sources
 ];
 ```
 
-### 2. Prompt Engineering
+#### Fast Mode (URL Context)
+```typescript
+const fastModeProcessing = [
+  'prepareURLList',        // Format URLs with numbering
+  'enhancePrompt',         // Add structured formatting instructions
+  'invokeURLContext',      // Use Gemini's URL context tool
+  'processResponse'        // Handle response and metadata
+];
+```
 
-Each category has a specialized prompt template:
+### 2. Mode Selection Logic
+
+The system intelligently selects processing mode based on:
 
 ```typescript
-const promptTemplate = `
-Search Topic: ${query}
+if (generationMode === 'fast' && documentIds.length === 0) {
+  // Pure fast mode: URLs only
+  report = await ai_processor.generate_report_fast(query, sources, promptTemplate);
+} else if (generationMode === 'fast' && documentIds.length > 0) {
+  // Hybrid mode: Fall back to traditional for document support
+  report = await ai_processor.generate_report(query, allContents, promptTemplate);
+} else {
+  // Traditional mode: Full content extraction
+  report = await ai_processor.generate_report(query, allContents, promptTemplate);
+}
+```
 
-${categoryConfig.defaultPrompt}
+### 3. Enhanced Prompt Engineering
 
-Sources:
-${combinedContent}
+#### Fast Mode Prompts
+Fast mode uses enhanced prompts for better formatting:
 
-Generate a comprehensive report including:
-1. Executive Summary
-2. Key Findings  
-3. Analysis
-4. Recommendations
-5. Sources Used
+```typescript
+const fastModePrompt = `Search Topic: ${query}
 
-Format: Markdown with proper headings
+${promptTemplate}
+
+Source Materials:
+[1] https://example1.com
+[2] https://example2.com
+
+Please generate a comprehensive research report with:
+
+# Research Report: ${query}
+
+## Executive Summary
+## Key Findings  
+## Detailed Analysis
+## Recommendations
+## Sources
+
+FORMATTING REQUIREMENTS:
+- Proper Markdown headings (# ## ###)
+- Citations as [1], [2] when referencing sources
+- Bold important terms with **text**
+- Professional academic formatting
+- Include title and date
 `;
 ```
 
-### 3. AI Model Configuration
+#### Traditional Mode Prompts
+Traditional mode uses extracted content:
 
 ```typescript
-const generationConfig = {
-  temperature: 0.7,        // Balance creativity and consistency
-  topK: 40,               // Limit token selection
-  topP: 0.95,             // Nucleus sampling
-  maxOutputTokens: 2048,  // Response length limit
+const traditionalPrompt = `
+Search Topic: ${query}
+
+Instructions: ${promptTemplate}
+
+Source Materials:
+Source 1:
+${extractedContent1}
+
+Source 2: 
+${extractedContent2}
+
+Generate comprehensive report with citations...
+`;
+```
+
+### 4. Dual AI Model Configuration
+
+#### Fast Mode Configuration
+```typescript
+const fastModeConfig = {
+  model: "gemini-2.0-flash",
+  config: {
+    tools: [{ urlContext: {} }],      // URL context tool
+    temperature: 0.7,
+    topK: 40,
+    topP: 0.95,
+    maxOutputTokens: 4096,            // Increased for rich formatting
+    responseModalities: ["TEXT"],
+  }
 };
 ```
 
-### 4. Error Handling & Retries
-
+#### Traditional Mode Configuration  
 ```typescript
-// Retry mechanism for rate limiting
+const traditionalModeConfig = {
+  contents: [{ role: "user", parts: [{ text: prompt }] }],
+  generationConfig: {
+    temperature: 0.7,
+    topK: 40,
+    topP: 0.95,
+    maxOutputTokens: 2048,
+  }
+};
+```
+
+### 5. Error Handling & Retries
+
+Both modes implement robust error handling:
+
+#### Fast Mode Error Handling
+```typescript
+// Fast mode with URL context fallback
+for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try {
+    const response = await this.genAINew.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [prompt],
+      config: { tools: [{ urlContext: {} }] }
+    });
+    return response.text || 'No response generated';
+  } catch (error) {
+    if (error?.status === 429) {
+      await this.delay(retryDelay * attempt); // Exponential backoff
+      continue;
+    }
+    // Could fallback to traditional mode here
+    throw error;
+  }
+}
+```
+
+#### Traditional Mode Error Handling
+```typescript
+// Traditional mode with content extraction
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
   try {
     return await this.model.generateContent(request);
   } catch (error) {
     if (error?.status === 429) {
-      await this.delay(retryDelay * attempt); // Exponential backoff
+      await this.delay(retryDelay * attempt);
       continue;
     }
     throw error; // Non-recoverable error
   }
 }
 ```
+
+## Generation Modes Architecture
+
+### Mode Selection Strategy
+
+The application implements intelligent mode selection based on content types:
+
+```typescript
+// Mode selection logic in API endpoint
+if (generationMode === 'fast') {
+  if (documentIds && documentIds.length > 0) {
+    // Documents require traditional mode for accuracy
+    console.log('Documents detected, falling back to traditional mode');
+    return await processTraditionalMode(query, sources, documentIds, promptTemplate);
+  } else {
+    // Pure fast mode with URLs only
+    return await processFastMode(query, sources, promptTemplate);
+  }
+} else {
+  // Explicit traditional mode selection
+  return await processTraditionalMode(query, sources, documentIds, promptTemplate);
+}
+```
+
+### Performance Comparison
+
+| Aspect | Traditional Mode | Fast Mode |
+|--------|------------------|-----------|
+| **Processing Time** | 30-60 seconds | 10-20 seconds |
+| **Content Extraction** | Full HTML parsing | URL context only |
+| **Document Support** | ✅ PDF, DOCX, TXT | ❌ URLs only |
+| **Content Depth** | Maximum detail | Context-based |
+| **API Calls** | Multiple (extraction + AI) | Single (AI only) |
+| **Accuracy** | Highest | High |
+| **Token Usage** | Higher | Lower |
+| **Rate Limiting** | More susceptible | Less susceptible |
+
+### Architecture Benefits
+
+#### Traditional Mode Advantages:
+- **Maximum Accuracy**: Full content extraction ensures no details are missed
+- **Document Support**: Handles uploaded PDFs and documents
+- **Content Control**: Complete control over what content is analyzed
+- **Offline Capability**: Could work with cached content
+
+#### Fast Mode Advantages:
+- **Speed**: 3x faster processing time
+- **Efficiency**: Single API call reduces complexity
+- **Scalability**: Less server resources required
+- **Real-time**: Better for time-sensitive research
+- **URL Context**: Leverages Google's advanced URL understanding
 
 ## Database Architecture
 

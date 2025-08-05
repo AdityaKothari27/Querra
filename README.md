@@ -18,10 +18,14 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 - **Content Extraction**: Advanced PDF and document text extraction capabilities
 
 ### 🤖 **AI-Powered Report Generation**
+- **Dual Generation Modes**: Choose between thorough analysis and fast insights
+  - **Traditional Mode**: Full content extraction and analysis (~30-60 seconds)
+  - **Fast Mode**: URL context-based generation (~10-20 seconds)
 - **Context-Aware AI**: Utilizes Google Gemini 2.0 Flash for intelligent content synthesis
 - **Category-Specific Prompts**: Tailored AI prompts for each research category
+- **Rich Markdown Formatting**: Professional reports with headings, citations, and structure
 - **Source Attribution**: Clear tracking and citation of all sources used
-- **Markdown Formatting**: Rich, structured output with proper formatting
+- **Mode Indicators**: Visual feedback showing which generation method was used
 
 ### 📄 **Multiple Export Formats**
 - **PDF Export**: Professional formatted documents with proper styling
@@ -145,18 +149,74 @@ Choose from 6 specialized categories based on your research needs:
 - Exclude specific domains to refine results
 - Add your own documents to the research scope
 
-### 3. **Conduct Research**
+### 3. **Configure Research Mode**
+Choose your preferred generation method:
+- **Traditional Mode (Thorough Analysis)**:
+  - Full content extraction from web pages
+  - Deep analysis of all source materials
+  - Best for comprehensive research reports
+  - Processing time: 30-60 seconds
+  
+- **Fast Mode (Quick Insights)**:
+  - Uses Gemini's URL context feature
+  - Faster processing with web sources
+  - Ideal for quick summaries and overviews
+  - Processing time: 10-20 seconds
+  - Note: Documents always use traditional mode for accuracy
+
+### 4. **Generate Reports**
 - Enter your research query
 - Review and select relevant sources from search results
 - Choose additional documents from your knowledge base
-- Generate AI-powered research reports
+- Select generation mode based on your needs
+- Generate AI-powered research reports with rich formatting
 
-### 4. **Export and Save**
+### 5. **Export and Save**
 - Export reports in PDF, DOCX, TXT, or MD format
 - Save reports to your knowledge base for future reference
 - Organize and manage your research library
 
-## 🔧 Category-Specific Search Features
+## � **Generation Modes Explained**
+
+Querra offers two distinct generation modes to suit different research needs:
+
+### ⚡ **Fast Mode (Quick Insights)**
+- **Technology**: Uses Google Gemini's URL Context feature
+- **Speed**: 10-20 seconds generation time
+- **Best For**: 
+  - Quick summaries and overviews
+  - Time-sensitive research
+  - Getting rapid insights from web sources
+- **Limitations**: 
+  - Web sources only (documents use traditional mode)
+  - Less detailed content extraction
+- **Output**: Professional formatted reports with citations and structure
+
+### 🔬 **Traditional Mode (Thorough Analysis)**  
+- **Technology**: Full content extraction + AI analysis
+- **Speed**: 30-60 seconds generation time
+- **Best For**:
+  - Comprehensive research reports
+  - Academic and professional research
+  - Detailed analysis requirements
+- **Capabilities**:
+  - Supports both web sources and documents
+  - Deep content extraction and analysis
+  - Maximum accuracy and detail
+- **Output**: Richly formatted reports with extensive citations
+
+### 🎯 **When to Use Each Mode**
+
+| Scenario | Recommended Mode | Why |
+|----------|------------------|-----|
+| Breaking news analysis | Fast Mode | Speed matters for current events |
+| Academic research paper | Traditional Mode | Depth and accuracy required |
+| Market trend overview | Fast Mode | Quick insights from multiple sources |
+| Legal document analysis | Traditional Mode | Precision and detail critical |
+| Technology comparison | Either Mode | Depends on time constraints |
+| Financial analysis | Traditional Mode | Accuracy crucial for decisions |
+
+## �🔧 Category-Specific Search Features
 
 ### Academic Search
 - Focuses on scholarly sources and peer-reviewed content
