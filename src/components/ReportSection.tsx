@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { generateReport } from '../lib/api';
-import { SparklesIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, BoltIcon, CogIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
@@ -28,7 +28,7 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
-  const { setGeneratedReport, generatedReport } = useSession();
+  const { setGeneratedReport, generatedReport, generationMode, setGenerationMode } = useSession();
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -91,7 +91,8 @@ const ReportSection: FC<ReportSectionProps> = ({
         searchQuery, 
         selectedSources, 
         selectedDocumentIds,
-        promptTemplate || getDefaultPrompt()
+        promptTemplate || getDefaultPrompt(),
+        generationMode
       );
       
       // Update local state first
@@ -369,6 +370,67 @@ const ReportSection: FC<ReportSectionProps> = ({
         />
       </div>
       
+      <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+          <CogIcon className="h-4 w-4 mr-2" />
+          Generation Mode
+        </h3>
+        <div className="grid grid-cols-2 gap-3">
+          <label className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            generationMode === 'traditional' 
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400' 
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+          }`}>
+            <input
+              type="radio"
+              name="generationMode"
+              value="traditional"
+              checked={generationMode === 'traditional'}
+              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast')}
+              className="sr-only"
+            />
+            <div className="flex-1">
+              <div className="flex items-center mb-1">
+                <SparklesIcon className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Thorough Analysis</span>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Extracts and analyzes full content from sources (~30-60s)
+              </p>
+            </div>
+          </label>
+          
+          <label className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            generationMode === 'fast' 
+              ? 'border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-400' 
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+          }`}>
+            <input
+              type="radio"
+              name="generationMode"
+              value="fast"
+              checked={generationMode === 'fast'}
+              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast')}
+              className="sr-only"
+            />
+            <div className="flex-1">
+              <div className="flex items-center mb-1">
+                <BoltIcon className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Quick Insights</span>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Uses URL context for faster processing (~10-20s)
+                {selectedDocumentIds.length > 0 && (
+                  <span className="block text-yellow-600 dark:text-yellow-400">
+                    ⚠️ Documents will use traditional mode
+                  </span>
+                )}
+              </p>
+            </div>
+          </label>
+        </div>
+      </div>
+      
       <div className="mb-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Selected sources: {selectedSources.length + selectedDocumentIds.length}
@@ -383,13 +445,21 @@ const ReportSection: FC<ReportSectionProps> = ({
       >
         {isGenerating ? (
           <div className="relative overflow-hidden">
-            <span className="text-white font-medium">Generating Report...</span>
+            <span className="text-white font-medium">
+              {generationMode === 'fast' ? 'Fast Generating...' : 'Generating Report...'}
+            </span>
             <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
           </div>
         ) : (
           <>
-            <SparklesIcon className="h-5 w-5 mr-2 text-white" />
-            <span className="text-white">Generate Report</span>
+            {generationMode === 'fast' ? (
+              <BoltIcon className="h-5 w-5 mr-2 text-white" />
+            ) : (
+              <SparklesIcon className="h-5 w-5 mr-2 text-white" />
+            )}
+            <span className="text-white">
+              {generationMode === 'fast' ? 'Generate Quick Report' : 'Generate Thorough Report'}
+            </span>
           </>
         )}
       </button>

@@ -42,12 +42,13 @@ export const generateReport = async (
   query: string,
   sources: string[],
   documentIds: number[],
-  promptTemplate: string
+  promptTemplate: string,
+  generationMode: 'traditional' | 'fast' = 'traditional'
 ) => {
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, sources, documentIds, promptTemplate }),
+    body: JSON.stringify({ query, sources, documentIds, promptTemplate, generationMode }),
   });
 
   if (!response.ok) {

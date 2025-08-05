@@ -15,6 +15,8 @@ interface SessionContextType {
   setSearchConfig: (config: any) => void;
   generatedReport: any;
   setGeneratedReport: (report: any) => void;
+  generationMode: 'traditional' | 'fast';
+  setGenerationMode: (mode: 'traditional' | 'fast') => void;
   clearSession: () => void;
 }
 
@@ -36,6 +38,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [selectedCategory, setSelectedCategory] = useState('general');
   const [searchConfig, setSearchConfig] = useState<any>(null);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  const [generationMode, setGenerationMode] = useState<'traditional' | 'fast'>('traditional');
 
   const clearSession = () => {
     // Set all state to initial values
@@ -46,6 +49,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setSelectedCategory('general');
     setSearchConfig(null);
     setGeneratedReport(null);
+    setGenerationMode('traditional');
     
     // Remove from localStorage
     localStorage.removeItem('researchSession');
@@ -58,7 +62,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       selectedDocumentIds: [],
       selectedCategory: 'general',
       searchConfig: null,
-      generatedReport: null
+      generatedReport: null,
+      generationMode: 'traditional'
     });
   };
 
@@ -73,14 +78,16 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         selectedCategory,
         searchConfig,
         generatedReport,
+        generationMode,
       } = JSON.parse(sessionData);
-      setSearchQuery(searchQuery);
-      setSearchResults(searchResults);
-      setSelectedSources(selectedSources);
-      setSelectedDocumentIds(selectedDocumentIds);
-      setSelectedCategory(selectedCategory);
+      setSearchQuery(searchQuery || '');
+      setSearchResults(searchResults || []);
+      setSelectedSources(selectedSources || []);
+      setSelectedDocumentIds(selectedDocumentIds || []);
+      setSelectedCategory(selectedCategory || 'general');
       setSearchConfig(searchConfig);
       setGeneratedReport(generatedReport);
+      setGenerationMode(generationMode || 'traditional');
     }
   }, []);
 
@@ -93,6 +100,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       selectedCategory,
       searchConfig,
       generatedReport,
+      generationMode,
     };
     localStorage.setItem('researchSession', JSON.stringify(sessionData));
   }, [
@@ -103,6 +111,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     selectedCategory,
     searchConfig,
     generatedReport,
+    generationMode,
   ]);
 
   return (
@@ -122,6 +131,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setSearchConfig,
         generatedReport,
         setGeneratedReport,
+        generationMode,
+        setGenerationMode,
         clearSession,
       }}
     >
