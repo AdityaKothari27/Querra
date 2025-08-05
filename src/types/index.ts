@@ -18,6 +18,14 @@ export interface SearchConfig {
   category?: string;
   excludedDomains?: string[];
   page?: number;
+  generationMode?: 'traditional' | 'fast';
+}
+
+export interface GenerationMode {
+  type: 'traditional' | 'fast';
+  label: string;
+  description: string;
+  icon: string;
 }
 
 export interface CategoryConfig {

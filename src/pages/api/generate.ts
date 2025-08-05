@@ -16,26 +16,54 @@ export default async function handler(
   }
 
   try {
-    const { query, sources, documentIds, promptTemplate } = req.body;
+    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional' } = req.body;
     
-    // Extract content from web sources
-    const webContents = await Promise.all(
-      sources.map((url: string) => extractor.extract(url))
-    );
+    let report: string;
     
-    // Get content from documents
-    const documentContents = await Promise.all(
-      (documentIds || []).map(async (id: number) => {
-        const content = await db.get_document_content(id);
-        return content;
-      })
-    );
-    
-    // Combine all contents
-    const allContents = [...webContents, ...documentContents];
-
-    // Generate report
-    const report = await ai_processor.generate_report(query, allContents, promptTemplate);
+    if (generationMode === 'fast') {
+      // Fast mode: Use URL context without content extraction
+      console.log('Using fast mode with URL context');
+      
+      // For fast mode, we only use web sources (URLs), documents still need extraction
+      if (documentIds && documentIds.length > 0) {
+        // If documents are included, fall back to traditional mode
+        console.log('Documents detected, falling back to traditional mode');
+        const webContents = await Promise.all(
+          sources.map((url: string) => extractor.extract(url))
+        );
+        
+        const documentContents = await Promise.all(
+          documentIds.map(async (id: number) => {
+            const content = await db.get_document_content(id);
+            return content;
+          })
+        );
+        
+        const allContents = [...webContents, ...documentContents];
+        report = await ai_processor.generate_report(query, allContents, promptTemplate);
+      } else {
+        // Pure fast mode with only URLs
+        report = await ai_processor.generate_report_fast(query, sources, promptTemplate);
+      }
+    } else {
+      // Traditional mode: Extract content from web sources
+      console.log('Using traditional mode with content extraction');
+      const webContents = await Promise.all(
+        sources.map((url: string) => extractor.extract(url))
+      );
+      
+      // Get content from documents
+      const documentContents = await Promise.all(
+        (documentIds || []).map(async (id: number) => {
+          const content = await db.get_document_content(id);
+          return content;
+        })
+      );
+      
+      // Combine all contents
+      const allContents = [...webContents, ...documentContents];
+      report = await ai_processor.generate_report(query, allContents, promptTemplate);
+    }
     
     // Save to database (include both web sources and document IDs)
     const allSources = [

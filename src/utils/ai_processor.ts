@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export class GeminiProcessor {
   private genAI: GoogleGenerativeAI;
+  private genAINew: GoogleGenAI;
   private model: any;
   private maxRetries: number = 3;
   private retryDelay: number = 1000; // 1 second
@@ -9,6 +11,7 @@ export class GeminiProcessor {
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY || '';
     this.genAI = new GoogleGenerativeAI(apiKey);
+    this.genAINew = new GoogleGenAI({ apiKey });
     this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     // this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro-exp-03-25" });
   }
@@ -52,6 +55,60 @@ export class GeminiProcessor {
     }
 
     throw new Error(`Failed to generate report after ${this.maxRetries} attempts. ${lastError?.message || ''}`);
+  }
+
+  async generate_report_fast(query: string, urls: string[], promptTemplate: string): Promise<string> {
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const prompt = this._prepare_fast_prompt({ query, urls, promptTemplate });
+        
+        const response = await this.genAINew.models.generateContent({
+          model: "gemini-2.0-flash",
+          contents: [prompt],
+          config: {
+            tools: [{ urlContext: {} }],
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+          },
+        });
+
+        console.log('URL Context Metadata:', response.candidates?.[0]?.urlContextMetadata);
+        return response.text || 'No response generated';
+      } catch (error: any) {
+        lastError = error;
+        console.error(`Fast mode attempt ${attempt} failed:`, error);
+        
+        if (error?.status === 429) {
+          // If rate limited, wait longer before retry
+          await this.delay(this.retryDelay * attempt);
+          continue;
+        }
+        
+        // For other errors, throw immediately
+        throw error;
+      }
+    }
+    
+    throw lastError;
+  }
+
+  private _prepare_fast_prompt({ query, urls, promptTemplate }: {
+    query: string;
+    urls: string[];
+    promptTemplate: string;
+  }): string {
+    return `Search Topic: ${query}
+
+Instructions: ${promptTemplate}
+
+Source Materials:
+${urls.join('\n')}
+
+Please generate a comprehensive report based on the above sources. Include relevant details, comparisons, and insights from all provided sources.`;
   }
 
   private _prepare_prompt({ query, contents, promptTemplate }: {
