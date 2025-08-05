@@ -72,7 +72,8 @@ export class GeminiProcessor {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 4096, // Increased for better formatting
+            responseModalities: ["TEXT"],
           },
         });
 
@@ -101,14 +102,57 @@ export class GeminiProcessor {
     urls: string[];
     promptTemplate: string;
   }): string {
+    const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
+    const currentDate = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    
     return `Search Topic: ${query}
 
-Instructions: ${promptTemplate}
+${promptTemplate}
 
 Source Materials:
-${urls.join('\n')}
+${urlsWithNumbers}
 
-Please generate a comprehensive report based on the above sources. Include relevant details, comparisons, and insights from all provided sources.`;
+Please generate a comprehensive research report based on the above sources. Structure your response with proper Markdown formatting exactly as shown below:
+
+# Research Report: ${query}
+
+**Generated:** ${currentDate}  
+**Mode:** Fast Analysis (URL Context)  
+**Sources:** ${urls.length} web sources
+
+## Executive Summary
+[Provide a comprehensive 2-3 paragraph overview of key findings and implications]
+
+## Key Findings
+[List 4-6 main discoveries with bullet points, each with supporting evidence]
+
+## Detailed Analysis
+[Provide in-depth analysis broken into logical subsections with ### subheadings]
+
+## Recommendations
+[Offer 3-5 actionable recommendations based on findings]
+
+## Conclusions
+[Summarize the main insights and their significance]
+
+## Sources and Citations
+[List all sources with proper citations and brief descriptions]
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Use EXACT Markdown headings (# ## ###) as shown above
+- Include citations as [1], [2], etc. throughout the text when referencing specific sources
+- Use bullet points (•) and numbered lists where appropriate
+- **Bold** important terms and key findings
+- Use > blockquotes for important quotes or statistics
+- Ensure professional academic formatting throughout
+- Each section should have substantial content (not just placeholders)
+- Make the report comprehensive and research-grade quality
+
+Generate the complete structured report now:`;
   }
 
   private _prepare_prompt({ query, contents, promptTemplate }: {
