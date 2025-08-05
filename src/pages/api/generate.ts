@@ -79,7 +79,7 @@ export default async function handler(
         day: 'numeric' 
       });
       const totalSources = sources.length + (documentIds || []).length;
-      report = `${report}\n\n---\n\n**Report Generation Details:**\n- Mode: Thorough Analysis (Content Extraction)\n- Generated: ${currentDate}\n- Sources: ${sources.length} web sources${(documentIds || []).length > 0 ? ` + ${(documentIds || []).length} documents` : ''}`;
+      report = `${report}\n`;
     }
     
     // Save to database (include both web sources and document IDs)
