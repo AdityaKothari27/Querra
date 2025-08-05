@@ -51,7 +51,7 @@ export default async function handler(
           month: 'long', 
           day: 'numeric' 
         });
-        report = `${report}\n\n---\n\n**Report Generation Details:**\n- Mode: Fast Analysis (URL Context)\n- Generated: ${currentDate}\n- Processing Time: ~10-20 seconds\n- Sources: ${sources.length} web sources`;
+        report = `${report}\n`;
       }
     } else {
       // Traditional mode: Extract content from web sources
@@ -79,7 +79,7 @@ export default async function handler(
         day: 'numeric' 
       });
       const totalSources = sources.length + (documentIds || []).length;
-      report = `${report}\n\n---\n\n**Report Generation Details:**\n- Mode: Thorough Analysis (Content Extraction)\n- Generated: ${currentDate}\n- Processing Time: ~30-60 seconds\n- Sources: ${sources.length} web sources${(documentIds || []).length > 0 ? ` + ${(documentIds || []).length} documents` : ''}`;
+      report = `${report}\n\n---\n\n**Report Generation Details:**\n- Mode: Thorough Analysis (Content Extraction)\n- Generated: ${currentDate}\n- Sources: ${sources.length} web sources${(documentIds || []).length > 0 ? ` + ${(documentIds || []).length} documents` : ''}`;
     }
     
     // Save to database (include both web sources and document IDs)
