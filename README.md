@@ -19,8 +19,8 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 
 ### 🤖 **AI-Powered Report Generation**
 - **Dual Generation Modes**: Choose between thorough analysis and fast insights
-  - **Traditional Mode**: Full content extraction and analysis (~30-60 seconds)
-  - **Fast Mode**: URL context-based generation (~10-20 seconds)
+  - **Traditional Mode**: Full content extraction and analysis 
+  - **Fast Mode**: URL context-based generation 
 - **Context-Aware AI**: Utilizes Google Gemini 2.0 Flash for intelligent content synthesis
 - **Category-Specific Prompts**: Tailored AI prompts for each research category
 - **Rich Markdown Formatting**: Professional reports with headings, citations, and structure
