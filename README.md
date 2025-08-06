@@ -21,7 +21,7 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 - **Dual Generation Modes**: Choose between thorough analysis and fast insights
   - **Traditional Mode**: Full content extraction and analysis 
   - **Fast Mode**: URL context-based generation 
-- **Context-Aware AI**: Utilizes Google Gemini 2.0 Flash for intelligent content synthesis
+- **Context-Aware AI**: Utilizes Google Gemini 2.5 Flash for intelligent content synthesis
 - **Category-Specific Prompts**: Tailored AI prompts for each research category
 - **Rich Markdown Formatting**: Professional reports with headings, citations, and structure
 - **Source Attribution**: Clear tracking and citation of all sources used

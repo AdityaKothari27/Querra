@@ -44,7 +44,7 @@ Querra follows a modern Next.js full-stack architecture with the following layer
 - **Language**: TypeScript 5.7.3 for type safety
 - **Styling**: Tailwind CSS 4.0.6 with Heroicons
 - **Database**: SQLite3 with in-memory fallback
-- **AI/ML**: Google Generative AI (Gemini 2.0 Flash)
+- **AI/ML**: Google Generative AI (Gemini 2.5 Flash)
 - **Search**: Google Custom Search API
 - **Content Processing**: Cheerio for HTML parsing, PDF-parse for documents
 
@@ -549,7 +549,7 @@ Generate comprehensive report with citations...
 #### Fast Mode Configuration
 ```typescript
 const fastModeConfig = {
-  model: "gemini-2.0-flash",
+  model: "gemini-2.5-flash",
   config: {
     tools: [{ urlContext: {} }],      // URL context tool
     temperature: 0.7,
@@ -584,7 +584,7 @@ Both modes implement robust error handling:
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
   try {
     const response = await this.genAINew.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: [prompt],
       config: { tools: [{ urlContext: {} }] }
     });
