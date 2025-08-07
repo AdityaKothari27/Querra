@@ -33,7 +33,7 @@ export class GeminiProcessor {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 20000,
           },
         });
 
@@ -72,7 +72,7 @@ export class GeminiProcessor {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 4096, // Increased for better formatting
+            maxOutputTokens: 20000, // Increased for better formatting
             responseModalities: ["TEXT"],
           },
         });
