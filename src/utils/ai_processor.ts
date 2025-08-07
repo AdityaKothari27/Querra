@@ -12,7 +12,7 @@ export class GeminiProcessor {
     const apiKey = process.env.GEMINI_API_KEY || '';
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.genAINew = new GoogleGenAI({ apiKey });
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
     // this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro-exp-03-25" });
   }
 
@@ -65,7 +65,7 @@ export class GeminiProcessor {
         const prompt = this._prepare_fast_prompt({ query, urls, promptTemplate });
         
         const response = await this.genAINew.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.5-pro",
           contents: [prompt],
           config: {
             tools: [{ urlContext: {} }],
