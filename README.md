@@ -17,15 +17,24 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 - **Knowledge Base Storage**: Persistent storage of uploaded documents and generated reports
 - **Content Extraction**: Advanced PDF and document text extraction capabilities
 
-### 🤖 **AI-Powered Report Generation**
-- **Dual Generation Modes**: Choose between thorough analysis and fast insights
-  - **Traditional Mode**: Full content extraction and analysis 
-  - **Fast Mode**: URL context-based generation 
+### 🤖 **AI-Powered Report Generation with Triple-Mode Intelligence**
+- **Three Generation Modes**: Flexible approach to content analysis
+  - **Quick Analysis**: Fast content extraction for rapid insights
+  - **Deep Analysis**: URL context-based generation with comprehensive details
+  - **Chat Mode**: Interactive conversational interface with sources
 - **Context-Aware AI**: Utilizes Google Gemini 2.5 Pro for intelligent content synthesis
 - **Category-Specific Prompts**: Tailored AI prompts for each research category
 - **Rich Markdown Formatting**: Professional reports with headings, citations, and structure
 - **Source Attribution**: Clear tracking and citation of all sources used
 - **Mode Indicators**: Visual feedback showing which generation method was used
+- **Interactive Chat**: Real-time Q&A with your selected sources (Chat Mode)
+
+### 💬 **Interactive Chat Interface**
+- **Conversational AI**: Ask questions and get instant answers about your sources
+- **Context Preservation**: Maintains conversation history throughout the session
+- **Source Integration**: Chat responses reference and cite your selected materials
+- **Real-time Interaction**: No report generation needed - immediate responses
+- **Session Persistence**: Chat history saved for continuous conversations
 
 ### 📄 **Multiple Export Formats**
 - **PDF Export**: Professional formatted documents with proper styling
@@ -176,45 +185,66 @@ Choose your preferred generation method:
 - Save reports to your knowledge base for future reference
 - Organize and manage your research library
 
-## � **Generation Modes Explained**
+## 🎯 **Generation Modes Explained**
 
-Querra offers two distinct generation modes to suit different research needs:
+Querra offers three distinct modes to suit different research needs and interaction preferences:
 
-### ⚡ **Fast Mode (Quick Insights)**
-- **Technology**: Uses Google Gemini's URL Context feature
-- **Speed**: 10-20 seconds generation time
+### ⚡ **Quick Analysis**
+- **Technology**: Traditional content extraction with optimized processing
+- **Speed**: 15-30 seconds generation time
 - **Best For**: 
-  - Quick summaries and overviews
-  - Time-sensitive research
-  - Getting rapid insights from web sources
-- **Limitations**: 
-  - Web sources only (documents use traditional mode)
-  - Less detailed content extraction
-- **Output**: Professional formatted reports with citations and structure
-
-### 🔬 **Traditional Mode (Thorough Analysis)**  
-- **Technology**: Full content extraction + AI analysis
-- **Speed**: 30-60 seconds generation time
-- **Best For**:
-  - Comprehensive research reports
-  - Academic and professional research
-  - Detailed analysis requirements
-- **Capabilities**:
+  - Fast document processing and basic summaries
+  - Quick content extraction needs
+  - When speed is prioritized over depth
+- **Capabilities**: 
   - Supports both web sources and documents
-  - Deep content extraction and analysis
-  - Maximum accuracy and detail
-- **Output**: Richly formatted reports with extensive citations
+  - Streamlined content extraction
+  - Efficient processing pipeline
+- **Output**: Professional formatted reports with essential insights
+
+### � **Deep Analysis**  
+- **Technology**: Google Gemini's advanced URL Context feature
+- **Speed**: 10-20 seconds generation time
+- **Best For**:
+  - Comprehensive web source analysis
+  - Detailed insights and context understanding
+  - Professional research requiring depth
+- **Capabilities**:
+  - Advanced URL context processing
+  - Rich contextual understanding
+  - Superior insight generation from web sources
+  - Documents processed via traditional extraction
+- **Output**: Highly detailed reports with comprehensive analysis
+
+### 💬 **Chat Mode**
+- **Technology**: Interactive conversational AI with source integration
+- **Speed**: Instant responses (2-5 seconds per message)
+- **Best For**:
+  - Exploratory research and Q&A
+  - Interactive analysis sessions
+  - Real-time source consultation
+  - Educational and learning scenarios
+- **Capabilities**:
+  - Conversation history preservation
+  - Source-aware responses with citations
+  - Follow-up question handling
+  - Context-aware dialogue
+- **Output**: Real-time chat interface with cited responses (no formal reports)
 
 ### 🎯 **When to Use Each Mode**
 
 | Scenario | Recommended Mode | Why |
 |----------|------------------|-----|
-| Breaking news analysis | Fast Mode | Speed matters for current events |
-| Academic research paper | Traditional Mode | Depth and accuracy required |
-| Market trend overview | Fast Mode | Quick insights from multiple sources |
-| Legal document analysis | Traditional Mode | Precision and detail critical |
-| Technology comparison | Either Mode | Depends on time constraints |
-| Financial analysis | Traditional Mode | Accuracy crucial for decisions |
+| Quick document review | Quick Analysis | Fast processing of uploaded files |
+| Breaking news analysis | Deep Analysis | Superior web context understanding |
+| Exploratory research | Chat Mode | Interactive Q&A format ideal for discovery |
+| Academic research paper | Deep Analysis | Comprehensive web source analysis |
+| Learning about a topic | Chat Mode | Conversational format aids understanding |
+| Market trend overview | Deep Analysis | Rich contextual insights from web sources |
+| Document summarization | Quick Analysis | Efficient extraction from files |
+| Legal document analysis | Quick Analysis | Reliable extraction from documents |
+| Interactive consultation | Chat Mode | Real-time Q&A with immediate responses |
+| Technology comparison | Deep Analysis | Detailed web-based comparative analysis |
 
 ## �🔧 Category-Specific Search Features
 
@@ -454,15 +484,41 @@ For support, please:
 3. Click "Search" to find relevant sources
 4. Navigate through results using pagination controls
 
-### Generating Reports
+### Generating Reports and Starting Conversations
 
-1. Select sources to include in your report:
+1. Select sources to include in your research:
    - Use individual checkboxes to select specific sources
-   - Use "Select All" to include all sources
-2. Customize the prompt template if desired
-3. Click "Generate Report" to create your research report
-4. Monitor progress through the animated loading indicator
-5. Review toast notifications for success or error messages
+   - Use "Select All" to include all sources from search results
+   - Upload and select documents from your Knowledge Base
+2. **Choose your research mode**:
+   - **Quick Analysis**: Fast content extraction for rapid insights
+   - **Deep Analysis**: URL context-based generation with comprehensive details  
+   - **Chat Mode**: Interactive conversation with your sources
+3. **For Quick/Deep Analysis**:
+   - Customize the prompt template if desired
+   - Click "Generate Report" to create your research report
+   - Monitor progress through the animated loading indicator
+   - Review and export your completed report
+4. **For Chat Mode**:
+   - Click "Start Chat Session" to initialize the interface
+   - Type questions about your sources in the chat input
+   - Get instant AI responses with source citations
+   - Continue the conversation with follow-up questions
+5. Monitor toast notifications for success or error messages
+
+### Using Chat Mode
+
+1. Select your research sources (web links and/or documents)
+2. Choose "Chat Mode" from the generation options
+3. Click "Start Chat Session" to initialize
+4. Ask questions like:
+   - "What are the main findings from these sources?"
+   - "Compare the different viewpoints presented"
+   - "What evidence supports [specific claim]?"
+   - "Summarize the key statistics mentioned"
+5. View responses with proper source citations
+6. Continue the conversation naturally
+7. Chat history is preserved throughout your session
 
 ### Exporting Reports
 
