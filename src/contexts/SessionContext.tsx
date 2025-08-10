@@ -95,7 +95,10 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       setSearchConfig(searchConfig);
       setGeneratedReport(generatedReport);
       setGenerationMode(generationMode || 'traditional');
-      setChatMessages(chatMessages || []);
+      setChatMessages((chatMessages || []).map((msg: any) => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp)
+      })));
     }
   }, []);
 
