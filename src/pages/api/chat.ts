@@ -23,12 +23,12 @@ export default async function handler(
       conversationHistory
     );
 
-    res.status(200).json({ response });
+    res.status(200).json({ message: response });
   } catch (error: any) {
     console.error('Chat error:', error);
     res.status(500).json({ 
-      message: error.message || 'Internal server error',
-      response: 'I apologize, but I encountered an error. Please try again.' 
+      error: error.message || 'Internal server error',
+      message: 'I apologize, but I encountered an error. Please try again.' 
     });
   }
 }
