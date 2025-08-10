@@ -53,23 +53,31 @@ const Layout: FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-white transition-colors duration-300">
-      <header className={`sticky top-0 z-10 transition-all duration-300 ${
-        scrolled 
-          ? 'backdrop-blur-xl bg-white dark:bg-black shadow-md' 
-          : 'backdrop-blur-md bg-white dark:bg-black'
-      } border-b border-gray-200 dark:border-gray-800`}>
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center group">
-            <div className="relative h-10 w-13">
-              <Image 
-                src="/images/querrawobg.png" 
-                alt="Querra Logo" 
-                width={100} 
-                height={40} 
-                className="transition-transform group-hover:scale-105" 
-                priority
-              />
-            </div>
+    <header
+      className={`sticky top-0 z-10 transition-all duration-300 ${
+        scrolled
+          ? 'backdrop-blur-xl bg-white/50 dark:bg-black/50 shadow-sm'
+          : 'backdrop-blur-md bg-white/30 dark:bg-black/30'
+      } border-b border-white/20 dark:border-gray-800/20`}
+      style={{
+        backgroundImage:
+          'linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.1))',
+        WebkitBackdropFilter: 'blur(20px)',
+        backdropFilter: 'blur(20px)'
+      }}
+    >
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link href="/" className="flex items-center group">
+          <div className="relative h-10 w-13">
+            <Image
+              src="/images/querrawobg.png"
+              alt="Querra Logo"
+              width={100}
+              height={40}
+              className="transition-transform group-hover:scale-105"
+              priority
+            />
+          </div>
           </Link>
           <div className="flex items-center space-x-6">
             <button 
