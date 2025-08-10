@@ -43,7 +43,7 @@ export const generateReport = async (
   sources: string[],
   documentIds: number[],
   promptTemplate: string,
-  generationMode: 'traditional' | 'fast' = 'traditional'
+  generationMode: 'traditional' | 'fast' | 'chat' = 'traditional'
 ) => {
   const response = await fetch('/api/generate', {
     method: 'POST',
@@ -53,6 +53,24 @@ export const generateReport = async (
 
   if (!response.ok) {
     throw new Error('Failed to generate report');
+  }
+
+  return response.json();
+};
+
+export const sendChatMessage = async (
+  message: string,
+  sources: string[],
+  conversationHistory: Array<{role: string, content: string}> = []
+) => {
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, sources, conversationHistory }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to send chat message');
   }
 
   return response.json();

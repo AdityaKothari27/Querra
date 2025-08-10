@@ -97,6 +97,80 @@ export class GeminiProcessor {
     throw lastError;
   }
 
+  async generate_chat_response(
+    message: string, 
+    urls: string[], 
+    conversationHistory: Array<{role: string, content: string}> = []
+  ): Promise<string> {
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const prompt = this._prepare_chat_prompt({ message, urls, conversationHistory });
+        
+        const response = await this.genAINew.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: [prompt],
+          config: {
+            tools: [{ urlContext: {} }],
+            temperature: 0.8, // Slightly higher for more conversational responses
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+            responseModalities: ["TEXT"],
+          },
+        });
+
+        console.log('Chat URL Context Metadata:', response.candidates?.[0]?.urlContextMetadata);
+        return response.text || 'I apologize, but I couldn\'t generate a response. Please try again.';
+      } catch (error: any) {
+        lastError = error;
+        console.error(`Chat mode attempt ${attempt} failed:`, error);
+        
+        if (error?.status === 429) {
+          await this.delay(this.retryDelay * attempt);
+          continue;
+        }
+        
+        throw error;
+      }
+    }
+    
+    throw lastError;
+  }
+
+  private _prepare_chat_prompt({ message, urls, conversationHistory }: {
+    message: string;
+    urls: string[];
+    conversationHistory: Array<{role: string, content: string}>;
+  }): string {
+    const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
+    
+    let historyText = '';
+    if (conversationHistory.length > 0) {
+      historyText = '\n\nPrevious conversation:\n' + 
+        conversationHistory.map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n');
+    }
+    
+    return `You are an AI research assistant engaged in a conversational chat with a user. You have access to the following source materials:
+
+Source Materials:
+${urlsWithNumbers}
+
+${historyText}
+
+Current user message: ${message}
+
+Please respond in a conversational, helpful manner. You can:
+- Reference information from the source materials using citations like [1], [2]
+- Ask follow-up questions to clarify the user's needs
+- Provide insights and analysis based on the sources
+- Maintain a natural, engaging conversation flow
+- Be concise but informative
+
+Respond to the user's message now:`;
+  }
+
   private _prepare_fast_prompt({ query, urls, promptTemplate }: {
     query: string;
     urls: string[];

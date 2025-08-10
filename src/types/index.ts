@@ -18,14 +18,22 @@ export interface SearchConfig {
   category?: string;
   excludedDomains?: string[];
   page?: number;
-  generationMode?: 'traditional' | 'fast';
+  generationMode?: 'traditional' | 'fast' | 'chat';
 }
 
 export interface GenerationMode {
-  type: 'traditional' | 'fast';
+  type: 'traditional' | 'fast' | 'chat';
   label: string;
   description: string;
   icon: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  sources?: string[];
 }
 
 export interface CategoryConfig {
@@ -43,4 +51,12 @@ export interface Document {
   name: string;
   path: string;
   created_at: string;
-} 
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  sources?: string[];
+}
