@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
-import { generateReport } from '../lib/api';
-import { SparklesIcon, BoltIcon, CogIcon } from '@heroicons/react/24/outline';
+import { generateReport, sendChatMessage } from '../lib/api';
+import { SparklesIcon, BoltIcon, CogIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
@@ -28,7 +28,11 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
-  const { setGeneratedReport, generatedReport, generationMode, setGenerationMode } = useSession();
+  const { setGeneratedReport, generatedReport, generationMode, setGenerationMode, chatMessages, setChatMessages } = useSession();
+
+  // Chat specific states
+  const [chatInput, setChatInput] = useState('');
+  const [isChatting, setIsChatting] = useState(false);
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -85,6 +89,15 @@ const ReportSection: FC<ReportSectionProps> = ({
       return;
     }
 
+    if (generationMode === 'chat') {
+      // For chat mode, just show a success message and let user start chatting
+      showToast({
+        type: 'success',
+        message: 'Chat session ready! You can now ask questions about your sources.',
+      });
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const response = await generateReport(
@@ -121,6 +134,51 @@ const ReportSection: FC<ReportSectionProps> = ({
       return categoryConfig.promptTemplate;
     }
     return 'Generate a comprehensive report based on the provided sources. Include an introduction, key findings, analysis, and conclusion. Use citation notation like [1], [2], etc. when referencing specific sources.';
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isChatting) return;
+
+    const userMessage = {
+      role: 'user' as const,
+      content: chatInput.trim(),
+      timestamp: new Date().toISOString()
+    };
+
+    // Add user message to chat
+    const updatedMessages = [...chatMessages, userMessage];
+    setChatMessages(updatedMessages);
+    setChatInput('');
+    setIsChatting(true);
+
+    try {
+      const response = await sendChatMessage(
+        chatInput.trim(),
+        selectedSources,
+        updatedMessages
+      );
+
+      const assistantMessage = {
+        role: 'assistant' as const,
+        content: response.message,
+        timestamp: new Date().toISOString()
+      };
+
+      setChatMessages([...updatedMessages, assistantMessage]);
+      
+      showToast({
+        type: 'success',
+        message: 'Message sent successfully!',
+      });
+    } catch (error) {
+      console.error('Error sending chat message:', error);
+      showToast({
+        type: 'error',
+        message: 'Failed to send message. Please try again.',
+      });
+    } finally {
+      setIsChatting(false);
+    }
   };
 
   const handleExport = async () => {
@@ -375,7 +433,7 @@ const ReportSection: FC<ReportSectionProps> = ({
           <CogIcon className="h-4 w-4 mr-2" />
           Generation Mode
         </h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <label className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
             generationMode === 'traditional' 
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400' 
@@ -386,16 +444,16 @@ const ReportSection: FC<ReportSectionProps> = ({
               name="generationMode"
               value="traditional"
               checked={generationMode === 'traditional'}
-              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast')}
+              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast' | 'chat')}
               className="sr-only"
             />
             <div className="flex-1">
               <div className="flex items-center mb-1">
                 <SparklesIcon className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Thorough Analysis</span>
+                <span className="font-medium text-gray-900 dark:text-white">Quick Analysis</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Extracts and analyzes full content from sources
+                Extracts content for faster processing
               </p>
             </div>
           </label>
@@ -410,21 +468,40 @@ const ReportSection: FC<ReportSectionProps> = ({
               name="generationMode"
               value="fast"
               checked={generationMode === 'fast'}
-              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast')}
+              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast' | 'chat')}
               className="sr-only"
             />
             <div className="flex-1">
               <div className="flex items-center mb-1">
                 <BoltIcon className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Quick Insights</span>
+                <span className="font-medium text-gray-900 dark:text-white">Deep Analysis</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Uses URL context for faster processing
-                {selectedDocumentIds.length > 0 && (
-                  <span className="block text-yellow-600 dark:text-yellow-400">
-                    ⚠️ Documents will use traditional mode
-                  </span>
-                )}
+                Uses URL context for detailed insights
+              </p>
+            </div>
+          </label>
+
+          <label className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            generationMode === 'chat' 
+              ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-400' 
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+          }`}>
+            <input
+              type="radio"
+              name="generationMode"
+              value="chat"
+              checked={generationMode === 'chat'}
+              onChange={(e) => setGenerationMode(e.target.value as 'traditional' | 'fast' | 'chat')}
+              className="sr-only"
+            />
+            <div className="flex-1">
+              <div className="flex items-center mb-1">
+                <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Chat Mode</span>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Interactive conversation with sources
               </p>
             </div>
           </label>
@@ -446,25 +523,95 @@ const ReportSection: FC<ReportSectionProps> = ({
         {isGenerating ? (
           <div className="relative overflow-hidden">
             <span className="text-white font-medium">
-              {generationMode === 'fast' ? 'Fast Generating...' : 'Generating Report...'}
+              {generationMode === 'chat' ? 'Starting Chat...' : generationMode === 'fast' ? 'Deep Analysis...' : 'Quick Generating...'}
             </span>
             <div className="absolute top-0 left-0 right-0 bottom-0 -inset-x-full z-10 block transform-gpu bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-fast"></div>
           </div>
         ) : (
           <>
-            {generationMode === 'fast' ? (
+            {generationMode === 'chat' ? (
+              <ChatBubbleLeftRightIcon className="h-5 w-5 mr-2 text-white" />
+            ) : generationMode === 'fast' ? (
               <BoltIcon className="h-5 w-5 mr-2 text-white" />
             ) : (
               <SparklesIcon className="h-5 w-5 mr-2 text-white" />
             )}
             <span className="text-white">
-              {generationMode === 'fast' ? 'Generate Quick Report' : 'Generate Thorough Report'}
+              {generationMode === 'chat' ? 'Start Chat Session' : generationMode === 'fast' ? 'Generate Deep Analysis' : 'Generate Quick Report'}
             </span>
           </>
         )}
       </button>
       
-      {report && (
+      {/* Chat Interface */}
+      {generationMode === 'chat' && (
+        <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+          <div className="h-96 overflow-y-auto p-4 space-y-4">
+            {chatMessages.length === 0 ? (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                <ChatBubbleLeftRightIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Start a conversation about your selected sources</p>
+              </div>
+            ) : (
+              chatMessages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg ${
+                      message.role === 'user'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                    }`}
+                  >
+                    <div className="text-sm">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                    <div className="text-xs opacity-75 mt-1">
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+            {isChatting && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white p-3 rounded-lg">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                placeholder="Ask about your sources..."
+                disabled={isChatting || (selectedSources.length === 0 && selectedDocumentIds.length === 0)}
+                className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!chatInput.trim() || isChatting || (selectedSources.length === 0 && selectedDocumentIds.length === 0)}
+                className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
+              >
+                <PaperAirplaneIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {report && generationMode !== 'chat' && (
         <div className="mt-6">
           <div className="flex items-center space-x-2 mt-4 mb-4">
             <label htmlFor="exportFormat" className="text-sm font-medium text-gray-700 dark:text-gray-300">

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { ChatMessage } from '../types';
 
 interface SessionContextType {
   searchQuery: string;
@@ -15,8 +16,10 @@ interface SessionContextType {
   setSearchConfig: (config: any) => void;
   generatedReport: any;
   setGeneratedReport: (report: any) => void;
-  generationMode: 'traditional' | 'fast';
-  setGenerationMode: (mode: 'traditional' | 'fast') => void;
+  generationMode: 'traditional' | 'fast' | 'chat';
+  setGenerationMode: (mode: 'traditional' | 'fast' | 'chat') => void;
+  chatMessages: ChatMessage[];
+  setChatMessages: (messages: ChatMessage[]) => void;
   clearSession: () => void;
 }
 
@@ -38,7 +41,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [selectedCategory, setSelectedCategory] = useState('general');
   const [searchConfig, setSearchConfig] = useState<any>(null);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
-  const [generationMode, setGenerationMode] = useState<'traditional' | 'fast'>('traditional');
+  const [generationMode, setGenerationMode] = useState<'traditional' | 'fast' | 'chat'>('traditional');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const clearSession = () => {
     // Set all state to initial values
@@ -50,6 +54,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setSearchConfig(null);
     setGeneratedReport(null);
     setGenerationMode('traditional');
+    setChatMessages([]);
     
     // Remove from localStorage
     localStorage.removeItem('researchSession');
@@ -63,7 +68,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       selectedCategory: 'general',
       searchConfig: null,
       generatedReport: null,
-      generationMode: 'traditional'
+      generationMode: 'traditional',
+      chatMessages: []
     });
   };
 
@@ -79,6 +85,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         searchConfig,
         generatedReport,
         generationMode,
+        chatMessages,
       } = JSON.parse(sessionData);
       setSearchQuery(searchQuery || '');
       setSearchResults(searchResults || []);
@@ -88,6 +95,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       setSearchConfig(searchConfig);
       setGeneratedReport(generatedReport);
       setGenerationMode(generationMode || 'traditional');
+      setChatMessages(chatMessages || []);
     }
   }, []);
 
@@ -101,6 +109,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       searchConfig,
       generatedReport,
       generationMode,
+      chatMessages,
     };
     localStorage.setItem('researchSession', JSON.stringify(sessionData));
   }, [
@@ -112,6 +121,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     searchConfig,
     generatedReport,
     generationMode,
+    chatMessages,
   ]);
 
   return (
@@ -133,6 +143,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setGeneratedReport,
         generationMode,
         setGenerationMode,
+        chatMessages,
+        setChatMessages,
         clearSession,
       }}
     >
