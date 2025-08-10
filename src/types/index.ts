@@ -52,11 +52,3 @@ export interface Document {
   path: string;
   created_at: string;
 }
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  sources?: string[];
-}
