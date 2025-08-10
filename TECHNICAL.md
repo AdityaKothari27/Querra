@@ -321,7 +321,42 @@ SearchResult[] = {
 5. Save report to database
 6. Return generated report
 
-### 3. `/api/documents` - Document Management
+### 3. `/api/chat` - Interactive Chat Endpoint
+
+**Method**: POST
+**Purpose**: Handles interactive chat conversations with sources
+
+**Request Body**:
+```typescript
+{
+  message: string;
+  sources: string[];
+  conversationHistory: Array<{role: string, content: string}>;
+}
+```
+
+**Response**:
+```typescript
+{
+  message: string;
+}
+```
+
+**Implementation Logic**:
+1. Validate chat message and sources
+2. Prepare conversation context with history
+3. Generate conversational prompt
+4. Use AI processor with URL context
+5. Return formatted chat response
+6. Maintain conversation state in frontend
+
+**Features**:
+- Real-time responses (2-5 seconds)
+- Conversation history preservation
+- Source-aware responses with citations
+- Conversational tone optimization
+
+### 4. `/api/documents` - Document Management
 
 **Methods**: GET, POST, DELETE
 **Purpose**: Handles document upload, retrieval, and deletion
@@ -449,13 +484,13 @@ const dateRestrictMap = {
 
 ## AI Processing Pipeline
 
-### 1. Dual-Mode Architecture
+### 1. Triple-Mode Architecture
 
-Querra now supports two distinct generation modes:
+Querra now supports three distinct generation modes, each optimized for different use cases:
 
-#### Traditional Mode (Content Extraction)
+#### Quick Analysis Mode (Traditional Content Extraction)
 ```typescript
-const contentPreparationPipeline = [
+const quickAnalysisPipeline = [
   'extractWebContent',      // Extract text from HTML using Cheerio
   'extractDocumentContent', // Extract text from PDF/DOCX files
   'cleanContent',          // Remove noise and formatting
@@ -464,9 +499,9 @@ const contentPreparationPipeline = [
 ];
 ```
 
-#### Fast Mode (URL Context)
+#### Deep Analysis Mode (URL Context)
 ```typescript
-const fastModeProcessing = [
+const deepAnalysisProcessing = [
   'prepareURLList',        // Format URLs with numbering
   'enhancePrompt',         // Add structured formatting instructions
   'invokeURLContext',      // Use Gemini's URL context tool
@@ -474,30 +509,96 @@ const fastModeProcessing = [
 ];
 ```
 
+#### Chat Mode (Interactive Conversation)
+```typescript
+const chatModePipeline = [
+  'prepareConversationContext', // Format conversation history
+  'prepareChatPrompt',          // Create conversational prompt
+  'invokeURLContext',           // Use Gemini's URL context tool
+  'processResponse',            // Handle response
+  'updateChatHistory'           // Maintain conversation state
+];
+```
+
 ### 2. Mode Selection Logic
 
-The system intelligently selects processing mode based on:
+The system intelligently selects processing mode based on user choice and capabilities:
 
 ```typescript
-if (generationMode === 'fast' && documentIds.length === 0) {
-  // Pure fast mode: URLs only
+if (generationMode === 'chat') {
+  // Chat mode: Initialize conversation interface
+  showToast({ type: 'success', message: 'Chat session ready!' });
+  return;
+} else if (generationMode === 'fast' && documentIds.length === 0) {
+  // Deep Analysis: URLs with advanced context
   report = await ai_processor.generate_report_fast(query, sources, promptTemplate);
 } else if (generationMode === 'fast' && documentIds.length > 0) {
-  // Hybrid mode: Fall back to traditional for document support
+  // Hybrid mode: Fall back to Quick Analysis for document support
   report = await ai_processor.generate_report(query, allContents, promptTemplate);
 } else {
-  // Traditional mode: Full content extraction
+  // Quick Analysis: Full content extraction
   report = await ai_processor.generate_report(query, allContents, promptTemplate);
 }
 ```
 
-### 3. Enhanced Prompt Engineering
+### 3. Enhanced Chat Processing
 
-#### Fast Mode Prompts
-Fast mode uses enhanced prompts for better formatting:
-
+#### Chat Response Generation
 ```typescript
-const fastModePrompt = `Search Topic: ${query}
+async generate_chat_response(
+  message: string, 
+  urls: string[], 
+  conversationHistory: Array<{role: string, content: string}> = []
+): Promise<string> {
+  const prompt = this._prepare_chat_prompt({ message, urls, conversationHistory });
+  
+  const response = await this.genAINew.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [prompt],
+    config: {
+      tools: [{ urlContext: {} }],
+      temperature: 0.8, // Higher for conversational responses
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 2048,
+      responseModalities: ["TEXT"],
+    },
+  });
+
+  return response.text || 'I apologize, but I couldn\'t generate a response.';
+}
+```
+
+#### Chat Prompt Engineering
+```typescript
+private _prepare_chat_prompt({ message, urls, conversationHistory }): string {
+  const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
+  
+  let historyText = '';
+  if (conversationHistory.length > 0) {
+    historyText = '\n\nPrevious conversation:\n' + 
+      conversationHistory.map(msg => 
+        `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+      ).join('\n');
+  }
+  
+  return `You are an AI research assistant engaged in a conversational chat.
+
+Source Materials:
+${urlsWithNumbers}
+${historyText}
+
+Current user message: ${message}
+
+Respond conversationally with source citations [1], [2], etc.`;
+}
+```
+
+### 4. Prompt Engineering by Mode
+
+#### Deep Analysis Prompts (Enhanced Formatting)
+```typescript
+const deepAnalysisPrompt = `Search Topic: ${query}
 
 ${promptTemplate}
 
@@ -505,7 +606,7 @@ Source Materials:
 [1] https://example1.com
 [2] https://example2.com
 
-Please generate a comprehensive research report with:
+Generate a comprehensive research report with EXACT Markdown formatting:
 
 # Research Report: ${query}
 
@@ -513,22 +614,20 @@ Please generate a comprehensive research report with:
 ## Key Findings  
 ## Detailed Analysis
 ## Recommendations
-## Sources
+## Conclusions
+## Sources and Citations
 
-FORMATTING REQUIREMENTS:
-- Proper Markdown headings (# ## ###)
-- Citations as [1], [2] when referencing sources
-- Bold important terms with **text**
+CRITICAL FORMATTING REQUIREMENTS:
+- Use EXACT Markdown headings (# ## ###)
+- Citations as [1], [2] throughout text
+- **Bold** important terms
 - Professional academic formatting
-- Include title and date
 `;
 ```
 
-#### Traditional Mode Prompts
-Traditional mode uses extracted content:
-
+#### Quick Analysis Prompts (Content-Based)
 ```typescript
-const traditionalPrompt = `
+const quickAnalysisPrompt = `
 Search Topic: ${query}
 
 Instructions: ${promptTemplate}
@@ -544,9 +643,7 @@ Generate comprehensive report with citations...
 `;
 ```
 
-### 4. Dual AI Model Configuration
-
-#### Fast Mode Configuration
+### 5. Triple AI Model Configuration
 ```typescript
 const fastModeConfig = {
   model: "gemini-2.5-pro",
@@ -736,10 +833,21 @@ interface DatabaseInterface {
 - Document integration
 
 ### 3. ReportSection Component (`src/components/ReportSection.tsx`)
-- Report generation interface
-- Export functionality (PDF, DOCX, TXT, MD)
-- Markdown rendering
-- Progress indicators
+- **Triple-mode interface**: Quick Analysis, Deep Analysis, Chat Mode
+- **Report generation**: Traditional and fast mode support
+- **Chat interface**: Interactive conversation UI with message history
+- **Export functionality**: PDF, DOCX, TXT, MD export options
+- **Markdown rendering**: Rich text display for reports
+- **Progress indicators**: Loading states and animations
+- **Mode-specific UI**: Different interfaces for each generation mode
+
+#### Chat Interface Features
+- Real-time message display with role-based styling
+- Conversation history preservation
+- Typing indicators for AI responses
+- Source-aware response citations
+- Message timestamp display
+- Interactive input with keyboard shortcuts
 
 ### 4. CategorySelector Component (`src/components/CategorySelector.tsx`)
 - Category selection interface
@@ -794,13 +902,51 @@ interface SessionContextType {
   searchConfig: SearchConfig | null;
   setSearchConfig: (config: SearchConfig) => void;
   
-  // Report state
+    // Report state
   generatedReport: string | null;
   setGeneratedReport: (report: string | null) => void;
+  
+  // Generation mode state
+  generationMode: 'traditional' | 'fast' | 'chat';
+  setGenerationMode: (mode: 'traditional' | 'fast' | 'chat') => void;
+  
+  // Chat state
+  chatMessages: ChatMessage[];
+  setChatMessages: (messages: ChatMessage[]) => void;
   
   // Session management
   clearSession: () => void;
 }
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  sources?: string[];
+}
+```
+
+### Local Storage Persistence
+
+The session context automatically persists state to localStorage:
+
+```typescript
+// Save session data including chat messages
+useEffect(() => {
+  const sessionData = {
+    searchQuery,
+    searchResults,
+    selectedSources,
+    selectedDocumentIds,
+    selectedCategory,
+    generatedReport,
+    generationMode,
+    chatMessages
+  };
+  localStorage.setItem('querra_session', JSON.stringify(sessionData));
+}, [searchQuery, searchResults, selectedSources, selectedDocumentIds, 
+    selectedCategory, generatedReport, generationMode, chatMessages]);
 ```
 
 ### Local Storage Persistence
