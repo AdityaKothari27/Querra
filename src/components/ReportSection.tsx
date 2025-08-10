@@ -140,9 +140,10 @@ const ReportSection: FC<ReportSectionProps> = ({
     if (!chatInput.trim() || isChatting) return;
 
     const userMessage = {
+      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       role: 'user' as const,
       content: chatInput.trim(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     };
 
     // Add user message to chat
@@ -159,9 +160,10 @@ const ReportSection: FC<ReportSectionProps> = ({
       );
 
       const assistantMessage = {
+        id: `assistant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         role: 'assistant' as const,
         content: response.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date()
       };
 
       setChatMessages([...updatedMessages, assistantMessage]);
@@ -569,7 +571,7 @@ const ReportSection: FC<ReportSectionProps> = ({
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                     <div className="text-xs opacity-75 mt-1">
-                      {new Date(message.timestamp).toLocaleTimeString()}
+                      {message.timestamp.toLocaleTimeString()}
                     </div>
                   </div>
                 </div>
