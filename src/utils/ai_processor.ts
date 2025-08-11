@@ -369,7 +369,7 @@ Do not include any explanations, introductions, or analysis.
         model: "moonshotai/kimi-k2-instruct",
         messages,
         temperature: 0.8,
-        max_tokens: 20000,
+        max_tokens: 16000,
       });
 
       return response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
@@ -456,7 +456,7 @@ Please provide a helpful response based on the sources above, citing them with [
         model: "moonshotai/kimi-k2-instruct",
         messages,
         temperature: 0.8,
-        max_tokens: 20000,
+        max_tokens: 16000,
       });
 
       return response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
@@ -502,7 +502,7 @@ Please generate a comprehensive report based on the above sources. Include relev
           }
         ],
         temperature: 0.7,
-        max_tokens: 4096,
+        max_tokens: 16000,
       });
 
       return response.choices[0]?.message?.content || "I apologize, but I couldn't generate a report. Please try again.";
