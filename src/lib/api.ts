@@ -43,12 +43,13 @@ export const generateReport = async (
   sources: string[],
   documentIds: number[],
   promptTemplate: string,
-  generationMode: 'traditional' | 'fast' | 'chat' = 'traditional'
+  generationMode: 'traditional' | 'fast' | 'chat' = 'traditional',
+  model: string = 'gemini-2.0-flash-exp'
 ) => {
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, sources, documentIds, promptTemplate, generationMode }),
+    body: JSON.stringify({ query, sources, documentIds, promptTemplate, generationMode, model }),
   });
 
   if (!response.ok) {
@@ -61,12 +62,13 @@ export const generateReport = async (
 export const sendChatMessage = async (
   message: string,
   sources: string[],
-  conversationHistory: Array<{role: string, content: string}> = []
+  conversationHistory: Array<{role: string, content: string}> = [],
+  model: string = 'gemini-2.0-flash-exp'
 ) => {
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, sources, conversationHistory }),
+    body: JSON.stringify({ message, sources, conversationHistory, model }),
   });
 
   if (!response.ok) {

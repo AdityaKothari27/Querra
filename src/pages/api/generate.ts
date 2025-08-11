@@ -16,7 +16,9 @@ export default async function handler(
   }
 
   try {
-    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional' } = req.body;
+    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional', model = 'gemini-2.0-flash-exp' } = req.body;
+    
+    console.log('Generation request:', { generationMode, model, sourcesCount: sources.length, documentsCount: documentIds?.length || 0 });
     
     let report: string;
     
@@ -40,10 +42,10 @@ export default async function handler(
         );
         
         const allContents = [...webContents, ...documentContents];
-        report = await ai_processor.generate_report(query, allContents, promptTemplate);
+        report = await ai_processor.generate_report(query, allContents, promptTemplate, model);
       } else {
         // Pure fast mode with only URLs
-        report = await ai_processor.generate_report_fast(query, sources, promptTemplate);
+        report = await ai_processor.generate_report_fast(query, sources, promptTemplate, model);
         
         // Add mode indicator to the report
         const currentDate = new Date().toLocaleDateString('en-US', { 
@@ -70,7 +72,7 @@ export default async function handler(
       
       // Combine all contents
       const allContents = [...webContents, ...documentContents];
-      report = await ai_processor.generate_report(query, allContents, promptTemplate);
+      report = await ai_processor.generate_report(query, allContents, promptTemplate, model);
       
       // Add mode indicator to the report
       const currentDate = new Date().toLocaleDateString('en-US', { 

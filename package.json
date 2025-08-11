@@ -22,6 +22,7 @@
     "docx": "^9.2.0",
     "file-saver": "^2.0.5",
     "formidable": "^3.5.2",
+    "groq-sdk": "^0.30.0",
     "jspdf": "3.0.1",
     "jspdf-autotable": "^5.0.2",
     "marked": "^15.0.7",
