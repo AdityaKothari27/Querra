@@ -29,7 +29,7 @@ export class GeminiProcessor {
     let lastError: any;
     
     // If using Groq model, use different approach
-    if (model.includes('mixtral')) {
+    if (model.includes('moonshot')) {
       return this._generateGroqReport(query, contents, promptTemplate);
     }
     
@@ -76,7 +76,7 @@ export class GeminiProcessor {
     let lastError: any;
     
     // If using Groq model, fall back to content extraction since Groq doesn't support URL context
-    if (model.includes('mixtral')) {
+    if (model.includes('moonshot')) {
       // Extract content from URLs and use traditional approach
       const contents = await Promise.all(urls.map(async (url) => {
         try {
@@ -139,7 +139,7 @@ export class GeminiProcessor {
     let lastError: any;
     
     // If no URLs provided and using a Groq model, use general chat
-    if (urls.length === 0 && model.includes('mixtral')) {
+    if (urls.length === 0 && model.includes('moonshot')) {
       return this._generateGroqResponse(message, conversationHistory, model);
     }
     
@@ -153,7 +153,7 @@ export class GeminiProcessor {
       try {
         const prompt = this._prepare_chat_prompt({ message, urls, conversationHistory });
         
-        if (model.includes('mixtral')) {
+        if (model.includes('moonshot')) {
           // Use Groq for Kimi model (Note: Groq doesn't support URL context, so we'll need content extraction)
           return this._generateGroqWithUrls(message, urls, conversationHistory, model);
         } else {
@@ -366,7 +366,7 @@ Do not include any explanations, introductions, or analysis.
       ];
 
       const response = await this.groq.chat.completions.create({
-        model: "mixtral-8x7b-32768",
+        model: "moonshotai/kimi-k2-instruct",
         messages,
         temperature: 0.8,
         max_tokens: 2048,
@@ -453,7 +453,7 @@ Please provide a helpful response based on the sources above, citing them with [
       ];
 
       const response = await this.groq.chat.completions.create({
-        model: "mixtral-8x7b-32768",
+        model: "moonshotai/kimi-k2-instruct",
         messages,
         temperature: 0.8,
         max_tokens: 2048,
@@ -490,7 +490,7 @@ ${combined_content}
 Please generate a comprehensive report based on the above sources. Include relevant details, comparisons, and insights from all provided sources.`;
 
       const response = await this.groq.chat.completions.create({
-        model: "mixtral-8x7b-32768",
+        model: "moonshotai/kimi-k2-instruct",
         messages: [
           {
             role: "system",
