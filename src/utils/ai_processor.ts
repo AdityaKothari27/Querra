@@ -167,7 +167,7 @@ export class GeminiProcessor {
               temperature: 0.8,
               topK: 40,
               topP: 0.95,
-              maxOutputTokens: 2048,
+              maxOutputTokens: 20000,
               responseModalities: ["TEXT"],
             },
           });
@@ -369,7 +369,7 @@ Do not include any explanations, introductions, or analysis.
         model: "moonshotai/kimi-k2-instruct",
         messages,
         temperature: 0.8,
-        max_tokens: 2048,
+        max_tokens: 20000,
       });
 
       return response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
@@ -456,7 +456,7 @@ Please provide a helpful response based on the sources above, citing them with [
         model: "moonshotai/kimi-k2-instruct",
         messages,
         temperature: 0.8,
-        max_tokens: 2048,
+        max_tokens: 20000,
       });
 
       return response.choices[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";

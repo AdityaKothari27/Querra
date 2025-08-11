@@ -157,7 +157,7 @@ class GeminiProcessor {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 20000,
           },
         });
         return result.response.text();
@@ -560,7 +560,7 @@ async generate_chat_response(
       temperature: 0.8, // Higher for conversational responses
       topK: 40,
       topP: 0.95,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 20000,
       responseModalities: ["TEXT"],
     },
   });
@@ -666,7 +666,7 @@ const traditionalModeConfig = {
     temperature: 0.7,
     topK: 40,
     topP: 0.95,
-    maxOutputTokens: 2048,
+    maxOutputTokens: 20000,
   }
 };
 ```
