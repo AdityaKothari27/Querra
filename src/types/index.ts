@@ -19,6 +19,14 @@ export interface SearchConfig {
   excludedDomains?: string[];
   page?: number;
   generationMode?: 'traditional' | 'fast' | 'chat';
+  model?: string;
+}
+
+export interface AIModel {
+  id: string;
+  name: string;
+  provider: 'gemini' | 'groq';
+  description: string;
 }
 
 export interface GenerationMode {

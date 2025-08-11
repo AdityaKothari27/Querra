@@ -12,15 +12,16 @@ export default async function handler(
   }
 
   try {
-    const { message, sources, conversationHistory = [] } = req.body;
+    const { message, sources, conversationHistory = [], model = 'gemini-2.0-flash-exp' } = req.body;
     
-    console.log('Chat mode request:', { message, sourcesCount: sources.length });
+    console.log('Chat mode request:', { message, sourcesCount: sources.length, model });
     
-    // Generate chat response using URL context
+    // Generate chat response using URL context or general chat based on model and sources
     const response = await ai_processor.generate_chat_response(
       message, 
       sources, 
-      conversationHistory
+      conversationHistory,
+      model
     );
 
     res.status(200).json({ message: response });

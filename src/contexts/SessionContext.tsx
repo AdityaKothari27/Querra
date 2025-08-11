@@ -18,6 +18,8 @@ interface SessionContextType {
   setGeneratedReport: (report: any) => void;
   generationMode: 'traditional' | 'fast' | 'chat';
   setGenerationMode: (mode: 'traditional' | 'fast' | 'chat') => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
   chatMessages: ChatMessage[];
   setChatMessages: (messages: ChatMessage[]) => void;
   clearSession: () => void;
@@ -42,6 +44,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [searchConfig, setSearchConfig] = useState<any>(null);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
   const [generationMode, setGenerationMode] = useState<'traditional' | 'fast' | 'chat'>('traditional');
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-2.0-flash-exp');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const clearSession = () => {
@@ -54,6 +57,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setSearchConfig(null);
     setGeneratedReport(null);
     setGenerationMode('traditional');
+    setSelectedModel('gemini-2.0-flash-exp');
     setChatMessages([]);
     
     // Remove from localStorage
@@ -85,6 +89,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         searchConfig,
         generatedReport,
         generationMode,
+        selectedModel,
         chatMessages,
       } = JSON.parse(sessionData);
       setSearchQuery(searchQuery || '');
@@ -95,6 +100,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       setSearchConfig(searchConfig);
       setGeneratedReport(generatedReport);
       setGenerationMode(generationMode || 'traditional');
+      setSelectedModel(selectedModel || 'gemini-2.0-flash-exp');
       setChatMessages((chatMessages || []).map((msg: any) => ({
         ...msg,
         timestamp: new Date(msg.timestamp)
@@ -112,6 +118,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       searchConfig,
       generatedReport,
       generationMode,
+      selectedModel,
       chatMessages,
     };
     localStorage.setItem('researchSession', JSON.stringify(sessionData));
@@ -124,6 +131,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     searchConfig,
     generatedReport,
     generationMode,
+    selectedModel,
     chatMessages,
   ]);
 
@@ -146,6 +154,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setGeneratedReport,
         generationMode,
         setGenerationMode,
+        selectedModel,
+        setSelectedModel,
         chatMessages,
         setChatMessages,
         clearSession,

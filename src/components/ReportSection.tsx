@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { saveAs } from 'file-saver';
 import { useToast } from './Toast';
 import { useSession } from '../contexts/SessionContext';
+import { AI_MODELS, getModelsByMode, getDefaultModel } from '../config/models';
 
 interface ReportSectionProps {
   searchQuery: string;
@@ -28,7 +29,7 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
-  const { setGeneratedReport, generatedReport, generationMode, setGenerationMode, chatMessages, setChatMessages } = useSession();
+  const { setGeneratedReport, generatedReport, generationMode, setGenerationMode, selectedModel, setSelectedModel, chatMessages, setChatMessages } = useSession();
 
   // Chat specific states
   const [chatInput, setChatInput] = useState('');
@@ -73,6 +74,18 @@ const ReportSection: FC<ReportSectionProps> = ({
     }
   }, [generatedReport, report]);
 
+  // Update model when generation mode changes
+  useEffect(() => {
+    const hasUrls = selectedSources.length > 0;
+    const defaultModel = getDefaultModel(generationMode, hasUrls);
+    const availableModels = getModelsByMode(generationMode, hasUrls);
+    
+    // If current model is not available for the new mode, switch to default
+    if (!availableModels.find(model => model.id === selectedModel)) {
+      setSelectedModel(defaultModel);
+    }
+  }, [generationMode, selectedSources.length, selectedModel, setSelectedModel]);
+
   const getButtonColorClass = () => {
     if (categoryConfig && categoryConfig.color) {
       return `bg-${categoryConfig.color}-600 hover:bg-${categoryConfig.color}-700 dark:bg-${categoryConfig.color}-700 dark:hover:bg-${categoryConfig.color}-800`;
@@ -81,7 +94,8 @@ const ReportSection: FC<ReportSectionProps> = ({
   };
 
   const handleGenerateReport = async () => {
-    if (selectedSources.length === 0 && selectedDocumentIds.length === 0) {
+    // For non-chat modes, require sources
+    if (generationMode !== 'chat' && selectedSources.length === 0 && selectedDocumentIds.length === 0) {
       showToast({
         type: 'warning',
         message: 'Please select at least one source or document',
@@ -90,10 +104,14 @@ const ReportSection: FC<ReportSectionProps> = ({
     }
 
     if (generationMode === 'chat') {
-      // For chat mode, just show a success message and let user start chatting
+      // For chat mode, show appropriate message based on whether sources are selected
+      const hasSourcesMessage = selectedSources.length > 0 || selectedDocumentIds.length > 0 
+        ? 'Chat session ready! You can now ask questions about your sources.'
+        : 'Chat session ready! You can now ask me anything.';
+      
       showToast({
         type: 'success',
-        message: 'Chat session ready! You can now ask questions about your sources.',
+        message: hasSourcesMessage,
       });
       return;
     }
@@ -105,7 +123,8 @@ const ReportSection: FC<ReportSectionProps> = ({
         selectedSources, 
         selectedDocumentIds,
         promptTemplate || getDefaultPrompt(),
-        generationMode
+        generationMode,
+        selectedModel
       );
       
       // Update local state first
@@ -156,7 +175,8 @@ const ReportSection: FC<ReportSectionProps> = ({
       const response = await sendChatMessage(
         chatInput.trim(),
         selectedSources,
-        updatedMessages
+        updatedMessages,
+        selectedModel
       );
 
       const assistantMessage = {
@@ -510,16 +530,56 @@ const ReportSection: FC<ReportSectionProps> = ({
         </div>
       </div>
       
+      {/* Model Selection */}
+      {(() => {
+        const hasUrls = selectedSources.length > 0;
+        const availableModels = getModelsByMode(generationMode, hasUrls);
+        
+        // Only show model selector if there are multiple models available
+        if (availableModels.length > 1) {
+          return (
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                <CogIcon className="h-4 w-4 mr-2" />
+                AI Model Selection
+                {generationMode === 'chat' && !hasUrls && (
+                  <span className="ml-2 text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded-full">
+                    No URLs - General Chat
+                  </span>
+                )}
+              </h3>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              >
+                {availableModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name} - {model.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+        return null;
+      })()}
+      
       <div className="mb-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Selected sources: {selectedSources.length + selectedDocumentIds.length}
           {selectedDocumentIds.length > 0 && ` (including ${selectedDocumentIds.length} document${selectedDocumentIds.length > 1 ? 's' : ''} from Knowledge Base)`}
+          {generationMode === 'chat' && selectedSources.length === 0 && selectedDocumentIds.length === 0 && (
+            <span className="block text-blue-600 dark:text-blue-400 mt-1">
+              💬 Chat mode: You can chat without selecting any sources for general AI assistance
+            </span>
+          )}
         </p>
       </div>
       
       <button
         onClick={handleGenerateReport}
-        disabled={isGenerating || (selectedSources.length === 0 && selectedDocumentIds.length === 0)}
+        disabled={isGenerating || (generationMode !== 'chat' && selectedSources.length === 0 && selectedDocumentIds.length === 0)}
         className={`w-full py-3 relative overflow-hidden rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center ${getButtonColorClass()}`}
       >
         {isGenerating ? (
@@ -597,13 +657,13 @@ const ReportSection: FC<ReportSectionProps> = ({
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                placeholder="Ask about your sources..."
-                disabled={isChatting || (selectedSources.length === 0 && selectedDocumentIds.length === 0)}
+                placeholder={selectedSources.length === 0 && selectedDocumentIds.length === 0 ? "Ask me anything..." : "Ask about your sources..."}
+                disabled={isChatting}
                 className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!chatInput.trim() || isChatting || (selectedSources.length === 0 && selectedDocumentIds.length === 0)}
+                disabled={!chatInput.trim() || isChatting}
                 className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
               >
                 <PaperAirplaneIcon className="h-5 w-5" />
