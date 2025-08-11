@@ -44,7 +44,7 @@ export const generateReport = async (
   documentIds: number[],
   promptTemplate: string,
   generationMode: 'traditional' | 'fast' | 'chat' = 'traditional',
-  model: string = 'gemini-2.0-flash-exp'
+  model: string = 'gemini-2.5-flash'
 ) => {
   const response = await fetch('/api/generate', {
     method: 'POST',
@@ -63,7 +63,7 @@ export const sendChatMessage = async (
   message: string,
   sources: string[],
   conversationHistory: Array<{role: string, content: string}> = [],
-  model: string = 'gemini-2.0-flash-exp'
+  model: string = 'gemini-2.5-flash'
 ) => {
   const response = await fetch('/api/chat', {
     method: 'POST',

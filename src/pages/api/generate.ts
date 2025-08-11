@@ -16,7 +16,7 @@ export default async function handler(
   }
 
   try {
-    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional', model = 'gemini-2.0-flash-exp' } = req.body;
+    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional', model = 'gemini-2.5-flash' } = req.body;
     
     console.log('Generation request:', { generationMode, model, sourcesCount: sources.length, documentsCount: documentIds?.length || 0 });
     

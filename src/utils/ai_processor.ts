@@ -25,7 +25,7 @@ export class GeminiProcessor {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async generate_report(query: string, contents: string[], promptTemplate: string, model: string = 'gemini-2.0-flash-exp'): Promise<string> {
+  async generate_report(query: string, contents: string[], promptTemplate: string, model: string = 'gemini-2.5-flash'): Promise<string> {
     let lastError: any;
     
     // If using Groq model, use different approach
@@ -72,7 +72,7 @@ export class GeminiProcessor {
     throw new Error(`Failed to generate report after ${this.maxRetries} attempts. ${lastError?.message || ''}`);
   }
 
-  async generate_report_fast(query: string, urls: string[], promptTemplate: string, model: string = 'gemini-2.0-flash-exp'): Promise<string> {
+  async generate_report_fast(query: string, urls: string[], promptTemplate: string, model: string = 'gemini-2.5-flash'): Promise<string> {
     let lastError: any;
     
     // If using Groq model, fall back to content extraction since Groq doesn't support URL context
@@ -134,7 +134,7 @@ export class GeminiProcessor {
     message: string, 
     urls: string[], 
     conversationHistory: Array<{role: string, content: string}> = [],
-    model: string = 'gemini-2.0-flash-exp'
+    model: string = 'gemini-2.5-flash'
   ): Promise<string> {
     let lastError: any;
     
