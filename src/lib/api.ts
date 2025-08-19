@@ -62,13 +62,14 @@ export const generateReport = async (
 export const sendChatMessage = async (
   message: string,
   sources: string[],
+  documentIds: number[] = [],
   conversationHistory: Array<{role: string, content: string}> = [],
   model: string = 'gemini-2.5-flash'
 ) => {
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, sources, conversationHistory, model }),
+    body: JSON.stringify({ message, sources, documentIds, conversationHistory, model }),
   });
 
   if (!response.ok) {
