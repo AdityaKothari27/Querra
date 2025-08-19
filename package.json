@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "security:audit": "npm audit",
+    "security:fix": "npm audit fix",
+    "security:scan": "npx tsx src/utils/security-audit.ts",
+    "security:check": "npm run security:audit && npm run security:scan",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",

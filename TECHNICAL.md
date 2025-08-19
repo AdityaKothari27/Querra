@@ -2,39 +2,92 @@
 
 ## Table of Contents
 1. [Architecture Overview](#architecture-overview)
-2. [Data Flow & Logic](#data-flow--logic)
-3. [Core Modules](#core-modules)
-4. [API Endpoints](#api-endpoints)
-5. [Category System](#category-system)
-6. [Search Implementation](#search-implementation)
-7. [AI Processing Pipeline](#ai-processing-pipeline)
-8. [Database Architecture](#database-architecture)
-9. [Component Architecture](#component-architecture)
-10. [State Management](#state-management)
-11. [Error Handling](#error-handling)
-12. [Performance Optimizations](#performance-optimizations)
+2. [Security Architecture](#security-architecture)
+3. [Multi-Model AI System](#multi-model-ai-system)
+4. [Data Flow & Logic](#data-flow--logic)
+5. [Core Modules](#core-modules)
+6. [API Endpoints](#api-endpoints)
+7. [Category System](#category-system)
+8. [Search Implementation](#search-implementation)
+9. [AI Processing Pipeline](#ai-processing-pipeline)
+10. [Database Architecture](#database-architecture)
+11. [Component Architecture](#component-architecture)
+12. [State Management](#state-management)
+13. [Security Implementation](#security-implementation)
+14. [Error Handling](#error-handling)
+15. [Performance Optimizations](#performance-optimizations)
+16. [Production Deployment](#production-deployment)
 
 ## Architecture Overview
 
-Querra follows a modern Next.js full-stack architecture with the following layers:
+Querra follows a modern Next.js full-stack architecture with enterprise-grade security and multi-model AI support:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (React/Next.js)                 │
+│                Frontend (React/Next.js)                     │
+│         ┌─────────────┐ ┌─────────────┐ ┌─────────────┐      │
+│         │   Layout    │ │  Security   │ │   Model     │      │
+│         │ Components  │ │  Headers    │ │ Selection   │      │
+│         └─────────────┘ └─────────────┘ └─────────────┘      │
+├─────────────────────────────────────────────────────────────┤
+│                    Security Middleware                      │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐            │
+│  │    Rate     │ │   Input     │ │ Intrusion   │            │
+│  │  Limiting   │ │ Validation  │ │ Detection   │            │
+│  └─────────────┘ └─────────────┘ └─────────────┘            │
 ├─────────────────────────────────────────────────────────────┤
 │                    API Routes (Next.js)                     │
 ├─────────────────────────────────────────────────────────────┤
 │                  Business Logic Layer                       │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐            │
-│  │   Search    │ │     AI      │ │  Database   │            │
+│  │   Search    │ │  Multi-AI   │ │  Database   │            │
 │  │   Engine    │ │ Processor   │ │   Manager   │            │
 │  └─────────────┘ └─────────────┘ └─────────────┘            │
 ├─────────────────────────────────────────────────────────────┤
 │                   External APIs                             │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐            │
-│  │   Google    │ │   Google    │ │   Content   │            │
-│  │   Search    │ │   Gemini    │ │ Extraction  │            │
+│  │   Google    │ │   Google    │ │    Groq     │            │
+│  │   Search    │ │   Gemini    │ │    SDK      │            │
 │  └─────────────┘ └─────────────┘ └─────────────┘            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Security Architecture
+
+### Multi-Layer Security Implementation
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Client Request                          │
+├─────────────────────────────────────────────────────────────┤
+│ Layer 1: Network Security                                   │
+│  • HTTPS/TLS Encryption                                     │
+│  • Security Headers (CSP, HSTS, XSS Protection)             │
+├─────────────────────────────────────────────────────────────┤
+│ Layer 2: Request Validation                                 │
+│  • Request Size Limits                                      │
+│  • CORS Policy Enforcement                                  │
+│  • Content-Type Validation                                  │
+├─────────────────────────────────────────────────────────────┤
+│ Layer 3: Rate Limiting & Abuse Prevention                   │
+│  • IP-based Rate Limiting                                   │
+│  • Progressive Penalties                                    │
+│  • Intrusion Detection                                      │
+├─────────────────────────────────────────────────────────────┤
+│ Layer 4: Input Sanitization                                 │
+│  • XSS Prevention                                           │
+│  • SQL Injection Detection                                  │
+│  • Malicious Pattern Filtering                              │
+├─────────────────────────────────────────────────────────────┤
+│ Layer 5: File Upload Security                               │
+│  • File Type Validation                                     │
+│  • Malware Scanning                                         │
+│  • Content Extraction Validation                            │
+├─────────────────────────────────────────────────────────────┤
+│ Layer 6: Business Logic Execution                           │
+│  • Secure API Key Management                                │
+│  • Environment Validation                                   │
+│  • Audit Logging                                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -43,57 +96,137 @@ Querra follows a modern Next.js full-stack architecture with the following layer
 - **Frontend Framework**: Next.js 15.2.4 with React 18
 - **Language**: TypeScript 5.7.3 for type safety
 - **Styling**: Tailwind CSS 4.0.6 with Heroicons
-- **Database**: SQLite3 with in-memory fallback
-- **AI/ML**: Google Generative AI (Gemini 2.5 Pro)
-- **Search**: Google Custom Search API
+- **Database**: SQLite3 with parameterized queries and in-memory fallback
+- **AI/ML**: Google Generative AI (Gemini 2.5 Flash/Pro) + Groq SDK (Kimi K2 Instruct)
+- **Search**: Google Custom Search API with domain filtering
 - **Content Processing**: Cheerio for HTML parsing, PDF-parse for documents
+- **Security**: Custom middleware with comprehensive validation and monitoring
+
+## Multi-Model AI System
+
+### AI Model Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   AI Model Router                           │
+├─────────────────────────────────────────────────────────────┤
+│ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │
+│ │   Gemini 2.5    │ │   Gemini 2.5    │ │   Kimi K2       │ │
+│ │     Flash       │ │      Pro        │ │   Instruct      │ │
+│ │                 │ │                 │ │                 │ │
+│ │ • Fast Response │ │ • Deep Analysis │ │ • Alternative   │ │
+│ │ • General Use   │ │ • Complex Tasks │ │   Perspective   │ │
+│ │ • Cost Effective│ │ • High Quality  │ │ • Diverse Views │ │
+│ └─────────────────┘ └─────────────────┘ └─────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Model Selection Logic
+
+```typescript
+// Model configuration and selection
+const AI_MODELS = {
+  'gemini-2.5-flash': {
+    provider: 'google',
+    name: 'Gemini 2.5 Flash',
+    description: 'Fast, efficient model for general use',
+    capabilities: ['chat', 'reports', 'url-context'],
+    costLevel: 'low'
+  },
+  'gemini-2.5-pro': {
+    provider: 'google', 
+    name: 'Gemini 2.5 Pro',
+    description: 'Advanced model for complex analysis',
+    capabilities: ['chat', 'reports', 'url-context'],
+    costLevel: 'high'
+  },
+  'moonshot-v1-8k': {
+    provider: 'groq',
+    name: 'Kimi K2 Instruct',
+    description: 'Alternative model for diverse perspectives',
+    capabilities: ['chat', 'reports'],
+    costLevel: 'medium'
+  }
+};
+
+// Dynamic model routing based on context
+function selectOptimalModel(context: GenerationContext): string {
+  if (context.hasUrls && context.mode === 'fast') {
+    return 'gemini-2.5-flash'; // Only Gemini supports URL context
+  }
+  
+  if (context.complexity === 'high') {
+    return 'gemini-2.5-pro'; // Use Pro for complex analysis
+  }
+  
+  return context.selectedModel || 'gemini-2.5-flash';
+}
+```
+
+### Model-Specific Processing
+
+- **Gemini Models**: Support URL context processing for direct web content analysis
+- **Groq/Kimi Model**: Uses content extraction approach for web sources
+- **Fallback Logic**: Automatic fallback between models based on availability
+- **Error Handling**: Model-specific error handling and retry logic
 
 ## Data Flow & Logic
 
-### 1. Search Flow
+### 1. Enhanced Search Flow with Security
 
 ```mermaid
 graph TD
-    A[User Input] --> B[Category Selection]
-    B --> C[Search Configuration]
-    C --> D[API Request to /api/search]
-    D --> E[GoogleSearch Class]
-    E --> F[Query Enhancement]
-    F --> G[Google Custom Search API]
-    G --> H[Result Processing]
-    H --> I[Return to Frontend]
-    I --> J[Display Results]
-    J --> K[Source Selection]
+    A[User Input] --> B[Input Validation]
+    B --> C[Rate Limiting Check]
+    C --> D[Category Selection]
+    D --> E[Search Configuration]
+    E --> F[API Request to /api/search]
+    F --> G[Security Middleware]
+    G --> H[GoogleSearch Class]
+    H --> I[Query Enhancement]
+    I --> J[Google Custom Search API]
+    J --> K[Result Processing]
+    K --> L[Security Logging]
+    L --> M[Return to Frontend]
+    M --> N[Display Results]
+    N --> O[Source Selection]
 ```
 
-### 2. Report Generation Flow
+### 2. Multi-Model Report Generation Flow
 
 ```mermaid
 graph TD
-    A[Selected Sources] --> B[Content Extraction]
-    B --> C[Document Retrieval]
-    C --> D[Content Aggregation]
-    D --> E[AI Processing]
-    E --> F[Report Generation]
-    F --> G[Database Storage]
-    G --> H[Return to User]
-    H --> I[Display/Export Options]
+    A[Selected Sources] --> B[Model Selection]
+    B --> C[Security Validation]
+    C --> D[Content Extraction]
+    D --> E[Document Retrieval]
+    E --> F[Content Aggregation]
+    F --> G[Model-Specific Processing]
+    G --> H[AI Processing]
+    H --> I[Report Generation]
+    I --> J[Content Sanitization]
+    J --> K[Database Storage]
+    K --> L[Audit Logging]
+    L --> M[Return to User]
+    M --> N[Display/Export Options]
 ```
 
-### 3. Session Management Flow
+### 3. Session Management with Security
 
 ```mermaid
 graph TD
-    A[User Action] --> B[Session Context Update]
-    B --> C[State Persistence]
-    C --> D[Local Storage Sync]
-    D --> E[Component Re-render]
-    E --> F[UI Update]
+    A[User Action] --> B[Security Validation]
+    B --> C[Session Context Update]
+    C --> D[State Persistence]
+    D --> E[Local Storage Sync]
+    E --> F[Component Re-render]
+    F --> G[UI Update]
+    G --> H[Security Monitoring]
 ```
 
 ## Core Modules
 
-### 1. Search Engine (`src/utils/search.ts`)
+### 1. Security Validator (`src/utils/security.ts`)
 
 **Purpose**: Handles Google Custom Search API integration with advanced filtering.
 
@@ -975,6 +1108,200 @@ useEffect(() => {
 }, []);
 ```
 
+## Security Implementation
+
+### Security Middleware Architecture
+
+The application implements a comprehensive security middleware that wraps all API endpoints:
+
+```typescript
+// Security middleware implementation
+export function withSecurity(
+  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void,
+  options: SecurityMiddlewareOptions = {}
+) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    // 1. Set security headers
+    setSecurityHeaders(res);
+    
+    // 2. Intrusion detection
+    const securityEvents = IntrusionDetector.analyzeRequest(req, req.body);
+    
+    // 3. Rate limiting
+    const rateLimit = RateLimiter.checkRateLimit(clientIP, maxRequests, windowMs);
+    
+    // 4. Input validation
+    const validation = SecurityValidator.validateRequestSize(req);
+    
+    // 5. Execute handler if all checks pass
+    await handler(req, res);
+  };
+}
+```
+
+### Input Validation System
+
+```typescript
+export class SecurityValidator {
+  // File upload validation
+  static validateFile(file: any, buffer: Buffer): SecurityValidationResult {
+    // File type whitelist
+    const ALLOWED_FILE_TYPES = [
+      'application/pdf',
+      'text/plain', 
+      'text/csv',
+      'application/msword'
+    ];
+    
+    // Malware pattern detection
+    const content = buffer.toString('utf8', 0, 1024);
+    if (this.containsMaliciousPatterns(content)) {
+      return { isValid: false, errors: ['Malicious content detected'] };
+    }
+    
+    return { isValid: true, errors: [] };
+  }
+  
+  // Input sanitization
+  static validateInput(input: string, maxLength: number = 10000): SecurityValidationResult {
+    // XSS prevention
+    const sanitized = input
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+    
+    return { isValid: true, errors: [], sanitized };
+  }
+}
+```
+
+### Rate Limiting Implementation
+
+```typescript
+export class RateLimiter {
+  private static readonly rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+  
+  static checkRateLimit(identifier: string, maxRequests: number, windowMs: number) {
+    const now = Date.now();
+    const record = this.rateLimitStore.get(identifier);
+    
+    if (!record || now > record.resetTime) {
+      this.rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+      return { allowed: true, remaining: maxRequests - 1, resetTime: now + windowMs };
+    }
+    
+    if (record.count >= maxRequests) {
+      return { allowed: false, remaining: 0, resetTime: record.resetTime };
+    }
+    
+    record.count++;
+    return { allowed: true, remaining: maxRequests - record.count, resetTime: record.resetTime };
+  }
+}
+```
+
+### Intrusion Detection System
+
+```typescript
+export class IntrusionDetector {
+  private static suspiciousPatterns = [
+    /\b(union|select|insert|update|delete|drop)\b.*\b(from|where|table)\b/gi,
+    /<script[^>]*>.*?<\/script>/gi,
+    /javascript:/gi,
+    /\.\.\/|\.\.\\|\.\.\%2f|\.\.\%5c/gi, // Path traversal
+  ];
+  
+  static analyzeRequest(req: NextApiRequest, payload?: any): SecurityEvent[] {
+    const events: SecurityEvent[] = [];
+    
+    // Check URL for suspicious patterns
+    if (req.url && this.containsSuspiciousContent(req.url)) {
+      events.push({
+        type: 'SUSPICIOUS_ACTIVITY',
+        severity: 'HIGH',
+        details: 'Suspicious patterns detected in URL'
+      });
+    }
+    
+    // Check payload
+    if (payload) {
+      const payloadStr = JSON.stringify(payload);
+      if (this.containsSuspiciousContent(payloadStr)) {
+        events.push({
+          type: 'MALICIOUS_INPUT',
+          severity: 'HIGH', 
+          details: 'Malicious patterns in payload'
+        });
+      }
+    }
+    
+    return events;
+  }
+}
+```
+
+### Security Logging & Monitoring
+
+```typescript
+class Logger {
+  security(event: SecurityEvent, req?: NextApiRequest): void {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level: 'SECURITY',
+      message: `Security event: ${event.type}`,
+      ip: this.getClientIP(req),
+      userAgent: req?.headers['user-agent'],
+      metadata: { securityEvent: event }
+    };
+    
+    this.logs.push(logEntry);
+    this.securityEvents.push(event);
+    
+    // Critical alerts in production
+    if (process.env.NODE_ENV === 'production' && event.severity === 'CRITICAL') {
+      this.sendCriticalAlert(event, req);
+    }
+  }
+}
+```
+
+### Environment Security
+
+```typescript
+class EnvironmentValidator {
+  private validateEnvironment(): void {
+    // Required API keys validation
+    const requiredKeys = ['GEMINI_API_KEY', 'GOOGLE_API_KEY', 'GOOGLE_CX'];
+    
+    for (const key of requiredKeys) {
+      const value = process.env[key];
+      if (!value || value.trim() === '') {
+        this.validationErrors.push(`Missing required environment variable: ${key}`);
+      }
+    }
+    
+    // API key format validation
+    if (this.config.GEMINI_API_KEY && !this.config.GEMINI_API_KEY.startsWith('AIza')) {
+      this.validationErrors.push('GEMINI_API_KEY appears to have invalid format');
+    }
+  }
+}
+```
+
+### Production Security Checklist
+
+- ✅ **Input Validation**: All user inputs sanitized and validated
+- ✅ **File Upload Security**: Type validation, size limits, malware scanning
+- ✅ **Rate Limiting**: IP-based limits with progressive penalties
+- ✅ **Intrusion Detection**: Real-time monitoring and blocking
+- ✅ **Security Headers**: CSP, HSTS, XSS Protection, Frame Options
+- ✅ **Environment Validation**: API key format verification
+- ✅ **Audit Logging**: Comprehensive security event tracking
+- ✅ **Error Handling**: Production-safe error messages
+- ✅ **HTTPS Ready**: SSL/TLS configuration support
+
 ## Error Handling
 
 ### API Error Handling
@@ -1161,5 +1488,72 @@ const config = {
   }
 };
 ```
+
+## Deployment Security
+
+### Vercel Deployment Best Practices
+
+**Environment Variables & API Keys:**
+- ✅ Store all API keys as Vercel Environment Variables (not in code)
+- ✅ Use Vercel's secret management for sensitive data
+- ✅ API key visibility in Network tab is normal (protected by CORS and rate limiting)
+- ✅ Client-side API calls are secured through middleware validation
+
+**Production Security Configuration:**
+```bash
+# Vercel Environment Variables (add in dashboard)
+GEMINI_API_KEY=AIza... (your Gemini API key)
+GOOGLE_API_KEY=AIza... (your Google Search API key) 
+GOOGLE_CX=... (your Custom Search Engine ID)
+GROQ_API_KEY=gsk_... (optional: for Groq AI models)
+NODE_ENV=production
+```
+
+**Security Headers in Production:**
+```typescript
+// Automatically applied by security middleware
+const securityHeaders = {
+  'Content-Security-Policy': "default-src 'self'",
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block'
+};
+```
+
+### SECURITY_RECOMMENDATIONS.ts Configuration
+
+The `SECURITY_RECOMMENDATIONS.ts` file provides **optional advanced security configurations** for enterprise deployments:
+
+```typescript
+// Optional: Enhanced security features for high-security environments
+export const ADVANCED_SECURITY_CONFIG = {
+  // File upload restrictions
+  MAX_FILE_SIZE: 50 * 1024 * 1024, // 50MB limit
+  ALLOWED_MIME_TYPES: ['application/pdf', 'text/plain'],
+  
+  // Rate limiting (already implemented with defaults)
+  RATE_LIMITS: {
+    chat: { requests: 30, window: 15 * 60 * 1000 },
+    reports: { requests: 20, window: 15 * 60 * 1000 },
+    uploads: { requests: 10, window: 15 * 60 * 1000 }
+  },
+  
+  // Security monitoring
+  ENABLE_INTRUSION_DETECTION: true,
+  LOG_SECURITY_EVENTS: true,
+  ALERT_ON_SUSPICIOUS_ACTIVITY: true
+};
+```
+
+**Implementation Status:**
+- ✅ **Core security is already implemented** - app is production-ready
+- ⚙️ **SECURITY_RECOMMENDATIONS.ts is optional** - for additional customization
+- 🔧 **Default configurations are secure** - no additional setup required
+
+**When to use SECURITY_RECOMMENDATIONS.ts:**
+- Enterprise environments requiring custom security policies
+- Organizations with specific compliance requirements  
+- Advanced users wanting to fine-tune security parameters
 
 This technical documentation provides a comprehensive understanding of Querra's architecture, implementation details, and development guidelines. It serves as a reference for developers working on the codebase and AI systems that need to understand the application structure for making informed changes and improvements.

@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { SearchResult } from '../types';
+import { requireAPIKey } from './environment';
+import { logger } from './logging';
 
 interface GoogleSearchResponse {
   items?: {
@@ -10,14 +12,25 @@ interface GoogleSearchResponse {
 }
 
 export class GoogleSearch {
-  private api_key: string | undefined;
-  private cx: string | undefined;
+  private api_key: string;
+  private cx: string;
   private endpoint: string;
 
   constructor() {
-    this.api_key = process.env.GOOGLE_API_KEY;
-    this.cx = process.env.GOOGLE_CX;
-    this.endpoint = "https://www.googleapis.com/customsearch/v1";
+    try {
+      this.api_key = requireAPIKey('GOOGLE');
+      this.cx = process.env.GOOGLE_CX || '';
+      this.endpoint = "https://www.googleapis.com/customsearch/v1";
+      
+      if (!this.cx) {
+        throw new Error('GOOGLE_CX environment variable is required');
+      }
+      
+      logger.info('Google Search initialized successfully');
+    } catch (error) {
+      logger.error('Failed to initialize Google Search', error as Error);
+      throw error;
+    }
   }
 
   private _get_date_restrict(timeFilter: string): string | null {
@@ -42,10 +55,6 @@ export class GoogleSearch {
     timeFilter: string = "Any",
     excludedDomains: string[] = []
   ): Promise<SearchResult[]> {
-    if (!this.api_key || !this.cx) {
-      throw new Error("Missing API key or Search Engine ID");
-    }
-
     // Modify query to exclude domains if specified
     let enhancedQuery = query;
     if (excludedDomains && excludedDomains.length > 0) {
@@ -88,7 +97,10 @@ export class GoogleSearch {
         if (items.length < 10) break;
         
       } catch (error) {
-        console.error('Error during search:', error);
+        logger.error('Error during search', error as Error, undefined, { 
+          query: enhancedQuery,
+          startIndex 
+        });
         break;
       }
     }
