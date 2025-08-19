@@ -141,31 +141,48 @@ export class GeminiProcessor {
   async generate_chat_response(
     message: string, 
     urls: string[], 
+    documentIds: number[] = [],
     conversationHistory: Array<{role: string, content: string}> = [],
     model: string = 'gemini-2.5-flash'
   ): Promise<string> {
     let lastError: any;
     
-    // If no URLs provided and using a Groq model, use general chat
-    if (urls.length === 0 && model.includes('moonshot')) {
+    // If no URLs or documents provided and using a Groq model, use general chat
+    if (urls.length === 0 && documentIds.length === 0 && model.includes('moonshot')) {
       return this._generateGroqResponse(message, conversationHistory, model);
     }
     
-    // If using Gemini 2.5 Pro without URLs, use traditional Gemini
-    if (urls.length === 0 && model === 'gemini-2.5-pro') {
+    // If using Gemini 2.5 Pro without URLs or documents, use traditional Gemini
+    if (urls.length === 0 && documentIds.length === 0 && model === 'gemini-2.5-pro') {
       return this._generateGeminiTraditionalResponse(message, conversationHistory, model);
     }
     
-    // For URL-based chat, use the appropriate model
+    // Fetch document contents if document IDs are provided
+    let documentContents: string[] = [];
+    if (documentIds.length > 0) {
+      try {
+        documentContents = await this._fetchDocumentContents(documentIds);
+      } catch (error) {
+        logger.error('Failed to fetch document contents', error as Error);
+        // Continue without document context if fetching fails
+      }
+    }
+    
+    // For URL-based and/or document-based chat, use the appropriate model
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
-        const prompt = this._prepare_chat_prompt({ message, urls, conversationHistory });
+        const prompt = this._prepare_chat_prompt({ 
+          message, 
+          urls, 
+          documentContents,
+          conversationHistory 
+        });
         
         if (model.includes('moonshot')) {
           // Use Groq for Kimi model (Note: Groq doesn't support URL context, so we'll need content extraction)
-          return this._generateGroqWithUrls(message, urls, conversationHistory, model);
+          return this._generateGroqWithUrls(message, urls, documentContents, conversationHistory, model);
         } else {
-          // Use Gemini with URL context
+          // Use Gemini with URL context and document content
           const geminiModel = model === 'gemini-2.5-pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
           const response = await this.genAINew.models.generateContent({
             model: geminiModel,
@@ -199,12 +216,23 @@ export class GeminiProcessor {
     throw lastError;
   }
 
-  private _prepare_chat_prompt({ message, urls, conversationHistory }: {
+  private _prepare_chat_prompt({ message, urls, documentContents, conversationHistory }: {
     message: string;
     urls: string[];
+    documentContents?: string[];
     conversationHistory: Array<{role: string, content: string}>;
   }): string {
     const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
+    
+    let sourceMaterials = '';
+    if (urls.length > 0) {
+      sourceMaterials += `Web Sources:\n${urlsWithNumbers}\n`;
+    }
+    
+    if (documentContents && documentContents.length > 0) {
+      sourceMaterials += `\nDocument Contents:\n` + 
+        documentContents.map((content, i) => `Document ${i + 1}:\n${content.substring(0, 1000)}`).join('\n\n');
+    }
     
     let historyText = '';
     if (conversationHistory.length > 0) {
@@ -214,9 +242,7 @@ export class GeminiProcessor {
     
     return `You are an AI research assistant engaged in a conversational chat with a user. You have access to the following source materials:
 
-Source Materials:
-${urlsWithNumbers}
-
+${sourceMaterials}
 ${historyText}
 
 Current user message: ${message}
@@ -420,6 +446,7 @@ Please respond in a conversational, helpful manner.`;
   private async _generateGroqWithUrls(
     message: string,
     urls: string[],
+    documentContents: string[],
     conversationHistory: Array<{role: string, content: string}>,
     model: string
   ): Promise<string> {
@@ -439,10 +466,20 @@ Please respond in a conversational, helpful manner.`;
 
       const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
       
+      // Combine URL content and document contents
+      let allContent = urlContents.join('\n\n');
+      
+      if (documentContents.length > 0) {
+        const docContentsFormatted = documentContents.map((content, i) => 
+          `Document ${i + 1}:\n${content.substring(0, 1500)}`
+        ).join('\n\n');
+        allContent += '\n\nDocument Contents:\n' + docContentsFormatted;
+      }
+      
       const messages = [
         {
           role: "system" as const,
-          content: "You are a helpful AI assistant with access to web content. Answer questions based on the provided sources and cite them using [1], [2], etc."
+          content: "You are a helpful AI assistant with access to web content and documents. Answer questions based on the provided sources and cite them using [1], [2], etc."
         },
         {
           role: "user" as const,
@@ -450,7 +487,7 @@ Please respond in a conversational, helpful manner.`;
 ${urlsWithNumbers}
 
 Source content:
-${urlContents.join('\n\n')}
+${allContent}
 
 ${conversationHistory.length > 0 ? `Previous conversation:\n${conversationHistory.map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n')}\n` : ''}
 
@@ -517,6 +554,55 @@ Please generate a comprehensive report based on the above sources. Include relev
     } catch (error: any) {
       console.error('Groq report generation error:', error);
       throw new Error(`Groq API failed: ${error.message}`);
+    }
+  }
+
+  private async _fetchDocumentContents(documentIds: number[]): Promise<string[]> {
+    try {
+      // Input validation
+      if (!Array.isArray(documentIds)) {
+        logger.warn('Invalid document IDs array provided');
+        return [];
+      }
+
+      // Validate each document ID
+      const validDocumentIds = documentIds.filter(id => {
+        if (!Number.isInteger(id) || id < 1 || id > 999999) {
+          logger.warn(`Invalid document ID: ${id}`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validDocumentIds.length === 0) {
+        return [];
+      }
+
+      const { Database } = await import('./database');
+      const db = new Database();
+      const contents: string[] = [];
+      
+      for (const docId of validDocumentIds) {
+        try {
+          // Fetch document content directly from database
+          const documentData = await db.get_document_by_id(docId);
+          if (documentData && documentData.content) {
+            // Limit content size for security and performance
+            const limitedContent = documentData.content.substring(0, 10000); // 10KB limit
+            contents.push(limitedContent);
+          } else {
+            logger.warn(`Document ${docId} not found or has no content`);
+          }
+        } catch (error) {
+          logger.error(`Error fetching document ${docId}:`, error as Error);
+          // Continue with other documents
+        }
+      }
+      
+      return contents;
+    } catch (error) {
+      logger.error('Error in _fetchDocumentContents:', error as Error);
+      return [];
     }
   }
 } 

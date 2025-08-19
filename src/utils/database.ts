@@ -177,6 +177,22 @@ export class Database {
     return doc?.content || '';
   }
 
+  async get_document_by_id(id: number) {
+    const db = await this.getConnection();
+    if (db) {
+      try {
+        const document = await db.get('SELECT id, name, path, content, created_at FROM documents WHERE id = ?', id);
+        return document || null;
+      } catch (error) {
+        console.error('Error getting document by ID from SQLite:', error);
+        const doc = inMemoryDB.documents.find(d => d.id === id);
+        return doc || null;
+      }
+    }
+    const doc = inMemoryDB.documents.find(d => d.id === id);
+    return doc || null;
+  }
+
   async delete_document(id: number) {
     const db = await this.getConnection();
     if (db) {
