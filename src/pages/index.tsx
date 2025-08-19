@@ -23,7 +23,8 @@ export default function Home() {
     selectedCategory,
     setSelectedCategory,
     setSearchConfig,
-    generatedReport
+    generatedReport,
+    generationMode
   } = useSession();
   
   // Log session data on mount for debugging
@@ -34,9 +35,10 @@ export default function Home() {
       selectedSourcesCount: selectedSources.length,
       selectedDocumentIdsCount: selectedDocumentIds.length,
       selectedCategory,
-      generatedReport: generatedReport ? 'Present' : 'None'
+      generatedReport: generatedReport ? 'Present' : 'None',
+      generationMode
     });
-  }, [searchQuery, searchResults, selectedSources, selectedDocumentIds, selectedCategory, generatedReport]);
+  }, [searchQuery, searchResults, selectedSources, selectedDocumentIds, selectedCategory, generatedReport, generationMode]);
 
   const handleSearch = async (query: string, config: SearchConfig) => {
     setIsLoading(true);

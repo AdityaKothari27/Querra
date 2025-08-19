@@ -436,19 +436,22 @@ const ReportSection: FC<ReportSectionProps> = ({
     <div className="bg-white dark:bg-black rounded-xl shadow-xl border border-gray-800 dark:border-white p-6 transition-all duration-300">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Generate Report</h2>
       
-      <div className="mb-4">
-        <label htmlFor="prompt-template" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Prompt Template
-        </label>
-        <textarea
-          id="prompt-template"
-          value={promptTemplate}
-          onChange={(e) => setPromptTemplate(e.target.value)}
-          className="w-full px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
-          rows={4}
-          placeholder={getDefaultPrompt()}
-        />
-      </div>
+      {/* Only show prompt template for Quick Analysis and Deep Analysis modes */}
+      {generationMode !== 'chat' && (
+        <div className="mb-4">
+          <label htmlFor="prompt-template" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Prompt Template
+          </label>
+          <textarea
+            id="prompt-template"
+            value={promptTemplate}
+            onChange={(e) => setPromptTemplate(e.target.value)}
+            className="w-full px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
+            rows={4}
+            placeholder={getDefaultPrompt()}
+          />
+        </div>
+      )}
       
       <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
