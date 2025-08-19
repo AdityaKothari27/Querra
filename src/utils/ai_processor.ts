@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleGenAI } from "@google/genai";
 import Groq from "groq-sdk";
+import { requireAPIKey } from "./environment";
+import { logger } from "./logging";
 
 export class GeminiProcessor {
   private genAI: GoogleGenerativeAI;
@@ -11,14 +13,20 @@ export class GeminiProcessor {
   private retryDelay: number = 1000; // 1 second
 
   constructor() {
-    const apiKey = process.env.GEMINI_API_KEY || '';
-    const groqApiKey = process.env.GROQ_API_KEY || '';
-    
-    this.genAI = new GoogleGenerativeAI(apiKey);
-    this.genAINew = new GoogleGenAI({ apiKey });
-    this.groq = new Groq({ apiKey: groqApiKey });
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    // this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro-exp-03-25" });
+    try {
+      const geminiApiKey = requireAPIKey('GEMINI');
+      const groqApiKey = requireAPIKey('GROQ');
+      
+      this.genAI = new GoogleGenerativeAI(geminiApiKey);
+      this.genAINew = new GoogleGenAI({ apiKey: geminiApiKey });
+      this.groq = new Groq({ apiKey: groqApiKey });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      
+      logger.info('AI Processor initialized successfully');
+    } catch (error) {
+      logger.error('Failed to initialize AI Processor', error as Error);
+      throw error;
+    }
   }
 
   private async delay(ms: number) {
