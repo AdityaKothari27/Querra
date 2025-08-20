@@ -13,25 +13,21 @@ const ALLOWED_FILE_TYPES = [
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_REQUEST_SIZE = 50 * 1024 * 1024; // 50MB
 
-// Malicious patterns to check for
+// Malicious patterns to check for (more lenient for legitimate coding discussions)
 const MALICIOUS_PATTERNS = [
-  /<script[^>]*>.*?<\/script>/gi,
-  /javascript:/gi,
-  /on\w+\s*=/gi,
-  /eval\s*\(/gi,
-  /Function\s*\(/gi,
-  /__proto__/gi,
-  /constructor\s*\[/gi,
-  /<iframe[^>]*>/gi,
-  /<object[^>]*>/gi,
-  /<embed[^>]*>/gi,
-  /data:text\/html/gi
+  /<script[^>]*>\s*(alert|confirm|prompt|document\.cookie|window\.location)/gi, // Only suspicious script content
+  /javascript:\s*[^a-zA-Z0-9\s]/gi, // Only suspicious javascript: usage
+  /on\w+\s*=\s*[^a-zA-Z0-9\s]/gi, // Only suspicious event handlers
+  /<iframe[^>]*src\s*=\s*["']?(?:data:|javascript:|about:)/gi, // Only malicious iframes
+  /<object[^>]*data\s*=\s*["']?(?:data:|javascript:)/gi, // Only malicious objects
+  /data:text\/html.*<script/gi // Only HTML data URLs with scripts
 ];
 
 const SQL_INJECTION_PATTERNS = [
-  /(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b)/gi,
-  /(--|\/\*|\*\/|;|'|")/g,
-  /(\b(or|and)\s+\d+\s*=\s*\d+)/gi
+  // Only catch actual SQL injection attempts, not legitimate SQL discussions
+  /(\bunion\s+select.*from.*where.*or.*=|select.*from.*where.*['"]\s*or\s+.*['"]\s*=\s*['"])/gi,
+  /(insert.*into.*values.*['"]\s*;\s*drop|delete.*from.*where.*['"]\s*or\s+.*['"]\s*=\s*['"])/gi,
+  // Remove overly broad patterns that block code discussions
 ];
 
 export interface SecurityValidationResult {
@@ -101,7 +97,7 @@ export class SecurityValidator {
   }
 
   /**
-   * Validate and sanitize user input
+   * Validate and sanitize user input (more lenient for legitimate content)
    */
   static validateInput(input: string, maxLength: number = 10000): SecurityValidationResult {
     const errors: string[] = [];
@@ -115,17 +111,22 @@ export class SecurityValidator {
       errors.push(`Input exceeds maximum length of ${maxLength} characters`);
     }
 
-    // Check for malicious patterns
-    if (this.containsMaliciousPatterns(input)) {
-      errors.push('Potentially malicious content detected');
+    // Only flag as malicious if multiple suspicious indicators are present
+    // This prevents blocking legitimate code discussions
+    const maliciousCount = MALICIOUS_PATTERNS.filter(pattern => pattern.test(input)).length;
+    const sqlCount = SQL_INJECTION_PATTERNS.filter(pattern => pattern.test(input)).length;
+    
+    // Only flag if we have strong indicators of actual malicious intent
+    if (maliciousCount >= 2) {
+      errors.push('Multiple malicious patterns detected');
+    }
+    
+    if (sqlCount >= 1 && input.toLowerCase().includes('drop') && input.toLowerCase().includes('table')) {
+      errors.push('Dangerous SQL injection patterns detected');
     }
 
-    // Check for SQL injection patterns
-    if (this.containsSQLInjection(input)) {
-      errors.push('Potentially malicious SQL patterns detected');
-    }
-
-    // Sanitize the input
+    // For chat/prompt contexts, be even more lenient
+    // Only sanitize HTML entities, don't block content
     const sanitized = this.sanitizeInput(input);
 
     return {
@@ -150,20 +151,22 @@ export class SecurityValidator {
   }
 
   /**
-   * Sanitize input by removing/escaping dangerous characters
+   * Sanitize input with minimal changes for legitimate content
    */
   private static sanitizeInput(input: string): string {
-    // Remove null bytes
-    let sanitized = input.replace(/\0/g, '');
+    // Remove null bytes and other control characters
+    let sanitized = input.replace(/[\0\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
     
-    // Escape HTML entities
-    sanitized = sanitized
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
+    // Only escape HTML when it appears to be in an executable context
+    // Don't break code examples or legitimate discussions
+    if (/(<script|<iframe|<object|javascript:|data:text\/html)/gi.test(sanitized)) {
+      sanitized = sanitized
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+    }
     
     return sanitized;
   }
