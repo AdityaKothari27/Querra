@@ -224,12 +224,17 @@ export class ErrorHandler {
 // Intrusion detection patterns
 export class IntrusionDetector {
   private static suspiciousPatterns = [
-    /\b(union|select|insert|update|delete|drop|create|alter)\b.*\b(from|where|table)\b/gi,
+    // Only catch actual malicious SQL injection attempts, not legitimate SQL keywords
+    /(\bunion\s+select|\bselect\s+.*\s+from\s+.*\s+where.*['"]\s*or\s+.*['"]\s*=\s*['"])/gi,
+    // XSS patterns - more specific to avoid blocking legitimate script discussions
     /<script[^>]*>.*?<\/script>/gi,
-    /javascript:/gi,
-    /\.\.\/|\.\.\\|\.\.\%2f|\.\.\%5c/gi, // Path traversal
-    /(cmd|command|exec|system|shell|eval|execute)/gi,
-    /\b(wget|curl|nc|netcat|telnet|ssh|ftp)\b/gi
+    /javascript:\s*[^a-zA-Z]/gi, // Only suspicious javascript: with non-alphabetic chars
+    // Path traversal - only actual attempts
+    /\.\.\/\.\.\/|\.\.\\\.\.\\|\.\.\%2f\.\.\%2f|\.\.\%5c\.\.\%5c/gi,
+    // Command injection - only when combined with suspicious operators
+    /(\||;|&|`|\$\()\s*(cmd|command|exec|system|shell|eval|rm\s+-rf|wget|curl)/gi,
+    // Network tools only when used maliciously
+    /\b(wget|curl|nc|netcat)\s+.*\s+(http|ftp|ssh)/gi
   ];
 
   private static readonly MAX_REQUESTS_PER_MINUTE = 60;
