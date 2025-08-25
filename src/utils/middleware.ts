@@ -80,10 +80,10 @@ export function withSecurity(
         return res.status(413).json({ message: 'Request too large' });
       }
 
-      // Input validation for POST/PUT requests
+      // Input validation for POST/PUT requests (disabled by default for chat endpoints)
       if (options.validateInput && (req.method === 'POST' || req.method === 'PUT')) {
         if (req.body && typeof req.body === 'object') {
-          const validationResult = validateRequestBody(req.body);
+          const validationResult = validateRequestBody(req.body, '', true); // Enable strict validation when explicitly requested
           if (!validationResult.isValid) {
             logger.security({
               type: 'MALICIOUS_INPUT',
@@ -152,22 +152,22 @@ function getClientIP(req: NextApiRequest): string {
 /**
  * Validate request body recursively
  */
-function validateRequestBody(body: any, path: string = ''): { isValid: boolean; errors: string[] } {
+function validateRequestBody(body: any, path: string = '', strictValidation: boolean = false): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (typeof body === 'string') {
-    const validation = SecurityValidator.validateInput(body);
+    const validation = SecurityValidator.validateInput(body, 10000, strictValidation);
     if (!validation.isValid) {
       errors.push(...validation.errors.map((err: string) => `${path}: ${err}`));
     }
   } else if (Array.isArray(body)) {
     body.forEach((item, index) => {
-      const validation = validateRequestBody(item, `${path}[${index}]`);
+      const validation = validateRequestBody(item, `${path}[${index}]`, strictValidation);
       errors.push(...validation.errors);
     });
   } else if (typeof body === 'object' && body !== null) {
     Object.entries(body).forEach(([key, value]) => {
-      const validation = validateRequestBody(value, path ? `${path}.${key}` : key);
+      const validation = validateRequestBody(value, path ? `${path}.${key}` : key, strictValidation);
       errors.push(...validation.errors);
     });
   }
