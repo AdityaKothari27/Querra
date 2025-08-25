@@ -97,9 +97,9 @@ export class SecurityValidator {
   }
 
   /**
-   * Validate and sanitize user input (more lenient for legitimate content)
+   * Validate and sanitize user input (minimal validation for chat contexts)
    */
-  static validateInput(input: string, maxLength: number = 10000): SecurityValidationResult {
+  static validateInput(input: string, maxLength: number = 10000, enableMaliciousChecks: boolean = false): SecurityValidationResult {
     const errors: string[] = [];
     
     if (!input || typeof input !== 'string') {
@@ -111,23 +111,23 @@ export class SecurityValidator {
       errors.push(`Input exceeds maximum length of ${maxLength} characters`);
     }
 
-    // Only flag as malicious if multiple suspicious indicators are present
-    // This prevents blocking legitimate code discussions
-    const maliciousCount = MALICIOUS_PATTERNS.filter(pattern => pattern.test(input)).length;
-    const sqlCount = SQL_INJECTION_PATTERNS.filter(pattern => pattern.test(input)).length;
-    
-    // Only flag if we have strong indicators of actual malicious intent
-    if (maliciousCount >= 2) {
-      errors.push('Multiple malicious patterns detected');
-    }
-    
-    if (sqlCount >= 1 && input.toLowerCase().includes('drop') && input.toLowerCase().includes('table')) {
-      errors.push('Dangerous SQL injection patterns detected');
+    // Only perform malicious pattern checking if explicitly enabled (disabled for chat)
+    if (enableMaliciousChecks) {
+      // Only flag extremely obvious malicious attempts
+      const suspiciousScripts = /<script[^>]*>[\s\S]*?document\.cookie|window\.location[\s\S]*?<\/script>/gi;
+      const dangerousSQL = /;\s*(drop|delete|truncate)\s+(table|database)/gi;
+      
+      if (suspiciousScripts.test(input)) {
+        errors.push('Suspicious script detected');
+      }
+      
+      if (dangerousSQL.test(input)) {
+        errors.push('Dangerous SQL command detected');
+      }
     }
 
-    // For chat/prompt contexts, be even more lenient
-    // Only sanitize HTML entities, don't block content
-    const sanitized = this.sanitizeInput(input);
+    // Minimal sanitization - only remove null bytes
+    const sanitized = this.sanitizeInput(input, enableMaliciousChecks);
 
     return {
       isValid: errors.length === 0,
@@ -153,13 +153,12 @@ export class SecurityValidator {
   /**
    * Sanitize input with minimal changes for legitimate content
    */
-  private static sanitizeInput(input: string): string {
+  private static sanitizeInput(input: string, enableHtmlEscaping: boolean = false): string {
     // Remove null bytes and other control characters
     let sanitized = input.replace(/[\0\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
     
-    // Only escape HTML when it appears to be in an executable context
-    // Don't break code examples or legitimate discussions
-    if (/(<script|<iframe|<object|javascript:|data:text\/html)/gi.test(sanitized)) {
+    // Only escape HTML when explicitly enabled and when it appears malicious
+    if (enableHtmlEscaping && /(<script|<iframe|<object|javascript:|data:text\/html)/gi.test(sanitized)) {
       sanitized = sanitized
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')

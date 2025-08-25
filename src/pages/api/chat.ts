@@ -58,6 +58,6 @@ export default withSecurity(handler, {
     maxRequests: 30, // More restrictive for chat (AI calls are expensive)
     windowMs: 15 * 60 * 1000 // 15 minutes
   },
-  validateInput: true,
+  validateInput: false, // Disabled to allow coding discussions and examples
   logRequests: true
 });

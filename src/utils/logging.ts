@@ -221,20 +221,19 @@ export class ErrorHandler {
   }
 }
 
-// Intrusion detection patterns
+// Intrusion detection patterns - very specific to avoid false positives
 export class IntrusionDetector {
   private static suspiciousPatterns = [
-    // Only catch actual malicious SQL injection attempts, not legitimate SQL keywords
-    /(\bunion\s+select|\bselect\s+.*\s+from\s+.*\s+where.*['"]\s*or\s+.*['"]\s*=\s*['"])/gi,
-    // XSS patterns - more specific to avoid blocking legitimate script discussions
-    /<script[^>]*>.*?<\/script>/gi,
-    /javascript:\s*[^a-zA-Z]/gi, // Only suspicious javascript: with non-alphabetic chars
-    // Path traversal - only actual attempts
-    /\.\.\/\.\.\/|\.\.\\\.\.\\|\.\.\%2f\.\.\%2f|\.\.\%5c\.\.\%5c/gi,
-    // Command injection - only when combined with suspicious operators
-    /(\||;|&|`|\$\()\s*(cmd|command|exec|system|shell|eval|rm\s+-rf|wget|curl)/gi,
-    // Network tools only when used maliciously
-    /\b(wget|curl|nc|netcat)\s+.*\s+(http|ftp|ssh)/gi
+    // Only catch obvious and dangerous SQL injection with malicious intent
+    /;\s*(drop|delete|truncate)\s+(table|database)\s+\w+\s*;/gi,
+    // XSS patterns - only when combined with malicious indicators
+    /<script[^>]*>[\s\S]*?(document\.cookie|window\.location|eval\(|setTimeout\(|setInterval\()[\s\S]*?<\/script>/gi,
+    // Path traversal - only obvious directory traversal attempts
+    /\.\.\/\.\.\/\.\.\/|\.\.\\\.\.\\\.\.\\|\.\.\%2f\.\.\%2f\.\.\%2f/gi,
+    // Command injection - only when combined with dangerous commands
+    /(\||;|&|`)\s*(rm\s+-rf\s+\/|format\s+c:|del\s+\/[sf]|shutdown)/gi,
+    // Network exploitation attempts
+    /\b(wget|curl)\s+.*\|\s*(sh|bash|cmd|powershell)/gi
   ];
 
   private static readonly MAX_REQUESTS_PER_MINUTE = 60;
