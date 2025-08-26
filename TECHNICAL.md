@@ -1,22 +1,100 @@
 # Querra Technical Documentation
 
 ## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Security Architecture](#security-architecture)
-3. [Multi-Model AI System](#multi-model-ai-system)
-4. [Data Flow & Logic](#data-flow--logic)
-5. [Core Modules](#core-modules)
-6. [API Endpoints](#api-endpoints)
-7. [Category System](#category-system)
-8. [Search Implementation](#search-implementation)
-9. [AI Processing Pipeline](#ai-processing-pipeline)
-10. [Database Architecture](#database-architecture)
-11. [Component Architecture](#component-architecture)
-12. [State Management](#state-management)
-13. [Security Implementation](#security-implementation)
-14. [Error Handling](#error-handling)
-15. [Performance Optimizations](#performance-optimizations)
-16. [Production Deployment](#production-deployment)
+1. [Recent Improvements](#recent-improvements)
+2. [Architecture Overview](#architecture-overview)
+3. [Security Architecture](#security-architecture)
+4. [Multi-Model AI System](#multi-model-ai-system)
+5. [Data Flow & Logic](#data-flow--logic)
+6. [Core Modules](#core-modules)
+7. [API Endpoints](#api-endpoints)
+8. [Category System](#category-system)
+9. [Search Implementation](#search-implementation)
+10. [AI Processing Pipeline](#ai-processing-pipeline)
+11. [Database Architecture](#database-architecture)
+12. [Component Architecture](#component-architecture)
+13. [State Management](#state-management)
+14. [Security Implementation](#security-implementation)
+15. [Error Handling](#error-handling)
+16. [Performance Optimizations](#performance-optimizations)
+17. [Production Deployment](#production-deployment)
+
+## Recent Improvements
+
+### Version 2.1 Updates
+
+#### AI Model Stability Enhancements
+- **Gemini 2.5 Pro Error Handling**: Improved response generation with proper error handling and automatic fallback mechanism
+- **Response Validation**: Added validation for empty or null responses from AI models
+- **Enhanced Retry Logic**: Better retry mechanisms with exponential backoff for API failures
+- **Fallback Strategy**: Automatic fallback from Gemini 2.5 Pro to Gemini 2.5 Flash when primary model fails
+
+```typescript
+// Enhanced error handling in AI processor
+private async _generateGeminiTraditionalResponse(message: string, ...): Promise<string> {
+  try {
+    // Primary Gemini 2.5 Pro attempt
+    const result = await geminiModel.generateContent({...});
+    const text = response.text();
+    
+    if (!text || text.trim().length === 0) {
+      throw new Error('Empty response from Gemini');
+    }
+    
+    return text;
+  } catch (error) {
+    // Automatic fallback to Gemini 2.5 Flash
+    try {
+      const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      // ... fallback logic
+    } catch (fallbackError) {
+      throw new Error(`Gemini API failed: ${error.message}`);
+    }
+  }
+}
+```
+
+#### Chat Interface Improvements
+- **Adaptive Textarea**: Replaced single-line input with multi-line textarea that grows with content
+- **Keyboard Shortcuts**: Added Shift+Enter for new lines, Enter to send
+- **Dynamic Height**: Auto-adjusting height (40px min, 200px max) based on content
+- **Enhanced UX**: Better visual feedback and placeholder text with keyboard hints
+
+```tsx
+// Adaptive chat input implementation
+<textarea
+  value={chatInput}
+  onChange={(e) => setChatInput(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }}
+  rows={chatInput.split('\n').length || 1}
+  style={{ minHeight: '40px', maxHeight: '200px', resize: 'none' }}
+  placeholder="Ask me anything... (Shift+Enter for new line)"
+/>
+```
+
+#### Security Optimizations
+- **Reduced False Positives**: Optimized malicious pattern detection to allow legitimate coding discussions
+- **Context-Aware Validation**: Enhanced input validation that distinguishes between malicious and educational content
+- **Improved Pattern Matching**: More specific regex patterns that target actual security threats
+- **Chat Mode Validation**: Disabled aggressive input validation for chat endpoints to allow coding examples
+
+```typescript
+// Enhanced security validation
+static validateInput(input: string, maxLength: number = 10000, enableMaliciousChecks: boolean = false): SecurityValidationResult {
+  // Only perform malicious pattern checking if explicitly enabled (disabled for chat)
+  if (enableMaliciousChecks) {
+    // Only flag extremely obvious malicious attempts
+    const suspiciousScripts = /<script[^>]*>[\s\S]*?document\.cookie|window\.location[\s\S]*?<\/script>/gi;
+    const dangerousSQL = /;\s*(drop|delete|truncate)\s+(table|database)/gi;
+    // ...more targeted patterns
+  }
+}
+```
 
 ## Architecture Overview
 
