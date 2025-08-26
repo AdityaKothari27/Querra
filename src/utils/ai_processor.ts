@@ -198,7 +198,13 @@ export class GeminiProcessor {
           });
 
           console.log('Chat URL Context Metadata:', response.candidates?.[0]?.urlContextMetadata);
-          return response.text || 'I apologize, but I couldn\'t generate a response. Please try again.';
+          const responseText = response.text;
+          
+          if (!responseText || responseText.trim().length === 0) {
+            throw new Error('Empty response from Gemini');
+          }
+          
+          return responseText;
         }
       } catch (error: any) {
         lastError = error;
@@ -418,16 +424,13 @@ Do not include any explanations, introductions, or analysis.
     conversationHistory: Array<{role: string, content: string}>,
     model: string
   ): Promise<string> {
-    try {
-      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-      
-      let conversationText = '';
-      if (conversationHistory.length > 0) {
-        conversationText = '\n\nPrevious conversation:\n' + 
-          conversationHistory.map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n');
-      }
+    let conversationText = '';
+    if (conversationHistory.length > 0) {
+      conversationText = '\n\nPrevious conversation:\n' + 
+        conversationHistory.map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n');
+    }
 
-      const prompt = `You are a helpful AI assistant. Provide clear, informative, and engaging responses to user questions.
+    const promptText = `You are a helpful AI assistant. Provide clear, informative, and engaging responses to user questions.
 
 ${conversationText}
 
@@ -435,10 +438,59 @@ Current user message: ${message}
 
 Please respond in a conversational, helpful manner.`;
 
-      const response = await geminiModel.generateContent(prompt);
-      return response.response.text() || "I apologize, but I couldn't generate a response. Please try again.";
+    try {
+      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+      const result = await geminiModel.generateContent({
+        contents: [{ role: "user", parts: [{ text: promptText }] }],
+        generationConfig: {
+          temperature: 0.8,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 16000,
+        },
+      });
+
+      const response = await result.response;
+      const text = response.text();
+      
+      if (!text || text.trim().length === 0) {
+        throw new Error('Empty response from Gemini');
+      }
+      
+      return text;
     } catch (error: any) {
       console.error('Gemini traditional response error:', error);
+      logger.error('Gemini 2.5 Pro traditional response failed', error, undefined, {
+        message: message.substring(0, 100),
+        model,
+        errorMessage: error.message
+      });
+      
+      // Fallback to Gemini 2.5 Flash if Pro fails
+      try {
+        const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const fallbackResult = await fallbackModel.generateContent({
+          contents: [{ role: "user", parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: 0.8,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 16000,
+          },
+        });
+        
+        const fallbackResponse = await fallbackResult.response;
+        const fallbackText = fallbackResponse.text();
+        
+        if (fallbackText && fallbackText.trim().length > 0) {
+          logger.info('Fallback to Gemini 2.5 Flash successful');
+          return fallbackText;
+        }
+      } catch (fallbackError) {
+        console.error('Fallback to Gemini Flash also failed:', fallbackError);
+      }
+      
       throw new Error(`Gemini API failed: ${error.message}`);
     }
   }

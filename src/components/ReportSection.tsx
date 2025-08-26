@@ -673,19 +673,25 @@ const ReportSection: FC<ReportSectionProps> = ({
           </div>
           
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex space-x-2">
-              <input
-                type="text"
+            <div className="flex space-x-2 items-end">
+              <textarea
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
                 placeholder={
                   selectedSources.length > 0 || selectedDocumentIds.length > 0 
-                    ? "Ask questions about your selected sources and documents..." 
-                    : "Ask me anything..."
+                    ? "Ask questions about your selected sources and documents... (Shift+Enter for new line)" 
+                    : "Ask me anything... (Shift+Enter for new line)"
                 }
                 disabled={isChatting}
-                className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                rows={chatInput.split('\n').length || 1}
+                style={{ minHeight: '40px', maxHeight: '200px', resize: 'none' }}
+                className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 overflow-y-auto"
               />
               <button
                 onClick={handleSendMessage}

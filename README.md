@@ -2,6 +2,26 @@
 
 Querra is an advanced, intelligent research assistant that revolutionizes how you gather, analyze, and synthesize information from the web and your personal documents. Powered by Google's Gemini AI and Groq's Kimi models, with enterprise-grade security features, Querra provides comprehensive research reports tailored to specific domains and use cases.
 
+## 🆕 **Recent Improvements (v2.1)**
+
+### 🛠️ **AI Model Enhancements**
+- **Gemini 2.5 Pro Stability**: Fixed response generation issues with improved error handling and automatic fallback to Gemini 2.5 Flash
+- **Enhanced Error Recovery**: Better error messages and automatic retry logic for failed AI responses
+- **Response Validation**: Added validation to ensure AI models return non-empty responses
+- **Logging Improvements**: Enhanced debugging and monitoring for AI model interactions
+
+### 💬 **Chat Interface Improvements**
+- **Adaptive Text Input**: Multi-line textarea with intelligent height adjustment
+- **Keyboard Shortcuts**: Shift+Enter for new lines, Enter to send messages
+- **Visual Feedback**: Improved placeholder text indicating keyboard shortcuts
+- **Better UX**: Responsive chat input that grows with content up to 200px max height
+
+### 🔒 **Security Optimizations**
+- **Reduced False Positives**: Optimized input validation to allow legitimate coding discussions and SQL examples
+- **Context-Aware Validation**: Smarter security checks that don't block educational content
+- **Improved Rate Limiting**: Better handling of coding-related prompts and technical discussions
+- **Enhanced Logging**: More targeted security monitoring with reduced noise
+
 ## 🛡️ **Security & Production-Ready Features**
 
 ### 🔒 **Enterprise-Grade Security**
@@ -31,10 +51,12 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 ### 🤖 **Multi-Model AI Intelligence**
 - **Three AI Models Available**:
   - **Gemini 2.5 Flash**: Fast, efficient responses for general use
-  - **Gemini 2.5 Pro**: Advanced reasoning for complex analysis
+  - **Gemini 2.5 Pro**: Advanced reasoning for complex analysis (Enhanced with improved error handling and automatic fallback)
   - **Kimi K2 Instruct**: Alternative model for diverse perspectives
 - **Context-Aware Processing**: Intelligent content synthesis with source attribution
 - **Model Selection**: Dynamic model switching based on use case and user preference
+- **Robust Error Handling**: Automatic fallback between models for improved reliability
+- **Enhanced Stability**: Improved response generation with better error recovery
 
 ### 📚 **Document Management System**
 - **Multi-format Document Upload**: Support for PDF, DOCX, TXT, and MD files
@@ -62,6 +84,8 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 - **Real-time Interaction**: No report generation needed - immediate responses
 - **Session Persistence**: Chat history saved for continuous conversations
 - **Multi-Model Support**: Choose your preferred AI model for different conversation styles
+- **Adaptive Input**: Multi-line text input with Shift+Enter for new lines and Enter to send
+- **Enhanced Error Handling**: Improved stability with automatic fallback between AI models
 
 ### 🔗 **Enhanced Chat Context (NEW)**
 - **Multi-Source Chat**: Combine web sources and uploaded documents in single conversations
