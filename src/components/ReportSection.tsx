@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect, useRef, useCallback } from 'react';
 import { generateReport, sendChatMessage, sendChatMessageStream } from '../lib/api';
 import { SparklesIcon, BoltIcon, CogIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
@@ -35,14 +35,24 @@ const ReportSection: FC<ReportSectionProps> = ({
   // Chat specific states
   const [chatInput, setChatInput] = useState('');
   const [isChatting, setIsChatting] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const streamingContentRef = useRef<string>('');
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
+  // Smooth auto-scroll to bottom when new messages arrive
+  const scrollToBottom = useCallback(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      const container = chatContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
     }
-  }, [chatMessages]);
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages, scrollToBottom]);
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -197,7 +207,25 @@ const ReportSection: FC<ReportSectionProps> = ({
     setChatMessages([...updatedMessages, assistantMessage]);
 
     try {
-      let streamingContent = '';
+      setIsStreaming(true);
+      streamingContentRef.current = '';
+      let pendingContent = '';
+      let bufferTimeout: NodeJS.Timeout | null = null;
+      
+      // Smooth rendering function
+      const updateStreamingContent = (assistantMessageId: string, currentMessages: ChatMessage[]) => {
+        const updatedMessages = currentMessages.map((msg: ChatMessage) => 
+          msg.id === assistantMessageId 
+            ? { ...msg, content: streamingContentRef.current }
+            : msg
+        );
+        setChatMessages(updatedMessages);
+        // Use requestAnimationFrame for smooth scrolling
+        requestAnimationFrame(() => scrollToBottom());
+      };
+
+      const messagesWithAssistant = [...updatedMessages, assistantMessage];
+      setChatMessages(messagesWithAssistant);
       
       await sendChatMessageStream(
         currentUserMessage,
@@ -206,23 +234,61 @@ const ReportSection: FC<ReportSectionProps> = ({
         updatedMessages,
         selectedModel,
         (chunk: string) => {
-          // Update streaming content
-          streamingContent += chunk;
+          // Buffer chunks for smoother rendering
+          pendingContent += chunk;
           
-          // Update the assistant message with new content
-          const updatedMessagesWithStream = [...updatedMessages, { ...assistantMessage, content: streamingContent }];
-          setChatMessages(updatedMessagesWithStream);
+          // Clear existing timeout
+          if (bufferTimeout) {
+            clearTimeout(bufferTimeout);
+          }
+          
+          // Apply changes immediately for first chunk or after delay
+          if (streamingContentRef.current.length === 0) {
+            streamingContentRef.current += pendingContent;
+            pendingContent = '';
+            updateStreamingContent(assistantMessage.id, messagesWithAssistant);
+          } else {
+            // Batch updates for smooth streaming - faster updates for better UX
+            bufferTimeout = setTimeout(() => {
+              streamingContentRef.current += pendingContent;
+              pendingContent = '';
+              updateStreamingContent(assistantMessage.id, messagesWithAssistant);
+            }, 50); // 50ms batching for smooth 20fps - feels natural like typing
+          }
         },
         () => {
-          // Streaming complete
+          // Final update with any remaining content
+          if (bufferTimeout) {
+            clearTimeout(bufferTimeout);
+          }
+          if (pendingContent) {
+            streamingContentRef.current += pendingContent;
+            updateStreamingContent(assistantMessage.id, messagesWithAssistant);
+          }
+          
+          setIsStreaming(false);
           setIsChatting(false);
+          
+          // Force a final re-render to apply markdown formatting
+          setTimeout(() => {
+            const finalMessages = messagesWithAssistant.map((msg: ChatMessage) => 
+              msg.id === assistantMessage.id 
+                ? { ...msg, content: streamingContentRef.current }
+                : msg
+            );
+            setChatMessages(finalMessages);
+          }, 100);
           showToast({
             type: 'success',
             message: 'Message sent successfully!',
           });
         },
         (error: string) => {
-          // Error occurred
+          // Error cleanup
+          if (bufferTimeout) {
+            clearTimeout(bufferTimeout);
+          }
+          setIsStreaming(false);
           setIsChatting(false);
           console.error('Error sending chat message:', error);
           
@@ -237,6 +303,7 @@ const ReportSection: FC<ReportSectionProps> = ({
       );
     } catch (error) {
       console.error('Error sending chat message:', error);
+      setIsStreaming(false);
       setIsChatting(false);
       
       // Remove the failed assistant message
@@ -247,6 +314,7 @@ const ReportSection: FC<ReportSectionProps> = ({
         message: 'Failed to send message. Please try again.',
       });
     } finally {
+      setIsStreaming(false);
       setIsChatting(false);
     }
   };
@@ -687,7 +755,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               chatMessages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeInUp`}
                 >
                   <div
                     className={`max-w-[80%] p-3 rounded-lg ${
@@ -697,7 +765,20 @@ const ReportSection: FC<ReportSectionProps> = ({
                     }`}
                   >
                     <div className="text-sm">
-                      <div className="whitespace-pre-wrap">{message.content}</div>
+                      {/* Use plain text during streaming for performance, markdown after completion */}
+                      {isStreaming && message.role === 'assistant' ? (
+                        <div className="whitespace-pre-wrap animate-typewriter">
+                          {message.content}
+                        </div>
+                      ) : (
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <ReactMarkdown>{message.content}</ReactMarkdown>
+                        </div>
+                      )}
+                      {/* Typing cursor for streaming messages */}
+                      {isStreaming && message.role === 'assistant' && message.content.length > 0 && (
+                        <span className="inline-block w-2 h-5 bg-gray-500 dark:bg-gray-300 animate-pulse ml-1"></span>
+                      )}
                     </div>
                     <div className="text-xs opacity-75 mt-1">
                       {message.timestamp.toLocaleTimeString()}
@@ -708,11 +789,11 @@ const ReportSection: FC<ReportSectionProps> = ({
             )}
             {isChatting && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white p-3 rounded-lg">
+                <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white p-3 rounded-lg max-w-[80%]">
                   <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>

@@ -17,6 +17,14 @@
     animation: slideIn 0.5s ease-in-out;
   }
   
+  .animate-fadeInUp {
+    animation: fadeInUp 0.4s ease-out;
+  }
+  
+  .animate-typewriter {
+    animation: typewriter 0.1s ease-in-out;
+  }
+  
   .animate-shimmer {
     animation: shimmer 2.5s infinite;
   }
@@ -42,6 +50,26 @@
   }
   to {
     transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes typewriter {
+  from {
+    opacity: 0.7;
+  }
+  to {
     opacity: 1;
   }
 }

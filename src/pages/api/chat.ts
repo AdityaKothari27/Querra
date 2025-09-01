@@ -53,7 +53,6 @@ async function handler(
   });
 
   try {
-    console.log('🚀 Starting chat streaming with model:', model);
     let chunkCount = 0;
     
     // Generate streaming chat response
@@ -65,13 +64,11 @@ async function handler(
       model,
       (chunk: string) => {
         chunkCount++;
-        console.log(`📦 Chunk ${chunkCount}:`, chunk.length, 'chars -', chunk.substring(0, 50) + '...');
         // Send each chunk as it's generated
         res.write(chunk);
       }
     );
     
-    console.log('✅ Streaming completed. Total chunks:', chunkCount);
     // Signal completion
     res.end();
   } catch (error) {

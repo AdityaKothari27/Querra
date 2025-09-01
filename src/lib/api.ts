@@ -90,15 +90,11 @@ export const sendChatMessageStream = async (
   onError: (error: string) => void
 ) => {
   try {
-    console.log('🌐 Starting streaming request...', { model, sources: sources.length, docs: documentIds.length });
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, sources, documentIds, conversationHistory, model }),
     });
-
-    console.log('📡 Response received:', response.status, response.statusText);
-    console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       throw new Error(`Failed to send chat message: ${response.status} ${response.statusText}`);
@@ -110,30 +106,22 @@ export const sendChatMessageStream = async (
     }
 
     const decoder = new TextDecoder();
-    let chunkCount = 0;
-    let totalContent = '';
-    
-    console.log('🔄 Starting to read stream...');
     
     while (true) {
       const { done, value } = await reader.read();
       
       if (done) {
-        console.log('✅ Streaming completed. Total frontend chunks:', chunkCount, 'Total content length:', totalContent.length);
         onComplete();
         break;
       }
       
       const chunk = decoder.decode(value, { stream: true });
       if (chunk) {
-        chunkCount++;
-        totalContent += chunk;
-        console.log(`📦 Frontend chunk ${chunkCount}:`, chunk.length, 'chars -', JSON.stringify(chunk.substring(0, 50)) + '...');
         onChunk(chunk);
       }
     }
   } catch (error) {
-    console.error('❌ Streaming error:', error);
+    console.error('Streaming error:', error);
     onError(error instanceof Error ? error.message : 'Unknown error occurred');
   }
 };
