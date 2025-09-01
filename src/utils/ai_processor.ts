@@ -222,6 +222,92 @@ export class GeminiProcessor {
     throw lastError;
   }
 
+  async generate_chat_response_stream(
+    message: string, 
+    urls: string[], 
+    documentIds: number[] = [],
+    conversationHistory: Array<{role: string, content: string}> = [],
+    model: string = 'gemini-2.5-flash',
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    let lastError: any;
+    
+    // If no URLs or documents provided and using a Groq model, use general chat
+    if (urls.length === 0 && documentIds.length === 0 && model.includes('moonshot')) {
+      return this._generateGroqResponseStream(message, conversationHistory, model, onChunk);
+    }
+    
+    // If using Gemini 2.5 Pro without URLs or documents, use traditional Gemini
+    if (urls.length === 0 && documentIds.length === 0 && model === 'gemini-2.5-pro') {
+      return this._generateGeminiTraditionalResponseStream(message, conversationHistory, model, onChunk);
+    }
+    
+    // Fetch document contents if document IDs are provided
+    let documentContents: string[] = [];
+    if (documentIds.length > 0) {
+      try {
+        documentContents = await this._fetchDocumentContents(documentIds);
+      } catch (error) {
+        logger.error('Failed to fetch document contents', error as Error);
+        // Continue without document context if fetching fails
+      }
+    }
+    
+    // For URL-based and/or document-based chat, use the appropriate model
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const prompt = this._prepare_chat_prompt({ 
+          message, 
+          urls, 
+          documentContents,
+          conversationHistory 
+        });
+        
+        if (model.includes('moonshot')) {
+          // Use Groq for Kimi model with streaming
+          return this._generateGroqWithUrlsStream(message, urls, documentContents, conversationHistory, model, onChunk);
+        } else {
+          // Use Gemini with streaming
+          const geminiModel = model === 'gemini-2.5-pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+          
+          // For Gemini streaming, we need to use the traditional API with generateContentStream
+          const geminiModelInstance = this.genAI.getGenerativeModel({ model: geminiModel });
+          const result = await geminiModelInstance.generateContentStream({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.8,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 20000,
+            },
+          });
+
+          // Process the stream
+          for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            if (chunkText) {
+              onChunk(chunkText);
+            }
+          }
+          
+          return;
+        }
+      } catch (error: any) {
+        lastError = error;
+        console.error(`Chat streaming attempt ${attempt} failed:`, error);
+        
+        if (error?.status === 429) {
+          await this.delay(this.retryDelay * attempt);
+          continue;
+        }
+        
+        throw error;
+      }
+    }
+    
+    throw lastError;
+  }
+
   private _prepare_chat_prompt({ message, urls, documentContents, conversationHistory }: {
     message: string;
     urls: string[];
@@ -419,6 +505,48 @@ Do not include any explanations, introductions, or analysis.
     }
   }
 
+  private async _generateGroqResponseStream(
+    message: string,
+    conversationHistory: Array<{role: string, content: string}>,
+    model: string,
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    try {
+      const messages = [
+        {
+          role: "system" as const,
+          content: "You are a helpful AI assistant. Provide clear, informative, and engaging responses to user questions."
+        },
+        ...conversationHistory.map(msg => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content
+        })),
+        {
+          role: "user" as const,
+          content: message
+        }
+      ];
+
+      const stream = await this.groq.chat.completions.create({
+        model: "moonshotai/kimi-k2-instruct",
+        messages,
+        temperature: 0.8,
+        max_tokens: 16000,
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+          onChunk(content);
+        }
+      }
+    } catch (error: any) {
+      console.error('Groq streaming API error:', error);
+      throw new Error(`Groq streaming API failed: ${error.message}`);
+    }
+  }
+
   private async _generateGeminiTraditionalResponse(
     message: string,
     conversationHistory: Array<{role: string, content: string}>,
@@ -495,6 +623,88 @@ Please respond in a conversational, helpful manner.`;
     }
   }
 
+  private async _generateGeminiTraditionalResponseStream(
+    message: string,
+    conversationHistory: Array<{role: string, content: string}>,
+    model: string,
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    let conversationText = '';
+    if (conversationHistory.length > 0) {
+      conversationText = '\n\nPrevious conversation:\n' + 
+        conversationHistory.map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n');
+    }
+
+    const promptText = `You are a helpful AI assistant. Provide clear, informative, and engaging responses to user questions.
+
+${conversationText}
+
+Current user message: ${message}
+
+Please respond in a conversational, helpful manner.`;
+
+    try {
+      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+      const result = await geminiModel.generateContentStream({
+        contents: [{ role: "user", parts: [{ text: promptText }] }],
+        generationConfig: {
+          temperature: 0.8,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 16000,
+        },
+      });
+
+      // Process the stream
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text();
+        if (chunkText) {
+          onChunk(chunkText);
+        }
+      }
+    } catch (error: any) {
+      console.error('Gemini traditional streaming response error:', error);
+      logger.error('Gemini 2.5 Pro traditional streaming response failed', error, undefined, {
+        message: message.substring(0, 100),
+        model,
+        errorMessage: error.message
+      });
+      
+      // Fallback to Gemini 2.5 Flash streaming if Pro fails
+      try {
+        const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const fallbackResult = await fallbackModel.generateContentStream({
+          contents: [{ role: "user", parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: 0.8,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 16000,
+          },
+        });
+        
+        let hasContent = false;
+        for await (const chunk of fallbackResult.stream) {
+          const chunkText = chunk.text();
+          if (chunkText) {
+            hasContent = true;
+            onChunk(chunkText);
+          }
+        }
+        
+        if (hasContent) {
+          logger.info('Fallback to Gemini 2.5 Flash streaming successful');
+          return;
+        }
+      } catch (fallbackError) {
+        console.error('Fallback to Gemini Flash streaming also failed:', fallbackError);
+      }
+      
+      throw new Error(`Gemini streaming API failed: ${error.message}`);
+    }
+  }
+
   private async _generateGroqWithUrls(
     message: string,
     urls: string[],
@@ -560,6 +770,81 @@ Please provide a helpful response based on the sources above, citing them with [
     } catch (error: any) {
       console.error('Groq with URLs error:', error);
       throw new Error(`Groq API with URLs failed: ${error.message}`);
+    }
+  }
+
+  private async _generateGroqWithUrlsStream(
+    message: string,
+    urls: string[],
+    documentContents: string[],
+    conversationHistory: Array<{role: string, content: string}>,
+    model: string,
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    try {
+      // For Groq, we need to extract content from URLs first since it doesn't support URL context
+      const urlContents = await Promise.all(urls.map(async (url) => {
+        try {
+          const response = await fetch(url);
+          const html = await response.text();
+          // Basic text extraction (you might want to use a more sophisticated method)
+          const textContent = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').substring(0, 2000);
+          return `Content from ${url}:\n${textContent}`;
+        } catch (error) {
+          return `Failed to extract content from ${url}`;
+        }
+      }));
+
+      const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
+      
+      // Combine URL content and document contents
+      let allContent = urlContents.join('\n\n');
+      
+      if (documentContents.length > 0) {
+        const docContentsFormatted = documentContents.map((content, i) => 
+          `Document ${i + 1}:\n${content.substring(0, 1500)}`
+        ).join('\n\n');
+        allContent += '\n\nDocument Contents:\n' + docContentsFormatted;
+      }
+      
+      const messages = [
+        {
+          role: "system" as const,
+          content: "You are a helpful AI assistant with access to web content and documents. Answer questions based on the provided sources and cite them using [1], [2], etc."
+        },
+        {
+          role: "user" as const,
+          content: `Sources:
+${urlsWithNumbers}
+
+Source content:
+${allContent}
+
+${conversationHistory.length > 0 ? `Previous conversation:\n${conversationHistory.map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n')}\n` : ''}
+
+User question: ${message}
+
+Please provide a helpful response based on the sources above, citing them with [1], [2], etc.`
+        }
+      ];
+
+      const stream = await this.groq.chat.completions.create({
+        model: "moonshotai/kimi-k2-instruct",
+        messages,
+        temperature: 0.8,
+        max_tokens: 16000,
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+          onChunk(content);
+        }
+      }
+    } catch (error: any) {
+      console.error('Groq with URLs streaming error:', error);
+      throw new Error(`Groq streaming API with URLs failed: ${error.message}`);
     }
   }
 

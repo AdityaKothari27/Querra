@@ -41,16 +41,42 @@ async function handler(
     }
   }
 
-  // Generate chat response using URL context and/or document context
-  const response = await ai_processor.generate_chat_response(
-    messageValidation.sanitized || message, 
-    sources || [], 
-    documentIds || [],
-    conversationHistory,
-    model
-  );
+  // Set up Server-Sent Events headers for streaming
+  res.writeHead(200, {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Cache-Control'
+  });
 
-  res.status(200).json({ message: response });
+  try {
+    console.log('🚀 Starting chat streaming with model:', model);
+    let chunkCount = 0;
+    
+    // Generate streaming chat response
+    await ai_processor.generate_chat_response_stream(
+      messageValidation.sanitized || message, 
+      sources || [], 
+      documentIds || [],
+      conversationHistory,
+      model,
+      (chunk: string) => {
+        chunkCount++;
+        console.log(`📦 Chunk ${chunkCount}:`, chunk.length, 'chars -', chunk.substring(0, 50) + '...');
+        // Send each chunk as it's generated
+        res.write(chunk);
+      }
+    );
+    
+    console.log('✅ Streaming completed. Total chunks:', chunkCount);
+    // Signal completion
+    res.end();
+  } catch (error) {
+    logger.error('Chat streaming error', error as Error, req);
+    res.write('Error: Failed to generate response. Please try again.');
+    res.end();
+  }
 }
 
 export default withSecurity(handler, {

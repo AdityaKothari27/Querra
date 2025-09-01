@@ -79,6 +79,57 @@ export const sendChatMessage = async (
   return response.json();
 };
 
+export const sendChatMessageStream = async (
+  message: string,
+  sources: string[],
+  documentIds: number[] = [],
+  conversationHistory: Array<{role: string, content: string}> = [],
+  model: string = 'gemini-2.5-flash',
+  onChunk: (chunk: string) => void,
+  onComplete: () => void,
+  onError: (error: string) => void
+) => {
+  try {
+    console.log('🌐 Starting streaming request...');
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, sources, documentIds, conversationHistory, model }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to send chat message');
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error('No response body');
+    }
+
+    const decoder = new TextDecoder();
+    let chunkCount = 0;
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      
+      if (done) {
+        console.log('✅ Streaming completed. Total frontend chunks:', chunkCount);
+        onComplete();
+        break;
+      }
+      
+      const chunk = decoder.decode(value, { stream: true });
+      if (chunk) {
+        chunkCount++;
+        console.log(`📦 Frontend chunk ${chunkCount}:`, chunk.length, 'chars -', chunk.substring(0, 50) + '...');
+        onChunk(chunk);
+      }
+    }
+  } catch (error) {
+    onError(error instanceof Error ? error.message : 'Unknown error occurred');
+  }
+};
+
 export const getReports = async (): Promise<Report[]> => {
   try {
     const response = await api.get('/reports');

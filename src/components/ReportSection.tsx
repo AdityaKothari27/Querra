@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { generateReport, sendChatMessage } from '../lib/api';
+import { generateReport, sendChatMessage, sendChatMessageStream } from '../lib/api';
 import { SparklesIcon, BoltIcon, CogIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
@@ -7,6 +7,7 @@ import { saveAs } from 'file-saver';
 import { useToast } from './Toast';
 import { useSession } from '../contexts/SessionContext';
 import { AI_MODELS, getModelsByMode, getDefaultModel } from '../config/models';
+import { ChatMessage } from '../types/index';
 
 interface ReportSectionProps {
   searchQuery: string;
@@ -158,43 +159,81 @@ const ReportSection: FC<ReportSectionProps> = ({
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isChatting) return;
 
-    const userMessage = {
+    const userMessage: ChatMessage = {
       id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      role: 'user' as const,
+      role: 'user',
       content: chatInput.trim(),
       timestamp: new Date()
     };
 
+    // Store current message for the stream
+    const currentUserMessage = chatInput.trim();
+    
     // Add user message to chat
     const updatedMessages = [...chatMessages, userMessage];
     setChatMessages(updatedMessages);
     setChatInput('');
     setIsChatting(true);
 
+    // Create streaming assistant message
+    const assistantMessageId = `assistant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    const assistantMessage: ChatMessage = {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date()
+    };
+
+    // Add initial empty assistant message
+    setChatMessages([...updatedMessages, assistantMessage]);
+
     try {
-      const response = await sendChatMessage(
-        chatInput.trim(),
+      let streamingContent = '';
+      
+      await sendChatMessageStream(
+        currentUserMessage,
         selectedSources,
         selectedDocumentIds,
         updatedMessages,
-        selectedModel
+        selectedModel,
+        (chunk: string) => {
+          // Update streaming content
+          streamingContent += chunk;
+          
+          // Update the assistant message with new content
+          const updatedMessagesWithStream = [...updatedMessages, { ...assistantMessage, content: streamingContent }];
+          setChatMessages(updatedMessagesWithStream);
+        },
+        () => {
+          // Streaming complete
+          setIsChatting(false);
+          showToast({
+            type: 'success',
+            message: 'Message sent successfully!',
+          });
+        },
+        (error: string) => {
+          // Error occurred
+          setIsChatting(false);
+          console.error('Error sending chat message:', error);
+          
+          // Remove the failed assistant message
+          setChatMessages(updatedMessages);
+          
+          showToast({
+            type: 'error',
+            message: 'Failed to send message. Please try again.',
+          });
+        }
       );
-
-      const assistantMessage = {
-        id: `assistant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        role: 'assistant' as const,
-        content: response.message,
-        timestamp: new Date()
-      };
-
-      setChatMessages([...updatedMessages, assistantMessage]);
-      
-      showToast({
-        type: 'success',
-        message: 'Message sent successfully!',
-      });
     } catch (error) {
       console.error('Error sending chat message:', error);
+      setIsChatting(false);
+      
+      // Remove the failed assistant message
+      setChatMessages(updatedMessages);
+      
       showToast({
         type: 'error',
         message: 'Failed to send message. Please try again.',
