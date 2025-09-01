@@ -90,30 +90,36 @@ export const sendChatMessageStream = async (
   onError: (error: string) => void
 ) => {
   try {
-    console.log('🌐 Starting streaming request...');
+    console.log('🌐 Starting streaming request...', { model, sources: sources.length, docs: documentIds.length });
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, sources, documentIds, conversationHistory, model }),
     });
 
+    console.log('📡 Response received:', response.status, response.statusText);
+    console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      throw new Error('Failed to send chat message');
+      throw new Error(`Failed to send chat message: ${response.status} ${response.statusText}`);
     }
 
     const reader = response.body?.getReader();
     if (!reader) {
-      throw new Error('No response body');
+      throw new Error('No response body available for reading');
     }
 
     const decoder = new TextDecoder();
     let chunkCount = 0;
+    let totalContent = '';
+    
+    console.log('🔄 Starting to read stream...');
     
     while (true) {
       const { done, value } = await reader.read();
       
       if (done) {
-        console.log('✅ Streaming completed. Total frontend chunks:', chunkCount);
+        console.log('✅ Streaming completed. Total frontend chunks:', chunkCount, 'Total content length:', totalContent.length);
         onComplete();
         break;
       }
@@ -121,11 +127,13 @@ export const sendChatMessageStream = async (
       const chunk = decoder.decode(value, { stream: true });
       if (chunk) {
         chunkCount++;
-        console.log(`📦 Frontend chunk ${chunkCount}:`, chunk.length, 'chars -', chunk.substring(0, 50) + '...');
+        totalContent += chunk;
+        console.log(`📦 Frontend chunk ${chunkCount}:`, chunk.length, 'chars -', JSON.stringify(chunk.substring(0, 50)) + '...');
         onChunk(chunk);
       }
     }
   } catch (error) {
+    console.error('❌ Streaming error:', error);
     onError(error instanceof Error ? error.message : 'Unknown error occurred');
   }
 };

@@ -44,8 +44,10 @@ async function handler(
   // Set up Server-Sent Events headers for streaming
   res.writeHead(200, {
     'Content-Type': 'text/plain; charset=utf-8',
-    'Cache-Control': 'no-cache',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
     'Connection': 'keep-alive',
+    'Transfer-Encoding': 'chunked',
+    'X-Accel-Buffering': 'no',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Cache-Control'
   });

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import { generateReport, sendChatMessage, sendChatMessageStream } from '../lib/api';
 import { SparklesIcon, BoltIcon, CogIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
@@ -35,6 +35,14 @@ const ReportSection: FC<ReportSectionProps> = ({
   // Chat specific states
   const [chatInput, setChatInput] = useState('');
   const [isChatting, setIsChatting] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   useEffect(() => {
     const loadExportLibraries = async () => {
@@ -669,16 +677,16 @@ const ReportSection: FC<ReportSectionProps> = ({
               </div>
             </div>
           )}
-          <div className="h-96 overflow-y-auto p-4 space-y-4">
+          <div ref={chatContainerRef} className="h-96 overflow-y-auto p-4 space-y-4">
             {chatMessages.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                 <ChatBubbleLeftRightIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>Start a conversation about your selected sources</p>
               </div>
             ) : (
-              chatMessages.map((message, index) => (
+              chatMessages.map((message) => (
                 <div
-                  key={index}
+                  key={message.id}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
@@ -689,7 +697,7 @@ const ReportSection: FC<ReportSectionProps> = ({
                     }`}
                   >
                     <div className="text-sm">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <div className="whitespace-pre-wrap">{message.content}</div>
                     </div>
                     <div className="text-xs opacity-75 mt-1">
                       {message.timestamp.toLocaleTimeString()}
