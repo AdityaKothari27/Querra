@@ -49,7 +49,7 @@ const CategorySelector: FC<CategorySelectorProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300">
+    <div className="bg-white dark:bg-black backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 dark:border-white p-6 transition-all duration-300">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
         Select Search Category
       </h2>
