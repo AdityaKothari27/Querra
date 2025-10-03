@@ -70,7 +70,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
         <Link href="/" className="flex items-center group">
           <div className="relative h-10 w-13">
             <Image
-              src="/images/querrawobg.png"
+              src={darkMode ? "/images/querrawobgdark.png" : "/images/querrawobg.png"}
               alt="Querra Logo"
               width={100}
               height={40}
