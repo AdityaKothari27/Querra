@@ -144,11 +144,10 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             <div className="flex items-center space-x-2 ml-2">
               <a href="https://x.com/aditya_kothari1?s=21" className="hover:opacity-80 transition-opacity duration-300" title="Follow on X" target='_blank'>
                 <Image 
-                  src="/images/x-logo-white.png" 
+                  src={darkMode ? "/images/logo-white.png" : "/images/logo-black.png"}
                   alt="X (Twitter)" 
                   width={16} 
-                  height={16} 
-                  className="filter invert dark:invert-0" 
+                  height={16}
                 />
               </a>
               <a href="https://www.linkedin.com/in/adityakothari27" className="hover:opacity-80 transition-opacity duration-300" title="Connect on LinkedIn" target='_blank'>
