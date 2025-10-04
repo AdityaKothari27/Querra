@@ -82,13 +82,13 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center space-x-6">
             <button 
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm"
+              className="p-2 rounded-full  text-gray-800 dark:text-white transition-colors duration-300 shadow-sm border border-1 hover:border-gray-600 dark:hover:border-black"
               aria-label="Toggle theme"
             >
               {darkMode ? (
-                <SunIcon className="h-5 w-5" />
+                <SunIcon className="h-5 w-5 hover:text-black" />
               ) : (
-                <MoonIcon className="h-5 w-5" />
+                <MoonIcon className="h-5 w-5 hover:text-black" />
               )}
             </button>
             
@@ -100,11 +100,12 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                   message: 'Session cleared successfully!'
                 });
               }}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm"
+              className="p-2 rounded-full text-gray-800 dark:text-white transition-colors duration-300 shadow-sm border border-1 hover:border-gray-600 dark:hover:border-gray-600"
+              // hover:bg-gray-200 dark:hover:bg-gray-700
               aria-label="Clear session"
               title="Clear session"
             >
-              <TrashIcon className="h-5 w-5" />
+              <TrashIcon className="h-5 w-5 hover:text-black" />
             </button>
             
             <nav>

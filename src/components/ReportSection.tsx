@@ -569,7 +569,7 @@ const ReportSection: FC<ReportSectionProps> = ({
         </div>
       )}
       
-      <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="mb-4 p-4 bg-gray-50 dark:bg-black rounded-lg border-2 border-white-100 dark:border-gray-700">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
           <CogIcon className="h-4 w-4 mr-2" />
           Generation Mode
@@ -591,7 +591,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             <div className="flex-1">
               <div className="flex items-center mb-1">
                 <SparklesIcon className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Quick Analysis</span>
+                <span className="font-medium text-gray-900 dark:text-black">Quick Analysis</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 Extracts content for faster processing
@@ -657,7 +657,7 @@ const ReportSection: FC<ReportSectionProps> = ({
         // Only show model selector if there are multiple models available
         if (availableModels.length > 1) {
           return (
-            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-black rounded-lg border border-gray-200 dark:border-gray-700">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                 <CogIcon className="h-4 w-4 mr-2" />
                 AI Model Selection
