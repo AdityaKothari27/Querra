@@ -591,7 +591,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             <div className="flex-1">
               <div className="flex items-center mb-1">
                 <SparklesIcon className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
-                <span className="font-medium text-gray-900 dark:text-black">Quick Analysis</span>
+                <span className="font-medium text-gray-900 dark:text-blue-600">Quick Analysis</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 Extracts content for faster processing
@@ -615,7 +615,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             <div className="flex-1">
               <div className="flex items-center mb-1">
                 <BoltIcon className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Deep Analysis</span>
+                <span className="font-medium text-gray-900 dark:text-green-600">Deep Analysis</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 Uses URL context for detailed insights
@@ -639,7 +639,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             <div className="flex-1">
               <div className="flex items-center mb-1">
                 <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Chat Mode</span>
+                <span className="font-medium text-gray-900 dark:text-purple-600">Chat Mode</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 Interactive conversation with sources
