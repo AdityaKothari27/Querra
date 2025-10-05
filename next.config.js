@@ -2,9 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   // Enable streaming responses
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  serverExternalPackages: [],
   // Disable buffering for API routes
   poweredByHeader: false,
   // Ensure proper streaming
