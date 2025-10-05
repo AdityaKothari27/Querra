@@ -9,6 +9,8 @@ import { useSession } from '../contexts/SessionContext';
 import { AI_MODELS, getModelsByMode, getDefaultModel } from '../config/models';
 import { ChatMessage } from '../types/index';
 
+export type darkmessage = `#3b3b3d`;
+
 interface ReportSectionProps {
   searchQuery: string;
   selectedSources: string[];
@@ -726,7 +728,7 @@ const ReportSection: FC<ReportSectionProps> = ({
       
       {/* Chat Interface */}
       {generationMode === 'chat' && (
-        <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+        <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-black">
           {/* Context Indicator */}
           {(selectedSources.length > 0 || selectedDocumentIds.length > 0) && (
             <div className="border-b border-gray-200 dark:border-gray-700 p-3 bg-blue-50 dark:bg-blue-900/20">
@@ -761,26 +763,38 @@ const ReportSection: FC<ReportSectionProps> = ({
                     className={`max-w-[80%] p-3 rounded-lg ${
                       message.role === 'user'
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white'
                     }`}
                   >
                     <div className="text-sm">
-                      {/* Use plain text during streaming for performance, markdown after completion */}
-                      {isStreaming && message.role === 'assistant' ? (
-                        <div className="whitespace-pre-wrap animate-typewriter">
+                      {/* Always use ReactMarkdown for consistent rendering */}
+                      <div 
+                        className="max-w-none"
+                        style={{
+                          color: message.role === 'user' ? 'white' : 'inherit'
+                        }}
+                      >
+                        <ReactMarkdown
+                          components={{
+                            p: ({node, ...props}) => <p style={{ color: 'inherit', margin: '0.5em 0' }} {...props} />,
+                            strong: ({node, ...props}) => <strong style={{ color: 'inherit' }} {...props} />,
+                            em: ({node, ...props}) => <em style={{ color: 'inherit' }} {...props} />,
+                            code: ({node, ...props}) => <code style={{ color: 'inherit' }} {...props} />,
+                            li: ({node, ...props}) => <li style={{ color: 'inherit' }} {...props} />,
+                            a: ({node, ...props}) => <a style={{ color: 'inherit', textDecoration: 'underline' }} {...props} />,
+                          }}
+                        >
                           {message.content}
-                        </div>
-                      ) : (
-                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                          <ReactMarkdown>{message.content}</ReactMarkdown>
-                        </div>
-                      )}
+                        </ReactMarkdown>
+                      </div>
                       {/* Typing cursor for streaming messages */}
                       {isStreaming && message.role === 'assistant' && message.content.length > 0 && (
-                        <span className="inline-block w-2 h-5 bg-gray-500 dark:bg-gray-300 animate-pulse ml-1"></span>
+                        <span className="inline-block w-2 h-5 bg-gray-400 animate-pulse ml-1"></span>
                       )}
                     </div>
-                    <div className="text-xs opacity-75 mt-1">
+                    <div className={`text-xs opacity-75 mt-1 ${
+                      message.role === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-400'
+                    }`}>
                       {message.timestamp.toLocaleTimeString()}
                     </div>
                   </div>
