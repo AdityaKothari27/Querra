@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleSearch } from '../../utils/search';
+import { withRateLimit } from '../../utils/rateLimiter';
 
 const searchClient = new GoogleSearch();
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -35,4 +36,6 @@ export default async function handler(
       results: [] 
     });
   }
-} 
+}
+
+export default withRateLimit(handler, { maxRequests: 2, windowMs: 60 * 1000 }); // 2 requests per minute per IP 

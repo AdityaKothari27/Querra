@@ -4,12 +4,13 @@ import { GeminiProcessor } from '../../utils/ai_processor';
 import { Database } from '../../utils/database';
 import { SecurityValidator, RateLimiter } from '../../utils/security';
 import { logger, ErrorHandler, IntrusionDetector } from '../../utils/logging';
+import { withRateLimit } from '../../utils/rateLimiter';
 
 const extractor = new ContentExtractor();
 const ai_processor = new GeminiProcessor();
 const db = new Database();
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -186,4 +187,6 @@ export default async function handler(
       report: 'Failed to generate report. Please try again.'
     });
   }
-} 
+}
+
+export default withRateLimit(handler, { maxRequests: 2, windowMs: 60 * 1000 }); // 2 requests per minute per IP 

@@ -8,9 +8,11 @@ import { SearchConfig } from '../types';
 import { searchWeb } from '../lib/api';
 import { getCategoryById } from '../config/categories';
 import { useSession } from '../contexts/SessionContext';
+import { useToast } from '../components/Toast';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
   const {
     searchQuery,
     setSearchQuery,
@@ -52,9 +54,13 @@ export default function Home() {
       };
       const results = await searchWeb(query, categoryConfig);
       setSearchResults(results);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error searching:', error);
-      alert('Failed to search. Please try again.');
+      const errorMessage = error?.message || 'Failed to search. Please try again.';
+      showToast({
+        type: 'error',
+        message: errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }

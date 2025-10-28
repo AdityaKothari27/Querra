@@ -24,8 +24,12 @@ export const searchWeb = async (
       page: config.page
     });
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Search API error:', error);
+    if (error.response?.status === 429) {
+      const retryAfter = error.response.data?.retryAfter || 60;
+      throw new Error(`Rate limit exceeded. Please wait ${retryAfter} seconds before trying again.`);
+    }
     throw new Error('Failed to search. Please try again.');
   }
 };
@@ -51,6 +55,11 @@ export const generateReport = async (
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, sources, documentIds, promptTemplate, generationMode, model }),
   });
+
+  if (response.status === 429) {
+    const data = await response.json();
+    throw new Error(data.message || 'Rate limit exceeded. Please wait before trying again.');
+  }
 
   if (!response.ok) {
     throw new Error('Failed to generate report');
@@ -95,6 +104,12 @@ export const sendChatMessageStream = async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, sources, documentIds, conversationHistory, model }),
     });
+
+    if (response.status === 429) {
+      const data = await response.json();
+      onError(data.message || 'Rate limit exceeded. Please wait before trying again.');
+      return;
+    }
 
     if (!response.ok) {
       throw new Error(`Failed to send chat message: ${response.status} ${response.statusText}`);

@@ -3,6 +3,7 @@ import { GeminiProcessor } from '../../utils/ai_processor';
 import { withSecurity } from '../../utils/middleware';
 import { SecurityValidator } from '../../utils/security';
 import { logger } from '../../utils/logging';
+import { withRateLimit } from '../../utils/rateLimiter';
 
 const ai_processor = new GeminiProcessor();
 
@@ -78,11 +79,14 @@ async function handler(
   }
 }
 
-export default withSecurity(handler, {
-  rateLimit: {
-    maxRequests: 30, // More restrictive for chat (AI calls are expensive)
-    windowMs: 15 * 60 * 1000 // 15 minutes
-  },
-  validateInput: false, // Disabled to allow coding discussions and examples
-  logRequests: true
-});
+export default withRateLimit(
+  withSecurity(handler, {
+    rateLimit: {
+      maxRequests: 30, // More restrictive for chat (AI calls are expensive)
+      windowMs: 15 * 60 * 1000 // 15 minutes
+    },
+    validateInput: false, // Disabled to allow coding discussions and examples
+    logRequests: true
+  }),
+  { maxRequests: 2, windowMs: 60 * 1000 } // 2 requests per minute per IP
+);

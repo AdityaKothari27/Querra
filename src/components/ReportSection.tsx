@@ -158,11 +158,13 @@ const ReportSection: FC<ReportSectionProps> = ({
         type: 'success',
         message: 'Report generated successfully!',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating report:', error);
+      // Check if it's a rate limit error
+      const errorMessage = error?.message || 'Failed to generate report. Please try again.';
       showToast({
         type: 'error',
-        message: 'Failed to generate report. Please try again.',
+        message: errorMessage,
       });
     } finally {
       setIsGenerating(false);
@@ -299,11 +301,11 @@ const ReportSection: FC<ReportSectionProps> = ({
           
           showToast({
             type: 'error',
-            message: 'Failed to send message. Please try again.',
+            message: error || 'Failed to send message. Please try again.',
           });
         }
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending chat message:', error);
       setIsStreaming(false);
       setIsChatting(false);
@@ -313,7 +315,7 @@ const ReportSection: FC<ReportSectionProps> = ({
       
       showToast({
         type: 'error',
-        message: 'Failed to send message. Please try again.',
+        message: error?.message || 'Failed to send message. Please try again.',
       });
     } finally {
       setIsStreaming(false);
@@ -559,15 +561,29 @@ const ReportSection: FC<ReportSectionProps> = ({
         <div className="mb-4">
           <label htmlFor="prompt-template" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Prompt Template
+            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+              ({promptTemplate.length}/2000 characters)
+            </span>
           </label>
           <textarea
             id="prompt-template"
             value={promptTemplate}
-            onChange={(e) => setPromptTemplate(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= 2000) {
+                setPromptTemplate(value);
+              }
+            }}
+            maxLength={2000}
             className="w-full px-3 py-2 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent text-gray-800 dark:text-white"
             rows={4}
             placeholder={getDefaultPrompt()}
           />
+          {promptTemplate.length >= 1900 && (
+            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+              {promptTemplate.length >= 2000 ? 'Character limit reached' : 'Approaching character limit'}
+            </p>
+          )}
         </div>
       )}
       
@@ -815,16 +831,32 @@ const ReportSection: FC<ReportSectionProps> = ({
           </div>
           
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="mb-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {chatInput.length}/2000 characters
+              </span>
+              {chatInput.length >= 1900 && (
+                <span className="ml-2 text-xs text-orange-600 dark:text-orange-400">
+                  {chatInput.length >= 2000 ? '⚠️ Character limit reached' : '⚠️ Approaching limit'}
+                </span>
+              )}
+            </div>
             <div className="flex space-x-2 items-end">
               <textarea
                 value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2000) {
+                    setChatInput(value);
+                  }
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSendMessage();
                   }
                 }}
+                maxLength={2000}
                 placeholder={
                   selectedSources.length > 0 || selectedDocumentIds.length > 0 
                     ? "Ask questions about your selected sources and documents... (Shift+Enter for new line)" 
