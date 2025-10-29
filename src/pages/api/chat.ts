@@ -15,7 +15,7 @@ async function handler(
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { message, sources, documentIds = [], conversationHistory = [], model = 'gemini-2.5-flash' } = req.body;
+  const { message, sources, documentIds = [], conversationHistory = [], model = 'gemini-2.5-flash', userApiKeys } = req.body;
   
   // Input validation
   const messageValidation = SecurityValidator.validateInput(message, 5000); // 5KB limit for messages
@@ -56,8 +56,13 @@ async function handler(
   try {
     let chunkCount = 0;
     
+    // Use user's API key if provided
+    const processorToUse = userApiKeys?.gemini 
+      ? new GeminiProcessor(userApiKeys.gemini)
+      : ai_processor;
+    
     // Generate streaming chat response
-    await ai_processor.generate_chat_response_stream(
+    await processorToUse.generate_chat_response_stream(
       messageValidation.sanitized || message, 
       sources || [], 
       documentIds || [],

@@ -26,7 +26,10 @@ export default function Home() {
     setSelectedCategory,
     setSearchConfig,
     generatedReport,
-    generationMode
+    generationMode,
+    useOwnKeys,
+    geminiApiKey,
+    groqApiKey
   } = useSession();
   
   // Log session data on mount for debugging
@@ -52,7 +55,14 @@ export default function Home() {
         ...config,
         category: selectedCategory
       };
-      const results = await searchWeb(query, categoryConfig);
+      
+      // Prepare user API keys if using own keys
+      const userKeys = useOwnKeys ? {
+        gemini: geminiApiKey || undefined,
+        groq: groqApiKey || undefined
+      } : undefined;
+      
+      const results = await searchWeb(query, categoryConfig, userKeys);
       setSearchResults(results);
     } catch (error: any) {
       console.error('Error searching:', error);

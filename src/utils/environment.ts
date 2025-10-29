@@ -79,7 +79,7 @@ class EnvironmentValidator {
         throw new Error('Environment validation failed in production. Check your environment variables.');
       }
     } else {
-      console.log('✅ Environment validation passed');
+      console.log('Environment validation passed');
     }
   }
 

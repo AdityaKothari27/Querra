@@ -22,6 +22,12 @@ interface SessionContextType {
   setSelectedModel: (model: string) => void;
   chatMessages: ChatMessage[];
   setChatMessages: (messages: ChatMessage[]) => void;
+  useOwnKeys: boolean;
+  setUseOwnKeys: (use: boolean) => void;
+  geminiApiKey: string;
+  setGeminiApiKey: (key: string) => void;
+  groqApiKey: string;
+  setGroqApiKey: (key: string) => void;
   clearSession: () => void;
 }
 
@@ -46,6 +52,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [generationMode, setGenerationMode] = useState<'traditional' | 'fast' | 'chat'>('traditional');
   const [selectedModel, setSelectedModel] = useState<string>('gemini-2.5-flash');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  
+  // BYOK (Bring Your Own Keys) state
+  const [useOwnKeys, setUseOwnKeys] = useState(false);
+  const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [groqApiKey, setGroqApiKey] = useState('');
 
   const clearSession = () => {
     // Set all state to initial values
@@ -59,6 +70,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setGenerationMode('traditional');
     setSelectedModel('gemini-2.5-flash');
     setChatMessages([]);
+    // Note: We don't clear API keys on session clear - they persist
     
     // Remove from localStorage
     localStorage.removeItem('researchSession');
@@ -106,6 +118,19 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         timestamp: new Date(msg.timestamp)
       })));
     }
+    
+    // Load API keys from separate localStorage (for security isolation)
+    const apiKeysData = localStorage.getItem('querraApiKeys');
+    if (apiKeysData) {
+      try {
+        const { useOwnKeys, geminiApiKey, groqApiKey } = JSON.parse(apiKeysData);
+        setUseOwnKeys(useOwnKeys || false);
+        setGeminiApiKey(geminiApiKey || '');
+        setGroqApiKey(groqApiKey || '');
+      } catch (error) {
+        console.error('Error loading API keys:', error);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -135,6 +160,16 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     chatMessages,
   ]);
 
+  // Persist API keys separately
+  useEffect(() => {
+    const apiKeysData = {
+      useOwnKeys,
+      geminiApiKey,
+      groqApiKey,
+    };
+    localStorage.setItem('querraApiKeys', JSON.stringify(apiKeysData));
+  }, [useOwnKeys, geminiApiKey, groqApiKey]);
+
   return (
     <SessionContext.Provider
       value={{
@@ -158,6 +193,12 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setSelectedModel,
         chatMessages,
         setChatMessages,
+        useOwnKeys,
+        setUseOwnKeys,
+        geminiApiKey,
+        setGeminiApiKey,
+        groqApiKey,
+        setGroqApiKey,
         clearSession,
       }}
     >

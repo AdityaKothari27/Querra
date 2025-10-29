@@ -12,17 +12,18 @@ export class GeminiProcessor {
   private maxRetries: number = 3;
   private retryDelay: number = 1000; // 1 second
 
-  constructor() {
+  constructor(userGeminiKey?: string, userGroqKey?: string) {
     try {
-      const geminiApiKey = requireAPIKey('GEMINI');
-      const groqApiKey = requireAPIKey('GROQ');
+      // Use user-provided keys if available, otherwise fall back to environment variables
+      const geminiApiKey = userGeminiKey || requireAPIKey('GEMINI');
+      const groqApiKey = userGroqKey || requireAPIKey('GROQ');
       
       this.genAI = new GoogleGenerativeAI(geminiApiKey);
       this.genAINew = new GoogleGenAI({ apiKey: geminiApiKey });
       this.groq = new Groq({ apiKey: groqApiKey });
       this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       
-      logger.info('AI Processor initialized successfully');
+      logger.info(userGeminiKey || userGroqKey ? 'AI Processor initialized with user API keys' : 'AI Processor initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize AI Processor', error as Error);
       throw error;

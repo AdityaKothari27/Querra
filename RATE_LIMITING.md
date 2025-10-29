@@ -79,24 +79,56 @@ if (response.status === 429) {
 - Rate limit: 2 requests/minute per IP
 - Prevents search API quota exhaustion
 
+## BYOK (Bring Your Own Keys) - Rate Limit Bypass
+
+### Overview
+Users can provide their own Gemini and Groq API keys to bypass rate limits entirely.
+
+### How to Use
+1. In the AI Model Selection section, check **"Use my own API keys"**
+2. Enter your Gemini API key (get from https://aistudio.google.com/app/apikey)
+3. Enter your Groq API key (get from https://console.groq.com/keys)
+4. Keys are stored locally in your browser
+5. Rate limits no longer apply! ✨
+
+### Technical Details
+- Keys stored in localStorage (`querraApiKeys`)
+- Frontend sends `x-user-api-keys: true` header
+- Backend bypasses rate limiting when header detected
+- API calls use user's keys instead of server keys
+- Response includes `X-RateLimit-Bypass: true` header
+
+### Benefits
+✅ **Unlimited requests** - No rate limits with your keys
+✅ **Privacy-first** - Keys never stored on our servers
+✅ **Full control** - Use your own API quota
+✅ **Transparent** - You know exactly what's being used
+
+See [BYOK_IMPLEMENTATION.md](./BYOK_IMPLEMENTATION.md) for full details.
+
+---
+
 ## Benefits
 
 ### Cost Management
 ✅ Prevents uncontrolled API usage on free tiers
 ✅ Protects against accidental quota exhaustion
 ✅ Limits token consumption per user
+✅ BYOK option for power users who want unlimited access
 
 ### Security
 ✅ Prevents DDoS attacks
 ✅ Mitigates brute force attempts
 ✅ Reduces spam and abuse
 ✅ IP-based tracking for accountability
+✅ BYOK users bypass without compromising security
 
 ### User Experience
 ✅ Clear feedback on limits
 ✅ Character counters prevent submission errors
 ✅ Helpful error messages with retry information
 ✅ Smooth degradation under load
+✅ Optional unlimited access via BYOK
 
 ## Production Considerations
 

@@ -37,6 +37,14 @@ export function checkRateLimit(
   res: NextApiResponse,
   config: RateLimitConfig = { maxRequests: 2, windowMs: 60 * 1000 } // Default: 2 requests per minute
 ): boolean {
+  // Check if user is using their own API keys - bypass rate limiting
+  const userKeys = req.headers['x-user-api-keys'];
+  if (userKeys && userKeys !== 'false') {
+    // User is using their own keys, bypass rate limit
+    res.setHeader('X-RateLimit-Bypass', 'true');
+    return true;
+  }
+
   // Get client IP address
   const forwarded = req.headers['x-forwarded-for'];
   const ip = typeof forwarded === 'string' 

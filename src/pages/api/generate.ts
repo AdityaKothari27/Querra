@@ -44,7 +44,7 @@ async function handler(
       return res.status(403).json({ message: 'Request blocked for security reasons' });
     }
 
-    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional', model = 'gemini-2.5-flash' } = req.body;
+    const { query, sources, documentIds, promptTemplate, generationMode = 'traditional', model = 'gemini-2.5-flash', userApiKeys } = req.body;
     
     // Input validation
     const queryValidation = SecurityValidator.validateInput(query, 2000);
@@ -96,6 +96,11 @@ async function handler(
     let report: string;
     const sanitizedQuery = queryValidation.sanitized || query;
     
+    // Use user's API key if provided
+    const processorToUse = userApiKeys?.gemini || userApiKeys?.groq
+      ? new GeminiProcessor(userApiKeys.gemini, userApiKeys.groq)
+      : ai_processor;
+    
     if (generationMode === 'fast') {
       // Fast mode: Use URL context without content extraction
       logger.info('Using fast mode with URL context', req);
@@ -116,10 +121,10 @@ async function handler(
         );
         
         const allContents = [...webContents, ...documentContents];
-        report = await ai_processor.generate_report(sanitizedQuery, allContents, promptTemplate, model);
+        report = await processorToUse.generate_report(sanitizedQuery, allContents, promptTemplate, model);
       } else {
         // Pure fast mode with only URLs
-        report = await ai_processor.generate_report_fast(sanitizedQuery, sources, promptTemplate, model);
+        report = await processorToUse.generate_report_fast(sanitizedQuery, sources, promptTemplate, model);
         
         // Add mode indicator to the report
         const currentDate = new Date().toLocaleDateString('en-US', { 
@@ -146,7 +151,7 @@ async function handler(
       
       // Combine all contents
       const allContents = [...webContents, ...documentContents];
-      report = await ai_processor.generate_report(sanitizedQuery, allContents, promptTemplate, model);
+      report = await processorToUse.generate_report(sanitizedQuery, allContents, promptTemplate, model);
       
       // Add mode indicator to the report
       const currentDate = new Date().toLocaleDateString('en-US', { 

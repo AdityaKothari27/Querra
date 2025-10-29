@@ -12,9 +12,17 @@ const mockSearchResults: Record<string, SearchResult[]> = {
 
 export const searchWeb = async (
   query: string,
-  config: SearchConfig
+  config: SearchConfig,
+  userApiKeys?: { gemini?: string; groq?: string }
 ): Promise<SearchResult[]> => {
   try {
+    const headers: Record<string, string> = {};
+    
+    // Add header to indicate user is using own keys (for rate limit bypass)
+    if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq)) {
+      headers['x-user-api-keys'] = 'true';
+    }
+    
     const response = await api.post('/search', {
       query,
       maxResults: config.maxResults,
@@ -22,7 +30,7 @@ export const searchWeb = async (
       excludedDomains: config.excludedDomains,
       category: config.category,
       page: config.page
-    });
+    }, { headers });
     return response.data;
   } catch (error: any) {
     console.error('Search API error:', error);
@@ -48,12 +56,20 @@ export const generateReport = async (
   documentIds: number[],
   promptTemplate: string,
   generationMode: 'traditional' | 'fast' | 'chat' = 'traditional',
-  model: string = 'gemini-2.5-flash'
+  model: string = 'gemini-2.5-flash',
+  userApiKeys?: { gemini?: string; groq?: string }
 ) => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  
+  // Add header to indicate user is using own keys (for rate limit bypass)
+  if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq)) {
+    headers['x-user-api-keys'] = 'true';
+  }
+  
   const response = await fetch('/api/generate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, sources, documentIds, promptTemplate, generationMode, model }),
+    headers,
+    body: JSON.stringify({ query, sources, documentIds, promptTemplate, generationMode, model, userApiKeys }),
   });
 
   if (response.status === 429) {
@@ -96,13 +112,21 @@ export const sendChatMessageStream = async (
   model: string = 'gemini-2.5-flash',
   onChunk: (chunk: string) => void,
   onComplete: () => void,
-  onError: (error: string) => void
+  onError: (error: string) => void,
+  userApiKeys?: { gemini?: string; groq?: string }
 ) => {
   try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    
+    // Add header to indicate user is using own keys (for rate limit bypass)
+    if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq)) {
+      headers['x-user-api-keys'] = 'true';
+    }
+    
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, sources, documentIds, conversationHistory, model }),
+      headers,
+      body: JSON.stringify({ message, sources, documentIds, conversationHistory, model, userApiKeys }),
     });
 
     if (response.status === 429) {

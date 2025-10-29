@@ -32,7 +32,22 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [exportFormat, setExportFormat] = useState('PDF');
   const [isExporting, setIsExporting] = useState(false);
   const { showToast } = useToast();
-  const { setGeneratedReport, generatedReport, generationMode, setGenerationMode, selectedModel, setSelectedModel, chatMessages, setChatMessages } = useSession();
+  const { 
+    setGeneratedReport, 
+    generatedReport, 
+    generationMode, 
+    setGenerationMode, 
+    selectedModel, 
+    setSelectedModel, 
+    chatMessages, 
+    setChatMessages,
+    useOwnKeys,
+    setUseOwnKeys,
+    geminiApiKey,
+    setGeminiApiKey,
+    groqApiKey,
+    setGroqApiKey
+  } = useSession();
 
   // Chat specific states
   const [chatInput, setChatInput] = useState('');
@@ -139,13 +154,20 @@ const ReportSection: FC<ReportSectionProps> = ({
 
     setIsGenerating(true);
     try {
+      // Prepare user API keys if using own keys
+      const userKeys = useOwnKeys ? {
+        gemini: geminiApiKey || undefined,
+        groq: groqApiKey || undefined
+      } : undefined;
+      
       const response = await generateReport(
         searchQuery, 
         selectedSources, 
         selectedDocumentIds,
         promptTemplate || getDefaultPrompt(),
         generationMode,
-        selectedModel
+        selectedModel,
+        userKeys
       );
       
       // Update local state first
@@ -231,6 +253,12 @@ const ReportSection: FC<ReportSectionProps> = ({
       const messagesWithAssistant = [...updatedMessages, assistantMessage];
       setChatMessages(messagesWithAssistant);
       
+      // Prepare user API keys if using own keys
+      const userKeys = useOwnKeys ? {
+        gemini: geminiApiKey || undefined,
+        groq: groqApiKey || undefined
+      } : undefined;
+      
       await sendChatMessageStream(
         currentUserMessage,
         selectedSources,
@@ -303,7 +331,8 @@ const ReportSection: FC<ReportSectionProps> = ({
             type: 'error',
             message: error || 'Failed to send message. Please try again.',
           });
-        }
+        },
+        userKeys
       );
     } catch (error: any) {
       console.error('Error sending chat message:', error);
@@ -696,6 +725,75 @@ const ReportSection: FC<ReportSectionProps> = ({
                   </option>
                 ))}
               </select>
+
+              {/* BYOK (Bring Your Own Keys) Section */}
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={useOwnKeys}
+                    onChange={(e) => setUseOwnKeys(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <span className="ml-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Use my own API keys
+                  </span>
+                  <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+                    ✨ Bypass rate limits
+                  </span>
+                </label>
+                
+                {useOwnKeys && (
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Gemini API Key 
+                        <a 
+                          href="https://aistudio.google.com/app/apikey" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="ml-1 text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          (Get key →)
+                        </a>
+                      </label>
+                      <input
+                        type="password"
+                        value={geminiApiKey}
+                        onChange={(e) => setGeminiApiKey(e.target.value)}
+                        placeholder="AIza..."
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Groq API Key
+                        <a 
+                          href="https://console.groq.com/keys" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="ml-1 text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          (Get key →)
+                        </a>
+                      </label>
+                      <input
+                        type="password"
+                        value={groqApiKey}
+                        onChange={(e) => setGroqApiKey(e.target.value)}
+                        placeholder="gsk_..."
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <p className="text-xs text-gray-600 dark:text-gray-400 flex items-start">
+                      <span className="mr-1">🔒</span>
+                      <span>Your keys are stored locally in your browser. We never see or store them on our servers.</span>
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           );
         }
