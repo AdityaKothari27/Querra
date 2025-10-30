@@ -727,7 +727,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               </select>
 
               {/* BYOK (Bring Your Own Keys) Section */}
-              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-gray-900 rounded-lg border border-blue-200 dark:border-gray-800">
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -789,7 +789,7 @@ const ReportSection: FC<ReportSectionProps> = ({
                     
                     <p className="text-xs text-gray-600 dark:text-gray-400 flex items-start">
                       <span className="mr-1">🔒</span>
-                      <span>Your keys are stored locally in your browser. We never see or store them on our servers.</span>
+                      <span>Your keys are stored locally in your browser. We never see or store them on our server.</span>
                     </p>
                   </div>
                 )}
