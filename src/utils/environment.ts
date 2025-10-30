@@ -5,6 +5,7 @@
 interface EnvironmentConfig {
   GEMINI_API_KEY: string;
   GROQ_API_KEY: string;
+  OPENROUTER_API_KEY: string;
   GOOGLE_API_KEY: string;
   GOOGLE_CX: string;
   NODE_ENV: 'development' | 'production' | 'test';
@@ -38,7 +39,8 @@ class EnvironmentValidator {
     ];
 
     const optionalKeys = [
-      'GROQ_API_KEY'
+      'GROQ_API_KEY',
+      'OPENROUTER_API_KEY'
     ];
 
     // Validate required keys
@@ -94,6 +96,11 @@ class EnvironmentValidator {
       this.validationErrors.push('GROQ_API_KEY appears to have invalid format');
     }
 
+    // Validate OpenRouter API key format (should start with 'sk-or-')
+    if (this.config.OPENROUTER_API_KEY && !this.config.OPENROUTER_API_KEY.startsWith('sk-or-')) {
+      this.validationErrors.push('OPENROUTER_API_KEY appears to have invalid format');
+    }
+
     // Validate Google API key format
     if (this.config.GOOGLE_API_KEY && !this.config.GOOGLE_API_KEY.startsWith('AIza')) {
       this.validationErrors.push('GOOGLE_API_KEY appears to have invalid format');
@@ -131,10 +138,11 @@ class EnvironmentValidator {
   }
 
   // Secure way to get API keys
-  getAPIKey(service: 'GEMINI' | 'GROQ' | 'GOOGLE'): string {
+  getAPIKey(service: 'GEMINI' | 'GROQ' | 'OPENROUTER' | 'GOOGLE'): string {
     const keyMap = {
       GEMINI: 'GEMINI_API_KEY',
       GROQ: 'GROQ_API_KEY',
+      OPENROUTER: 'OPENROUTER_API_KEY',
       GOOGLE: 'GOOGLE_API_KEY'
     };
 
@@ -168,7 +176,7 @@ class EnvironmentValidator {
 export const envValidator = EnvironmentValidator.getInstance();
 
 // Utility functions
-export function requireAPIKey(service: 'GEMINI' | 'GROQ' | 'GOOGLE'): string {
+export function requireAPIKey(service: 'GEMINI' | 'GROQ' | 'OPENROUTER' | 'GOOGLE'): string {
   return envValidator.getAPIKey(service);
 }
 

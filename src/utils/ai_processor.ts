@@ -943,4 +943,315 @@ Please generate a comprehensive report based on the above sources. Include relev
       return [];
     }
   }
+}
+
+/**
+ * OpenRouter AI Processor
+ * Handles OpenRouter API integration with support for multiple models
+ */
+export class OpenRouterProcessor {
+  private apiKey: string;
+  private maxRetries: number = 3;
+  private retryDelay: number = 1000;
+
+  constructor(userApiKey?: string) {
+    try {
+      // Use user-provided key if available, otherwise fall back to environment variable
+      this.apiKey = userApiKey || requireAPIKey('OPENROUTER');
+      logger.info(userApiKey ? 'OpenRouter Processor initialized with user API key' : 'OpenRouter Processor initialized successfully');
+    } catch (error) {
+      logger.error('Failed to initialize OpenRouter Processor', error as Error);
+      throw error;
+    }
+  }
+
+  private async delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async generate_report(
+    query: string, 
+    contents: string[], 
+    promptTemplate: string, 
+    model: string = 'minimax/minimax-m2:free'
+  ): Promise<string> {
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const prompt = this._prepare_prompt({ query, contents, promptTemplate });
+        
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+            'X-Title': 'Querra Research Assistant'
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a professional research assistant. Generate well-structured, comprehensive reports based on provided sources.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            temperature: 0.7,
+            max_tokens: 16000,
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`OpenRouter API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        }
+
+        const data = await response.json();
+        return data.choices[0]?.message?.content || 'No response generated';
+      } catch (error: any) {
+        lastError = error;
+        console.error(`OpenRouter attempt ${attempt} failed:`, error);
+        
+        if (error?.status === 429 || error.message?.includes('429')) {
+          await this.delay(this.retryDelay * attempt);
+          continue;
+        }
+        
+        throw error;
+      }
+    }
+
+    throw new Error(`Failed to generate report after ${this.maxRetries} attempts. ${lastError?.message || ''}`);
+  }
+
+  async generate_chat_response_stream(
+    message: string,
+    urls: string[],
+    documentIds: number[] = [],
+    conversationHistory: Array<{role: string, content: string}> = [],
+    model: string = 'minimax/minimax-m2:free',
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    let lastError: any;
+    
+    // Fetch document contents if document IDs are provided
+    let documentContents: string[] = [];
+    if (documentIds.length > 0) {
+      try {
+        documentContents = await this._fetchDocumentContents(documentIds);
+      } catch (error) {
+        logger.error('Failed to fetch document contents', error as Error);
+      }
+    }
+
+    // Extract URL content since OpenRouter doesn't have native URL context
+    let urlContents: string[] = [];
+    if (urls.length > 0) {
+      urlContents = await Promise.all(urls.map(async (url) => {
+        try {
+          const response = await fetch(url);
+          const html = await response.text();
+          const textContent = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').substring(0, 2000);
+          return `Content from ${url}:\n${textContent}`;
+        } catch (error) {
+          return `Failed to extract content from ${url}`;
+        }
+      }));
+    }
+    
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const prompt = this._prepare_chat_prompt({
+          message,
+          urls,
+          urlContents,
+          documentContents,
+          conversationHistory
+        });
+
+        const messages = [
+          {
+            role: 'system',
+            content: 'You are a helpful AI assistant with access to web content and documents. Answer questions based on the provided sources and cite them using [1], [2], etc.'
+          },
+          ...conversationHistory.map(msg => ({
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content
+          })),
+          {
+            role: 'user',
+            content: prompt
+          }
+        ];
+
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+            'X-Title': 'Querra Research Assistant'
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            temperature: 0.8,
+            max_tokens: 16000,
+            stream: true,
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`OpenRouter API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('Failed to get response reader');
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+              
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices[0]?.delta?.content;
+                if (content) {
+                  onChunk(content);
+                }
+              } catch (e) {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+
+        return;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`OpenRouter streaming attempt ${attempt} failed:`, error);
+        
+        if (error?.status === 429 || error.message?.includes('429')) {
+          await this.delay(this.retryDelay * attempt);
+          continue;
+        }
+        
+        throw error;
+      }
+    }
+
+    throw lastError;
+  }
+
+  private _prepare_prompt({ query, contents, promptTemplate }: {
+    query: string;
+    contents: string[];
+    promptTemplate: string;
+  }): string {
+    const validContents = contents
+      .filter(content => !content.startsWith('[Unable to extract'))
+      .map(content => content.substring(0, 2000));
+
+    const combined_content = validContents
+      .map((content, i) => `Source ${i + 1}:\n${content}`)
+      .join("\n\n");
+    
+    return `Search Topic: ${query}
+
+Instructions: ${promptTemplate}
+
+Source Materials:
+${combined_content}
+
+Please generate a comprehensive report based on the above sources. Include relevant details, comparisons, and insights from all provided sources.`;
+  }
+
+  private _prepare_chat_prompt({ message, urls, urlContents, documentContents, conversationHistory }: {
+    message: string;
+    urls: string[];
+    urlContents: string[];
+    documentContents: string[];
+    conversationHistory: Array<{role: string, content: string}>;
+  }): string {
+    const urlsWithNumbers = urls.map((url, index) => `[${index + 1}] ${url}`).join('\n');
+    
+    let sourceMaterials = '';
+    if (urls.length > 0) {
+      sourceMaterials += `Web Sources:\n${urlsWithNumbers}\n\n${urlContents.join('\n\n')}`;
+    }
+    
+    if (documentContents.length > 0) {
+      sourceMaterials += `\n\nDocument Contents:\n` + 
+        documentContents.map((content, i) => `Document ${i + 1}:\n${content.substring(0, 1000)}`).join('\n\n');
+    }
+    
+    if (sourceMaterials) {
+      return `${sourceMaterials}\n\nUser question: ${message}\n\nPlease provide a helpful response based on the sources above, citing them with [1], [2], etc.`;
+    } else {
+      return message;
+    }
+  }
+
+  private async _fetchDocumentContents(documentIds: number[]): Promise<string[]> {
+    try {
+      if (!Array.isArray(documentIds)) {
+        logger.warn('Invalid document IDs array provided');
+        return [];
+      }
+
+      const validDocumentIds = documentIds.filter(id => {
+        if (!Number.isInteger(id) || id < 1 || id > 999999) {
+          logger.warn(`Invalid document ID: ${id}`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validDocumentIds.length === 0) {
+        return [];
+      }
+
+      const { Database } = await import('./database');
+      const db = new Database();
+      const contents: string[] = [];
+      
+      for (const docId of validDocumentIds) {
+        try {
+          const documentData = await db.get_document_by_id(docId);
+          if (documentData && documentData.content) {
+            const limitedContent = documentData.content.substring(0, 10000);
+            contents.push(limitedContent);
+          } else {
+            logger.warn(`Document ${docId} not found or has no content`);
+          }
+        } catch (error) {
+          logger.error(`Error fetching document ${docId}:`, error as Error);
+        }
+      }
+      
+      return contents;
+    } catch (error) {
+      logger.error('Error in _fetchDocumentContents:', error as Error);
+      return [];
+    }
+  }
 } 

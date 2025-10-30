@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { GeminiProcessor } from '../../utils/ai_processor';
+import { GeminiProcessor, OpenRouterProcessor } from '../../utils/ai_processor';
 import { withSecurity } from '../../utils/middleware';
 import { SecurityValidator } from '../../utils/security';
 import { logger } from '../../utils/logging';
@@ -56,10 +56,23 @@ async function handler(
   try {
     let chunkCount = 0;
     
-    // Use user's API key if provided
-    const processorToUse = userApiKeys?.gemini 
-      ? new GeminiProcessor(userApiKeys.gemini)
-      : ai_processor;
+    // Determine which processor to use based on model and user keys
+    let processorToUse: GeminiProcessor | OpenRouterProcessor;
+    
+    if (model && model.includes('minimax')) {
+      // OpenRouter model
+      processorToUse = userApiKeys?.openrouter
+        ? new OpenRouterProcessor(userApiKeys.openrouter)
+        : new OpenRouterProcessor();
+    } else {
+      // Gemini or Groq model
+      processorToUse = userApiKeys?.gemini || userApiKeys?.groq
+        ? new GeminiProcessor(userApiKeys.gemini, userApiKeys.groq)
+        : ai_processor;
+    }
+    
+    // If using custom OpenRouter model, update the model variable
+    const modelToUse = userApiKeys?.openrouterModel || model;
     
     // Generate streaming chat response
     await processorToUse.generate_chat_response_stream(
@@ -67,7 +80,7 @@ async function handler(
       sources || [], 
       documentIds || [],
       conversationHistory,
-      model,
+      modelToUse,
       (chunk: string) => {
         chunkCount++;
         // Send each chunk as it's generated

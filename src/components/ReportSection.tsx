@@ -46,7 +46,11 @@ const ReportSection: FC<ReportSectionProps> = ({
     geminiApiKey,
     setGeminiApiKey,
     groqApiKey,
-    setGroqApiKey
+    setGroqApiKey,
+    openrouterApiKey,
+    setOpenrouterApiKey,
+    openrouterModel,
+    setOpenrouterModel
   } = useSession();
 
   // Chat specific states
@@ -157,7 +161,9 @@ const ReportSection: FC<ReportSectionProps> = ({
       // Prepare user API keys if using own keys
       const userKeys = useOwnKeys ? {
         gemini: geminiApiKey || undefined,
-        groq: groqApiKey || undefined
+        groq: groqApiKey || undefined,
+        openrouter: openrouterApiKey || undefined,
+        openrouterModel: openrouterModel || undefined
       } : undefined;
       
       const response = await generateReport(
@@ -256,7 +262,9 @@ const ReportSection: FC<ReportSectionProps> = ({
       // Prepare user API keys if using own keys
       const userKeys = useOwnKeys ? {
         gemini: geminiApiKey || undefined,
-        groq: groqApiKey || undefined
+        groq: groqApiKey || undefined,
+        openrouter: openrouterApiKey || undefined,
+        openrouterModel: openrouterModel || undefined
       } : undefined;
       
       await sendChatMessageStream(
@@ -785,6 +793,44 @@ const ReportSection: FC<ReportSectionProps> = ({
                         placeholder="gsk_..."
                         className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        OpenRouter API Key
+                        <a 
+                          href="https://openrouter.ai/keys" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="ml-1 text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          (Get key →)
+                        </a>
+                      </label>
+                      <input
+                        type="password"
+                        value={openrouterApiKey}
+                        onChange={(e) => setOpenrouterApiKey(e.target.value)}
+                        placeholder="sk-or-..."
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        OpenRouter Model Name
+                        <span className="ml-1 text-gray-500 dark:text-gray-400">(optional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={openrouterModel}
+                        onChange={(e) => setOpenrouterModel(e.target.value)}
+                        placeholder="e.g., minimax/minimax-m2:free"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Leave empty to use the default model. Specify a custom model if needed.
+                      </p>
                     </div>
                     
                     <p className="text-xs text-gray-600 dark:text-gray-400 flex items-start">

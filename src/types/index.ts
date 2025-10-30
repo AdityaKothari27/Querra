@@ -25,7 +25,7 @@ export interface SearchConfig {
 export interface AIModel {
   id: string;
   name: string;
-  provider: 'gemini' | 'groq';
+  provider: 'gemini' | 'groq' | 'openrouter';
   description: string;
 }
 

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ContentExtractor } from '../../utils/extractor';
-import { GeminiProcessor } from '../../utils/ai_processor';
+import { GeminiProcessor, OpenRouterProcessor } from '../../utils/ai_processor';
 import { Database } from '../../utils/database';
 import { SecurityValidator, RateLimiter } from '../../utils/security';
 import { logger, ErrorHandler, IntrusionDetector } from '../../utils/logging';
@@ -96,10 +96,23 @@ async function handler(
     let report: string;
     const sanitizedQuery = queryValidation.sanitized || query;
     
-    // Use user's API key if provided
-    const processorToUse = userApiKeys?.gemini || userApiKeys?.groq
-      ? new GeminiProcessor(userApiKeys.gemini, userApiKeys.groq)
-      : ai_processor;
+    // Determine which processor to use based on model and user keys
+    let processorToUse: GeminiProcessor | OpenRouterProcessor;
+    
+    if (model && model.includes('minimax')) {
+      // OpenRouter model
+      processorToUse = userApiKeys?.openrouter
+        ? new OpenRouterProcessor(userApiKeys.openrouter)
+        : new OpenRouterProcessor();
+    } else {
+      // Gemini or Groq model
+      processorToUse = userApiKeys?.gemini || userApiKeys?.groq
+        ? new GeminiProcessor(userApiKeys.gemini, userApiKeys.groq)
+        : ai_processor;
+    }
+    
+    // If using custom OpenRouter model, update the model variable
+    const modelToUse = userApiKeys?.openrouterModel || model;
     
     if (generationMode === 'fast') {
       // Fast mode: Use URL context without content extraction
@@ -121,10 +134,18 @@ async function handler(
         );
         
         const allContents = [...webContents, ...documentContents];
-        report = await processorToUse.generate_report(sanitizedQuery, allContents, promptTemplate, model);
+        report = await processorToUse.generate_report(sanitizedQuery, allContents, promptTemplate, modelToUse);
       } else {
         // Pure fast mode with only URLs
-        report = await processorToUse.generate_report_fast(sanitizedQuery, sources, promptTemplate, model);
+        // Note: OpenRouter doesn't have generate_report_fast, so fall back to traditional for OpenRouter models
+        if (processorToUse instanceof OpenRouterProcessor) {
+          const webContents = await Promise.all(
+            sources.map((url: string) => extractor.extract(url))
+          );
+          report = await processorToUse.generate_report(sanitizedQuery, webContents, promptTemplate, modelToUse);
+        } else {
+          report = await (processorToUse as GeminiProcessor).generate_report_fast(sanitizedQuery, sources, promptTemplate, modelToUse);
+        }
         
         // Add mode indicator to the report
         const currentDate = new Date().toLocaleDateString('en-US', { 
@@ -151,7 +172,7 @@ async function handler(
       
       // Combine all contents
       const allContents = [...webContents, ...documentContents];
-      report = await processorToUse.generate_report(sanitizedQuery, allContents, promptTemplate, model);
+      report = await processorToUse.generate_report(sanitizedQuery, allContents, promptTemplate, modelToUse);
       
       // Add mode indicator to the report
       const currentDate = new Date().toLocaleDateString('en-US', { 

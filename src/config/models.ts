@@ -18,6 +18,12 @@ export const AI_MODELS: AIModel[] = [
     name: 'Kimi K2 Instruct',
     provider: 'groq',
     description: 'Fast inference model via Groq API'
+  },
+  {
+    id: 'minimax/minimax-m2:free',
+    name: 'Minimax M2 (Free)',
+    provider: 'openrouter',
+    description: 'Fast model via OpenRouter - free tier'
   }
 ];
 
@@ -27,15 +33,19 @@ export const getModelsByMode = (mode: 'traditional' | 'fast' | 'chat', hasUrls: 
       // For chat with URLs, support all models
       return AI_MODELS;
     } else {
-      // For chat without URLs, support Gemini 2.5 Pro and Kimi
+      // For chat without URLs, support Gemini 2.5 Pro, Kimi, and Minimax
       return AI_MODELS.filter(model => 
-        model.id === 'gemini-2.5-pro' || model.id === 'moonshotai/kimi-k2-instruct'
+        model.id === 'gemini-2.5-pro' || 
+        model.id === 'moonshotai/kimi-k2-instruct' ||
+        model.id === 'minimax/minimax-m2:free'
       );
     }
   } else if (mode === 'traditional') {
-    // For traditional mode (Quick Analysis), support Gemini default and Kimi
+    // For traditional mode (Quick Analysis), support Gemini default, Kimi, and Minimax
     return AI_MODELS.filter(model => 
-      model.id === 'gemini-2.5-flash' || model.id === 'moonshotai/kimi-k2-instruct'
+      model.id === 'gemini-2.5-flash' || 
+      model.id === 'moonshotai/kimi-k2-instruct' ||
+      model.id === 'minimax/minimax-m2:free'
     );
   } else {
     // For fast mode (Deep Analysis), use default Gemini with URL context

@@ -13,13 +13,13 @@ const mockSearchResults: Record<string, SearchResult[]> = {
 export const searchWeb = async (
   query: string,
   config: SearchConfig,
-  userApiKeys?: { gemini?: string; groq?: string }
+  userApiKeys?: { gemini?: string; groq?: string; openrouter?: string; openrouterModel?: string }
 ): Promise<SearchResult[]> => {
   try {
     const headers: Record<string, string> = {};
     
     // Add header to indicate user is using own keys (for rate limit bypass)
-    if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq)) {
+    if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq || userApiKeys.openrouter)) {
       headers['x-user-api-keys'] = 'true';
     }
     
@@ -57,12 +57,12 @@ export const generateReport = async (
   promptTemplate: string,
   generationMode: 'traditional' | 'fast' | 'chat' = 'traditional',
   model: string = 'gemini-2.5-flash',
-  userApiKeys?: { gemini?: string; groq?: string }
+  userApiKeys?: { gemini?: string; groq?: string; openrouter?: string; openrouterModel?: string }
 ) => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   
   // Add header to indicate user is using own keys (for rate limit bypass)
-  if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq)) {
+  if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq || userApiKeys.openrouter)) {
     headers['x-user-api-keys'] = 'true';
   }
   
@@ -113,13 +113,13 @@ export const sendChatMessageStream = async (
   onChunk: (chunk: string) => void,
   onComplete: () => void,
   onError: (error: string) => void,
-  userApiKeys?: { gemini?: string; groq?: string }
+  userApiKeys?: { gemini?: string; groq?: string; openrouter?: string; openrouterModel?: string }
 ) => {
   try {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     
     // Add header to indicate user is using own keys (for rate limit bypass)
-    if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq)) {
+    if (userApiKeys && (userApiKeys.gemini || userApiKeys.groq || userApiKeys.openrouter)) {
       headers['x-user-api-keys'] = 'true';
     }
     

@@ -28,6 +28,10 @@ interface SessionContextType {
   setGeminiApiKey: (key: string) => void;
   groqApiKey: string;
   setGroqApiKey: (key: string) => void;
+  openrouterApiKey: string;
+  setOpenrouterApiKey: (key: string) => void;
+  openrouterModel: string;
+  setOpenrouterModel: (model: string) => void;
   clearSession: () => void;
 }
 
@@ -57,6 +61,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [useOwnKeys, setUseOwnKeys] = useState(false);
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [groqApiKey, setGroqApiKey] = useState('');
+  const [openrouterApiKey, setOpenrouterApiKey] = useState('');
+  const [openrouterModel, setOpenrouterModel] = useState('');
 
   const clearSession = () => {
     // Set all state to initial values
@@ -123,10 +129,12 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     const apiKeysData = localStorage.getItem('querraApiKeys');
     if (apiKeysData) {
       try {
-        const { useOwnKeys, geminiApiKey, groqApiKey } = JSON.parse(apiKeysData);
+        const { useOwnKeys, geminiApiKey, groqApiKey, openrouterApiKey, openrouterModel } = JSON.parse(apiKeysData);
         setUseOwnKeys(useOwnKeys || false);
         setGeminiApiKey(geminiApiKey || '');
         setGroqApiKey(groqApiKey || '');
+        setOpenrouterApiKey(openrouterApiKey || '');
+        setOpenrouterModel(openrouterModel || '');
       } catch (error) {
         console.error('Error loading API keys:', error);
       }
@@ -166,9 +174,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       useOwnKeys,
       geminiApiKey,
       groqApiKey,
+      openrouterApiKey,
+      openrouterModel,
     };
     localStorage.setItem('querraApiKeys', JSON.stringify(apiKeysData));
-  }, [useOwnKeys, geminiApiKey, groqApiKey]);
+  }, [useOwnKeys, geminiApiKey, groqApiKey, openrouterApiKey, openrouterModel]);
 
   return (
     <SessionContext.Provider
@@ -199,6 +209,10 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setGeminiApiKey,
         groqApiKey,
         setGroqApiKey,
+        openrouterApiKey,
+        setOpenrouterApiKey,
+        openrouterModel,
+        setOpenrouterModel,
         clearSession,
       }}
     >
