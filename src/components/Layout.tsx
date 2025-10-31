@@ -162,7 +162,8 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
           <div className="text-right">
-            Powered by Gemini
+            <a href="https://www.producthunt.com/products/querra" target="_blank">Product Hunt</a>
+            
           </div>
         </div>
       </footer>
