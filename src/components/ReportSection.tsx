@@ -57,6 +57,7 @@ const ReportSection: FC<ReportSectionProps> = ({
   const [chatInput, setChatInput] = useState('');
   const [isChatting, setIsChatting] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isSourcesExpanded, setIsSourcesExpanded] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const streamingContentRef = useRef<string>('');
 
@@ -891,20 +892,81 @@ const ReportSection: FC<ReportSectionProps> = ({
         <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-black">
           {/* Context Indicator */}
           {(selectedSources.length > 0 || selectedDocumentIds.length > 0) && (
-            <div className="border-b border-gray-200 dark:border-gray-700 p-3 bg-blue-50 dark:bg-blue-900/20">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                  🔗 Context Active:
-                </span>
-                <div className="flex items-center space-x-3 text-sm text-blue-700 dark:text-blue-300">
+            <div className="border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
+              <button
+                onClick={() => setIsSourcesExpanded(!isSourcesExpanded)}
+                className="w-full p-3 text-left hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      🔗 Context Active:
+                    </span>
+                    <div className="flex items-center space-x-3 text-sm text-blue-700 dark:text-blue-300">
+                      {selectedSources.length > 0 && (
+                        <span>📄 {selectedSources.length} web source{selectedSources.length !== 1 ? 's' : ''}</span>
+                      )}
+                      {selectedDocumentIds.length > 0 && (
+                        <span>📚 {selectedDocumentIds.length} document{selectedDocumentIds.length !== 1 ? 's' : ''}</span>
+                      )}
+                    </div>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 text-blue-700 dark:text-blue-300 transition-transform ${
+                      isSourcesExpanded ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+              
+              {isSourcesExpanded && (
+                <div className="px-3 pb-3 space-y-2 bg-white dark:bg-gray-900 border-t border-blue-200 dark:border-blue-800 pt-2">
                   {selectedSources.length > 0 && (
-                    <span>📄 {selectedSources.length} web source{selectedSources.length !== 1 ? 's' : ''}</span>
+                    <div>
+                      <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">Web Sources:</p>
+                      <div className="space-y-1">
+                        {selectedSources.map((source, index) => (
+                          <div key={index} className="flex items-start space-x-2 text-xs">
+                            <span className="font-mono font-semibold text-blue-700 dark:text-blue-300 min-w-[28px]">
+                              [{index + 1}]
+                            </span>
+                            <a
+                              href={source}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                            >
+                              {source}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                   {selectedDocumentIds.length > 0 && (
-                    <span>📚 {selectedDocumentIds.length} document{selectedDocumentIds.length !== 1 ? 's' : ''}</span>
+                    <div className={selectedSources.length > 0 ? 'mt-3' : ''}>
+                      <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">Documents:</p>
+                      <div className="space-y-1">
+                        {selectedDocumentIds.map((docId, index) => (
+                          <div key={docId} className="flex items-start space-x-2 text-xs">
+                            <span className="font-mono font-semibold text-blue-700 dark:text-blue-300 min-w-[28px]">
+                              [D{index + 1}]
+                            </span>
+                            <span className="text-blue-700 dark:text-blue-300">
+                              Document ID: {docId}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
+              )}
             </div>
           )}
           <div ref={chatContainerRef} className="h-96 overflow-y-auto p-4 space-y-4">
