@@ -895,7 +895,7 @@ const ReportSection: FC<ReportSectionProps> = ({
             <div className="border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
               <button
                 onClick={() => setIsSourcesExpanded(!isSourcesExpanded)}
-                className="w-full p-3 text-left hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                className="w-full p-3 text-left hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors bg-white dark:bg-gray-900"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -925,7 +925,7 @@ const ReportSection: FC<ReportSectionProps> = ({
               </button>
               
               {isSourcesExpanded && (
-                <div className="px-3 pb-3 space-y-2 bg-white dark:bg-gray-900 border-t border-blue-200 dark:border-blue-800 pt-2">
+                <div className="px-3 pb-3 space-y-2 bg-white dark:bg-black border-t border-blue-200 dark:border-blue-800 pt-2">
                   {selectedSources.length > 0 && (
                     <div>
                       <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">Web Sources:</p>
