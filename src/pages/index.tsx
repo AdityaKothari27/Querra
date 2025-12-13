@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Querra - AI-Powered Research Assistant</title>
+        <title>Querra</title>
         <meta name="description" content="Querra - AI-powered research assistant for comprehensive reports" />
       </Head>
 
