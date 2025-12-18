@@ -8,8 +8,8 @@ export const AI_MODELS: AIModel[] = [
     description: 'Fast and efficient model with URL context support'
   },
   {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro',
+    id: 'gemini-3-flash-preview',
+    name: 'Gemini 3 Flash Preview',
     provider: 'gemini',
     description: 'More advanced reasoning and analysis capabilities'
   },
@@ -33,9 +33,9 @@ export const getModelsByMode = (mode: 'traditional' | 'fast' | 'chat', hasUrls: 
       // For chat with URLs, support all models
       return AI_MODELS;
     } else {
-      // For chat without URLs, support Gemini 2.5 Pro, Kimi, and Minimax
+      // For chat without URLs, support Gemini 3 Flash Preview, Kimi, and Minimax
       return AI_MODELS.filter(model => 
-        model.id === 'gemini-2.5-pro' || 
+        model.id === 'gemini-3-flash-preview' || 
         model.id === 'moonshotai/kimi-k2-instruct' ||
         model.id === 'minimax/minimax-m2:free'
       );
@@ -55,7 +55,7 @@ export const getModelsByMode = (mode: 'traditional' | 'fast' | 'chat', hasUrls: 
 
 export const getDefaultModel = (mode: 'traditional' | 'fast' | 'chat', hasUrls: boolean = true): string => {
   if (mode === 'chat' && !hasUrls) {
-    return 'gemini-2.5-pro'; // Default for chat without URLs
+    return 'gemini-3-flash-preview'; // Default for chat without URLs
   }
   return 'gemini-2.5-flash'; // Default for all other cases
 };

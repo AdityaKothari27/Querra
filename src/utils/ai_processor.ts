@@ -47,8 +47,8 @@ export class GeminiProcessor {
         const prompt = this._prepare_prompt({ query, contents, promptTemplate });
         
         // Select appropriate Gemini model
-        const geminiModel = model === 'gemini-2.5-pro' ? 
-          this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" }) :
+        const geminiModel = model === 'gemini-3-flash-preview' ? 
+          this.genAI.getGenerativeModel({ model: "gemini-3-flash-preview" }) :
           this.model;
         
         const result = await geminiModel.generateContent({
@@ -104,7 +104,7 @@ export class GeminiProcessor {
         const prompt = this._prepare_fast_prompt({ query, urls, promptTemplate });
         
         // Select appropriate model
-        const geminiModel = model === 'gemini-2.5-pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+        const geminiModel = model === 'gemini-3-flash-preview' ? 'gemini-3-flash-preview' : 'gemini-2.5-flash';
         
         const response = await this.genAINew.models.generateContent({
           model: geminiModel,
@@ -153,8 +153,8 @@ export class GeminiProcessor {
       return this._generateGroqResponse(message, conversationHistory, model);
     }
     
-    // If using Gemini 2.5 Pro without URLs or documents, use traditional Gemini
-    if (urls.length === 0 && documentIds.length === 0 && model === 'gemini-2.5-pro') {
+    // If using Gemini 3 Flash Preview without URLs or documents, use traditional Gemini
+    if (urls.length === 0 && documentIds.length === 0 && model === 'gemini-3-flash-preview') {
       return this._generateGeminiTraditionalResponse(message, conversationHistory, model);
     }
     
@@ -184,7 +184,7 @@ export class GeminiProcessor {
           return this._generateGroqWithUrls(message, urls, documentContents, conversationHistory, model);
         } else {
           // Use Gemini with URL context and document content
-          const geminiModel = model === 'gemini-2.5-pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+          const geminiModel = model === 'gemini-3-flash-preview' ? 'gemini-3-flash-preview' : 'gemini-2.5-flash';
           const response = await this.genAINew.models.generateContent({
             model: geminiModel,
             contents: [prompt],
@@ -238,8 +238,8 @@ export class GeminiProcessor {
       return this._generateGroqResponseStream(message, conversationHistory, model, onChunk);
     }
     
-    // If using Gemini 2.5 Pro without URLs or documents, use traditional Gemini
-    if (urls.length === 0 && documentIds.length === 0 && model === 'gemini-2.5-pro') {
+    // If using Gemini 3 Flash Preview without URLs or documents, use traditional Gemini
+    if (urls.length === 0 && documentIds.length === 0 && model === 'gemini-3-flash-preview') {
       return this._generateGeminiTraditionalResponseStream(message, conversationHistory, model, onChunk);
     }
     
@@ -269,7 +269,7 @@ export class GeminiProcessor {
           return this._generateGroqWithUrlsStream(message, urls, documentContents, conversationHistory, model, onChunk);
         } else {
           // Use Gemini with streaming
-          const geminiModel = model === 'gemini-2.5-pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+          const geminiModel = model === 'gemini-3-flash-preview' ? 'gemini-3-flash-preview' : 'gemini-2.5-flash';
           
           // For Gemini streaming, we need to use the traditional API with generateContentStream
           const geminiModelInstance = this.genAI.getGenerativeModel({ model: geminiModel });
@@ -568,7 +568,7 @@ Current user message: ${message}
 Please respond in a conversational, helpful manner.`;
 
     try {
-      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
       const result = await geminiModel.generateContent({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
@@ -590,7 +590,7 @@ Please respond in a conversational, helpful manner.`;
       return text;
     } catch (error: any) {
       console.error('Gemini traditional response error:', error);
-      logger.error('Gemini 2.5 Pro traditional response failed', error, undefined, {
+      logger.error('Gemini 3 Flash Preview traditional response failed', error, undefined, {
         message: message.substring(0, 100),
         model,
         errorMessage: error.message
@@ -645,7 +645,7 @@ Current user message: ${message}
 Please respond in a conversational, helpful manner.`;
 
     try {
-      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+      const geminiModel = this.genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
       const result = await geminiModel.generateContentStream({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
@@ -666,7 +666,7 @@ Please respond in a conversational, helpful manner.`;
       }
     } catch (error: any) {
       console.error('Gemini traditional streaming response error:', error);
-      logger.error('Gemini 2.5 Pro traditional streaming response failed', error, undefined, {
+      logger.error('Gemini 3 Flash Preview traditional streaming response failed', error, undefined, {
         message: message.substring(0, 100),
         model,
         errorMessage: error.message

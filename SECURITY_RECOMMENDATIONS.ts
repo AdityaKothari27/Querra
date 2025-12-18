@@ -31,7 +31,7 @@ export const API_PROTECTION = {
 export const ADVANCED_RATE_LIMITING = {
   // Different limits based on operation cost
   AI_OPERATIONS: {
-    'gemini-2.5-pro': { limit: 10, window: 15 * 60 * 1000 }, // More expensive
+    'gemini-3-flash-preview': { limit: 10, window: 15 * 60 * 1000 }, // More expensive
     'gemini-2.5-flash': { limit: 30, window: 15 * 60 * 1000 }, // Cheaper
     'kimi': { limit: 25, window: 15 * 60 * 1000 }
   },

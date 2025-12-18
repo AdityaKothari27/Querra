@@ -43,7 +43,7 @@ private async _generateGeminiTraditionalResponse(message: string, ...): Promise<
     
     return text;
   } catch (error) {
-    // Automatic fallback to Gemini 2.5 Flash
+    // Automatic fallback to Gemini 2.5 Flash Lite
     try {
       const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       // ... fallback logic
@@ -206,14 +206,14 @@ Querra follows a modern Next.js full-stack architecture with enterprise-grade se
 const AI_MODELS = {
   'gemini-2.5-flash': {
     provider: 'google',
-    name: 'Gemini 2.5 Flash',
+    name: 'Gemini 2.5 Flash Lite',
     description: 'Fast, efficient model for general use',
     capabilities: ['chat', 'reports', 'url-context'],
     costLevel: 'low'
   },
-  'gemini-2.5-pro': {
+  'gemini-3-flash-preview': {
     provider: 'google', 
-    name: 'Gemini 2.5 Pro',
+    name: 'Gemini 3 Flash Preview',
     description: 'Advanced model for complex analysis',
     capabilities: ['chat', 'reports', 'url-context'],
     costLevel: 'high'
@@ -234,7 +234,7 @@ function selectOptimalModel(context: GenerationContext): string {
   }
   
   if (context.complexity === 'high') {
-    return 'gemini-2.5-pro'; // Use Pro for complex analysis
+    return 'gemini-3-flash-preview'; // Use Pro for complex analysis
   }
   
   return context.selectedModel || 'gemini-2.5-flash';
@@ -857,7 +857,7 @@ Generate comprehensive report with citations...
 ### 5. Triple AI Model Configuration
 ```typescript
 const fastModeConfig = {
-  model: "gemini-2.5-pro",
+  model: "gemini-3-flash-preview",
   config: {
     tools: [{ urlContext: {} }],      // URL context tool
     temperature: 0.7,
@@ -892,7 +892,7 @@ Both modes implement robust error handling:
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
   try {
     const response = await this.genAINew.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-3-flash-preview",
       contents: [prompt],
       config: { tools: [{ urlContext: {} }] }
     });
