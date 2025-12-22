@@ -37,6 +37,7 @@
     "react": "latest",
     "react-dom": "latest",
     "react-markdown": "^10.1.0",
+    "react-snowfall": "^2.4.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "sqlite": "^5.1.1",

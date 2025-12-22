@@ -6,6 +6,7 @@ import { BookOpenIcon, SunIcon, MoonIcon, TrashIcon } from '@heroicons/react/24/
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { useToast } from './Toast';
+import Snowfall from 'react-snowfall';
 
 interface LayoutProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ interface LayoutProps {
 const Layout: FC<LayoutProps> = ({ children }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [scrolled, setScrolled] = useState(false);
+  const [snowEnabled, setSnowEnabled] = useState(false);
 
   const { clearSession } = useSession();
   const { showToast } = useToast();
@@ -53,6 +55,22 @@ const Layout: FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-white transition-colors duration-300">
+    {/* Snowfall effect */}
+    {snowEnabled && (
+      <Snowfall 
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100vh',
+          zIndex: 9999,
+          pointerEvents: 'none'
+        }}
+        snowflakeCount={150}
+        speed={[0.5, 2]}
+        wind={[-0.5, 1]}
+        radius={[0.5, 2.5]}
+      />
+    )}
     <header
       className={`sticky top-0 z-10 transition-all duration-300 ${
         scrolled
@@ -80,6 +98,14 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           </div>
           </Link>
           <div className="flex items-center space-x-6">
+            <button 
+              onClick={() => setSnowEnabled(!snowEnabled)}
+              className={`p-2 rounded-full text-gray-800 dark:text-white transition-colors duration-300 shadow-sm border border-1 hover:border-gray-600 dark:hover:border-gray-600 ${snowEnabled ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-400 dark:border-blue-600' : ''}`}
+              aria-label="Toggle snowfall"
+              title={snowEnabled ? "Disable snowfall" : "Enable snowfall"}
+            >
+              <span className="text-lg">❄️</span>
+            </button>
             <button 
               onClick={toggleTheme}
               className="p-2 rounded-full  text-gray-800 dark:text-white transition-colors duration-300 shadow-sm border border-1 hover:border-gray-600 dark:hover:border-black"
