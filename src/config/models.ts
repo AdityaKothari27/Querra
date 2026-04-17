@@ -14,8 +14,8 @@ export const AI_MODELS: AIModel[] = [
     description: 'More advanced reasoning and analysis capabilities'
   },
   {
-    id: 'moonshotai/kimi-k2-instruct',
-    name: 'Kimi K2 Instruct',
+    id: 'openai/gpt-oss-120b',
+    name: 'GPT OSS 120B',
     provider: 'groq',
     description: 'Fast inference model via Groq API'
   },
@@ -33,18 +33,18 @@ export const getModelsByMode = (mode: 'traditional' | 'fast' | 'chat', hasUrls: 
       // For chat with URLs, support all models
       return AI_MODELS;
     } else {
-      // For chat without URLs, support Gemini 3 Flash Preview, Kimi, and Minimax
+      // For chat without URLs, support Gemini 3 Flash Preview, GPT, and Minimax
       return AI_MODELS.filter(model => 
         model.id === 'gemini-3-flash-preview' || 
-        model.id === 'moonshotai/kimi-k2-instruct' ||
+        model.id === 'openai/gpt-oss-120b' ||
         model.id === 'minimax/minimax-m2:free'
       );
     }
   } else if (mode === 'traditional') {
-    // For traditional mode (Quick Analysis), support Gemini default, Kimi, and Minimax
+    // For traditional mode (Quick Analysis), support Gemini default, GPT, and Minimax
     return AI_MODELS.filter(model => 
       model.id === 'gemini-2.5-flash' || 
-      model.id === 'moonshotai/kimi-k2-instruct' ||
+      model.id === 'openai/gpt-oss-120b' ||
       model.id === 'minimax/minimax-m2:free'
     );
   } else {

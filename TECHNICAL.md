@@ -175,7 +175,7 @@ Querra follows a modern Next.js full-stack architecture with enterprise-grade se
 - **Language**: TypeScript 5.7.3 for type safety
 - **Styling**: Tailwind CSS 4.0.6 with Heroicons
 - **Database**: SQLite3 with parameterized queries and in-memory fallback
-- **AI/ML**: Google Generative AI (Gemini 2.5 Flash/Pro) + Groq SDK (Kimi K2 Instruct)
+- **AI/ML**: Google Generative AI (Gemini 2.5 Flash/Pro) + Groq SDK
 - **Search**: Google Custom Search API with domain filtering
 - **Content Processing**: Cheerio for HTML parsing, PDF-parse for documents
 - **Security**: Custom middleware with comprehensive validation and monitoring
@@ -189,8 +189,8 @@ Querra follows a modern Next.js full-stack architecture with enterprise-grade se
 │                   AI Model Router                           │
 ├─────────────────────────────────────────────────────────────┤
 │ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │
-│ │   Gemini 2.5    │ │   Gemini 2.5    │ │   Kimi K2       │ │
-│ │     Flash       │ │      Pro        │ │   Instruct      │ │
+│ │   Gemini 2.5    │ │   Gemini 2.5    │ │   GPT OSS       │ │
+│ │     Flash       │ │      Pro        │ │     120B        │ │
 │ │                 │ │                 │ │                 │ │
 │ │ • Fast Response │ │ • Deep Analysis │ │ • Alternative   │ │
 │ │ • General Use   │ │ • Complex Tasks │ │   Perspective   │ │
@@ -218,9 +218,9 @@ const AI_MODELS = {
     capabilities: ['chat', 'reports', 'url-context'],
     costLevel: 'high'
   },
-  'moonshot-v1-8k': {
+  'openai/gpt-oss-120b': {
     provider: 'groq',
-    name: 'Kimi K2 Instruct',
+    name: 'GPT OSS 120B',
     description: 'Alternative model for diverse perspectives',
     capabilities: ['chat', 'reports'],
     costLevel: 'medium'
@@ -244,7 +244,7 @@ function selectOptimalModel(context: GenerationContext): string {
 ### Model-Specific Processing
 
 - **Gemini Models**: Support URL context processing for direct web content analysis
-- **Groq/Kimi Model**: Uses content extraction approach for web sources
+- **Groq**: Uses content extraction approach for web sources
 - **Fallback Logic**: Automatic fallback between models based on availability
 - **Error Handling**: Model-specific error handling and retry logic
 

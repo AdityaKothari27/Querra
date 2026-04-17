@@ -180,7 +180,7 @@ export class GeminiProcessor {
         });
         
         if (model.includes('moonshot')) {
-          // Use Groq for Kimi model (Note: Groq doesn't support URL context, so we'll need content extraction)
+          // Use Groq for GPT model (Note: Groq doesn't support URL context, so we'll need content extraction)
           return this._generateGroqWithUrls(message, urls, documentContents, conversationHistory, model);
         } else {
           // Use Gemini with URL context and document content
@@ -265,7 +265,7 @@ export class GeminiProcessor {
         });
         
         if (model.includes('moonshot')) {
-          // Use Groq for Kimi model with streaming
+          // Use Groq for GPT model with streaming
           return this._generateGroqWithUrlsStream(message, urls, documentContents, conversationHistory, model, onChunk);
         } else {
           // Use Gemini with streaming
@@ -493,7 +493,7 @@ Do not include any explanations, introductions, or analysis.
       ];
 
       const response = await this.groq.chat.completions.create({
-        model: "moonshotai/kimi-k2-instruct",
+        model: "openai/gpt-oss-120b",
         messages,
         temperature: 0.8,
         max_tokens: 16000,
@@ -529,7 +529,7 @@ Do not include any explanations, introductions, or analysis.
       ];
 
       const stream = await this.groq.chat.completions.create({
-        model: "moonshotai/kimi-k2-instruct",
+        model: "openai/gpt-oss-120b",
         messages,
         temperature: 0.8,
         max_tokens: 16000,
@@ -761,7 +761,7 @@ Please provide a helpful response based on the sources above, citing them with [
       ];
 
       const response = await this.groq.chat.completions.create({
-        model: "moonshotai/kimi-k2-instruct",
+        model: "openai/gpt-oss-120b",
         messages,
         temperature: 0.8,
         max_tokens: 16000,
@@ -830,7 +830,7 @@ Please provide a helpful response based on the sources above, citing them with [
       ];
 
       const stream = await this.groq.chat.completions.create({
-        model: "moonshotai/kimi-k2-instruct",
+        model: "openai/gpt-oss-120b",
         messages,
         temperature: 0.8,
         max_tokens: 16000,
@@ -873,7 +873,7 @@ ${combined_content}
 Please generate a comprehensive report based on the above sources. Include relevant details, comparisons, and insights from all provided sources.`;
 
       const response = await this.groq.chat.completions.create({
-        model: "moonshotai/kimi-k2-instruct",
+        model: "openai/gpt-oss-120b",
         messages: [
           {
             role: "system",

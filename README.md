@@ -1,6 +1,6 @@
 # Querra: AI-Powered Research Assistant
 
-Querra is an advanced, intelligent research assistant that revolutionizes how you gather, analyze, and synthesize information from the web and your personal documents. Powered by Google's Gemini AI and Groq's Kimi models, with enterprise-grade security features, Querra provides comprehensive research reports tailored to specific domains and use cases.
+Querra is an advanced, intelligent research assistant that revolutionizes how you gather, analyze, and synthesize information from the web and your personal documents. Powered by Google's Gemini AI and Groq's models, with enterprise-grade security features, Querra provides comprehensive research reports tailored to specific domains and use cases.
 
 ## 🆕 **Recent Improvements (v2.1)**
 
@@ -52,7 +52,7 @@ Querra is an advanced, intelligent research assistant that revolutionizes how yo
 - **Three AI Models Available**:
   - **Gemini 2.5 Flash**: Fast, efficient responses for general use
   - **Gemini 2.5 Pro**: Advanced reasoning for complex analysis (Enhanced with improved error handling and automatic fallback)
-  - **Kimi K2 Instruct**: Alternative model for diverse perspectives
+  - **GPT OSS 120B**: Alternative model for diverse perspectives
 - **Context-Aware Processing**: Intelligent content synthesis with source attribution
 - **Model Selection**: Dynamic model switching based on use case and user preference
 - **Robust Error Handling**: Automatic fallback between models for improved reliability
@@ -138,7 +138,7 @@ Before installing Querra, ensure you have:
 3. **Google API Key** with Custom Search API enabled
 4. **Google Custom Search Engine ID**
 5. **Google Gemini API Key**
-6. **Groq API Key** (optional, for Kimi model support)
+6. **Groq API Key** (optional, for GPT OSS 120B support)
 
 ## 🚀 Installation & Setup
 
@@ -189,7 +189,7 @@ NODE_ENV=development
 #### Groq API Key (Optional):
 1. Visit [Groq Console](https://console.groq.com/)
 2. Create an account and generate an API key
-3. Add the key to enable Kimi K2 Instruct model support
+3. Add the key to enable Gpt-oss-120b model support
 
 ### 5. Security Validation
 Run the security check to ensure your environment is properly configured:
